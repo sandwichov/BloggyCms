@@ -1,0 +1,504 @@
+<?php
+
+namespace posts\actions;
+
+/**
+ * Действие редактирования поста в административной панели
+ * Отображает форму редактирования существующего поста с его блоками, тегами и полями,
+ * обрабатывает сохранение изменений, поддерживает как обычные, так и AJAX-запросы
+ * 
+ * @package posts\actions
+ * @extends PostAction
+ */
+class Edit extends PostAction {
+    
+    /**
+     * Метод выполнения редактирования поста
+     * Проверяет ID, загружает данные поста, блоки, категории, теги,
+     * обрабатывает POST-запрос для сохранения или отображает форму
+     * 
+     * @return void
+     * @throws \Exception Если ID не указан
+     */
+    public function execute() {
+        // Получение ID поста из параметров
+        $id = $this->params['id'] ?? null;
+        if (!$id) {
+            throw new \Exception('ID поста не указан');
+        }
+
+        try {
+            // Загрузка данных поста
+            $post = $this->loadPost($id);
+            
+            // Загрузка всех необходимых данных для формы
+            $this->postBlockManager->loadAllPostBlockAssets();
+            $categories = $this->categoryModel->getAll();
+            $tags = $this->tagModel->getAll();
+            $postTags = $this->tagModel->getForPost($id);
+            
+            // Загрузка и подготовка блоков поста
+            $preparedBlocks = $this->loadPostBlocks($id);
+
+            // Обработка POST-запроса (сохранение изменений)
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks);
+                return;
+            }
+
+            // Отображение формы редактирования
+            $this->renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks);
+
+        } catch (\Exception $e) {
+            $this->handleError($e, $post ?? null, $categories ?? [], $tags ?? [], $postTags ?? [], $preparedBlocks ?? []);
+        }
+    }
+
+    /**
+     * Загружает пост по ID и проверяет его существование
+     * 
+     * @param int $id ID поста
+     * @return array Данные поста
+     * @throws \Exception Если пост не найден
+     */
+    private function loadPost($id) {
+        $post = $this->postModel->getById($id);
+        if (!$post) {
+            throw new \Exception('Пост не найден');
+        }
+        return $post;
+    }
+
+    /**
+     * Загружает и подготавливает блоки поста для отображения в форме
+     * 
+     * @param int $postId ID поста
+     * @return array Массив подготовленных блоков
+     */
+    private function loadPostBlocks($postId) {
+        $blocks = $this->postBlockModel->getByPost($postId);
+        $preparedBlocks = [];
+        
+        foreach ($blocks as $block) {
+            $preparedBlocks[] = $this->prepareBlockData($block);
+        }
+        
+        return $preparedBlocks;
+    }
+
+    /**
+     * Подготавливает данные одного блока для отображения в форме
+     * 
+     * @param array $block Данные блока из БД
+     * @return array Подготовленные данные блока
+     */
+    private function prepareBlockData($block) {
+        $content = $block['content'];
+        $settings = $block['settings'];
+        
+        if (is_string($content)) {
+            $decoded = json_decode($content, true);
+            $content = (json_last_error() === JSON_ERROR_NONE) ? $decoded : $content;
+        }
+        
+        if (is_string($settings)) {
+            $decodedSettings = json_decode($settings, true);
+            $settings = (json_last_error() === JSON_ERROR_NONE) ? $decodedSettings : [];
+        }
+        
+        return [
+            'id' => 'block_' . $block['id'],
+            'type' => $block['type'],
+            'content' => $content,
+            'settings' => $settings,
+            'order' => (int)($block['order'] ?? 0)
+        ];
+    }
+
+    /**
+     * Обрабатывает POST-запрос на сохранение изменений поста
+     * 
+     * @param int $id ID поста
+     * @param array $post Исходные данные поста
+     * @param array $categories Список категорий
+     * @param array $tags Список всех тегов
+     * @param array $postTags Текущие теги поста
+     * @param array $preparedBlocks Подготовленные блоки
+     * @return void
+     */
+    private function handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks) {
+        // Валидация обязательных полей
+        $this->validateRequiredFields();
+        
+        // Подготовка данных для обновления
+        $data = $this->preparePostData($id, $post);
+        
+        // Обновление основного поста
+        $this->postModel->update($id, $data);
+        
+        // Обновление блоков
+        $this->updatePostBlocks($id);
+        
+        // Обновление тегов
+        $this->updatePostTags($id);
+        
+        // Обновление пользовательских полей
+        $this->updateCustomFields($id);
+        
+        // Обработка успешного сохранения
+        $this->handleUpdateSuccess();
+    }
+
+    /**
+     * Валидирует обязательные поля формы
+     * 
+     * @throws \Exception При ошибках валидации
+     * @return void
+     */
+    private function validateRequiredFields() {
+        if (empty($_POST['title'])) {
+            throw new \Exception('Заголовок обязателен');
+        }
+        if (empty($_POST['category_id'])) {
+            throw new \Exception('Категория обязательна');
+        }
+
+        // ВАЛИДАЦИЯ МАКСИМАЛЬНОГО КОЛИЧЕСТВА ТЕГОВ
+        if (!empty($_POST['tags_json'])) {
+            $tagsData = json_decode($_POST['tags_json'], true);
+            
+            if (is_array($tagsData) && !empty($tagsData)) {
+                $maxTags = \SettingsHelper::get('controller_tags', 'max_tags_per_post', 10);
+                
+                if (count($tagsData) > $maxTags) {
+                    throw new \Exception("Максимальное количество тегов: {$maxTags}. Вы выбрали: " . count($tagsData));
+                }
+            }
+        }
+
+        // Валидация даты публикации
+        if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
+            $publishDate = $_POST['publish_date'];
+            $selectedDate = new \DateTime($publishDate);
+            $currentDate = new \DateTime();
+            
+            if ($selectedDate > $currentDate) {
+                throw new \Exception('Дата публикации не может быть в будущем');
+            }
+        }
+    }
+
+    /**
+     * Подготавливает данные поста для обновления
+     * 
+     * @param int $id ID поста
+     * @param array $post Текущие данные поста
+     * @return array Подготовленные данные
+     */
+    private function preparePostData($id, $post) {
+        $data = [
+            'title' => trim($_POST['title']),
+            'short_description' => $_POST['short_description'] ?? null,
+            'slug' => $this->postModel->createSlug($_POST['title'], $id),
+            'category_id' => (int)$_POST['category_id'],
+            'status' => $_POST['status'] ?? 'draft',
+            'meta_description' => $_POST['meta_description'] ?? null,
+            'seo_title' => $_POST['seo_title'] ?? null,
+            'password_protected' => isset($_POST['password_protected']) ? 1 : 0,
+            'password' => $_POST['password'] ?? null,
+            'show_to_groups' => !empty($_POST['show_to_groups']) ? json_encode($_POST['show_to_groups']) : null,
+            'hide_from_groups' => !empty($_POST['hide_from_groups']) ? json_encode($_POST['hide_from_groups']) : null
+        ];
+
+        // Обработка даты публикации
+        if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
+            $data['created_at'] = $_POST['publish_date'];
+        }
+
+        // Обработка главного изображения
+        $data['featured_image'] = $this->processFeaturedImage($post);
+
+        return $data;
+    }
+
+    /**
+     * Обрабатывает загрузку/обновление главного изображения
+     * 
+     * @param array $post Текущие данные поста
+     * @return string|null Путь к изображению или null
+     */
+    private function processFeaturedImage($post) {
+        // Если передано уже загруженное изображение
+        if (!empty($_POST['uploaded_image_path'])) {
+            $this->deleteOldImage($post['featured_image']);
+            return $_POST['uploaded_image_path'];
+        }
+        
+        // Если загружается новое изображение
+        if (!empty($_FILES['featured_image']['tmp_name'])) {
+            return $this->uploadNewImage($post['featured_image']);
+        }
+        
+        // Если запрошено удаление изображения
+        if (isset($_POST['remove_featured_image']) && $_POST['remove_featured_image'] == '1') {
+            $this->deleteOldImage($post['featured_image']);
+            return null;
+        }
+        
+        // Оставляем текущее изображение
+        return $post['featured_image'] ?? null;
+    }
+
+    /**
+     * Загружает новое изображение на сервер
+     * 
+     * @param string|null $oldImage Имя старого изображения для удаления
+     * @return string|null Имя загруженного файла или null
+     */
+    private function uploadNewImage($oldImage) {
+        $uploadDir = UPLOADS_PATH . '/images/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $fileName = uniqid() . '_' . basename($_FILES['featured_image']['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetPath)) {
+            $this->deleteOldImage($oldImage);
+            return $fileName;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Удаляет старое изображение с сервера
+     * 
+     * @param string|null $imageName Имя файла для удаления
+     * @return void
+     */
+    private function deleteOldImage($imageName) {
+        if (!empty($imageName)) {
+            $oldImagePath = UPLOADS_PATH . '/images/' . $imageName;
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+    }
+
+    /**
+     * Обновляет блоки поста
+     * 
+     * @param int $postId ID поста
+     * @return void
+     */
+    private function updatePostBlocks($postId) {
+        if (!empty($_POST['post_blocks'])) {
+            $blocksData = json_decode($_POST['post_blocks'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($blocksData)) {
+                $this->processPostBlocks($postId, $blocksData);
+            }
+        }
+    }
+
+    /**
+     * Обновляет теги поста
+     * 
+     * @param int $postId ID поста
+     * @return void
+     */
+    private function updatePostTags($postId) {
+        // Удаляем существующие связи с тегами
+        $this->db->query("DELETE FROM post_tags WHERE post_id = ?", [$postId]);
+        
+        // Добавляем новые теги
+        if (!empty($_POST['tags_json'])) {
+            $tagsData = json_decode($_POST['tags_json'], true);
+            
+            if (is_array($tagsData) && !empty($tagsData)) {
+                foreach ($tagsData as $tag) {
+                    $tagId = is_array($tag) ? ($tag['id'] ?? $tag) : $tag;
+                    
+                    if (!empty($tagId)) {
+                        $this->db->query(
+                            "INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)",
+                            [$postId, (int)$tagId]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Обновляет пользовательские поля поста
+     * 
+     * @param int $postId ID поста
+     * @throws \Exception При ошибках валидации
+     * @return void
+     */
+    private function updateCustomFields($postId) {
+        $fieldModel = new \FieldModel($this->db);
+        $fieldManager = new \FieldManager($this->db);
+        $customFields = $fieldModel->getActiveByEntityType('post');
+
+        // Получение текущих значений полей
+        $currentValues = $this->getCurrentFieldValues($customFields, $postId, $fieldModel);
+
+        // Валидация полей
+        $validationErrors = $this->validateCustomFields($customFields, $currentValues, $fieldManager);
+        if (!empty($validationErrors)) {
+            throw new \Exception(implode('<br>', $validationErrors));
+        }
+
+        // Сохранение полей
+        foreach ($customFields as $field) {
+            $this->saveCustomField($field, $postId, $currentValues, $fieldModel, $fieldManager);
+        }
+    }
+
+    /**
+     * Получает текущие значения пользовательских полей
+     * 
+     * @param array $customFields Массив полей
+     * @param int $postId ID поста
+     * @param \FieldModel $fieldModel Модель полей
+     * @return array Массив текущих значений
+     */
+    private function getCurrentFieldValues($customFields, $postId, $fieldModel) {
+        $currentValues = [];
+        foreach ($customFields as $field) {
+            $currentValues[$field['system_name']] = $fieldModel->getFieldValue('post', $postId, $field['system_name']);
+        }
+        return $currentValues;
+    }
+
+    /**
+     * Валидирует пользовательские поля
+     * 
+     * @param array $customFields Массив полей
+     * @param array $currentValues Текущие значения
+     * @param \FieldManager $fieldManager Менеджер полей
+     * @return array Массив ошибок валидации
+     */
+    private function validateCustomFields($customFields, $currentValues, $fieldManager) {
+        $errors = [];
+        
+        foreach ($customFields as $field) {
+            $currentValue = $currentValues[$field['system_name']] ?? null;
+            $validationResult = $fieldManager->validateFieldValue($field, $currentValue, $_POST, $_FILES);
+            
+            if (!$validationResult['is_valid']) {
+                $errors[] = $validationResult['message'];
+            }
+        }
+        
+        return $errors;
+    }
+
+    /**
+     * Сохраняет одно пользовательское поле
+     * 
+     * @param array $field Данные поля
+     * @param int $postId ID поста
+     * @param array $currentValues Текущие значения
+     * @param \FieldModel $fieldModel Модель полей
+     * @param \FieldManager $fieldManager Менеджер полей
+     * @return void
+     */
+    private function saveCustomField($field, $postId, $currentValues, $fieldModel, $fieldManager) {
+        try {
+            $value = $fieldManager->processFieldValue($field, $_POST, $_FILES, $currentValues);
+            
+            if ($value !== null) {
+                $config = is_array($field['config']) ? $field['config'] : json_decode($field['config'] ?? '{}', true);
+                $fieldModel->saveFieldValue(
+                    $field['id'], 
+                    'post', 
+                    $postId, 
+                    $value,
+                    $field['type'],
+                    $config
+                );
+            }
+        } catch (\Exception $e) {
+            \Notification::error("Ошибка обработки поля {$field['name']}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Обрабатывает успешное обновление поста
+     * 
+     * @return void
+     */
+    private function handleUpdateSuccess() {
+        if ($this->isAjaxRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Пост успешно обновлен',
+                'redirect' => ADMIN_URL . '/posts'
+            ]);
+            exit;
+        }
+
+        \Notification::success('Пост успешно обновлен');
+        $this->redirect(ADMIN_URL . '/posts');
+    }
+
+    /**
+     * Отображает форму редактирования поста
+     * 
+     * @param array $post Данные поста
+     * @param array $categories Список категорий
+     * @param array $tags Список всех тегов
+     * @param array $postTags Текущие теги поста
+     * @param array $preparedBlocks Подготовленные блоки
+     * @return void
+     */
+    private function renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks) {
+        $this->render('admin/posts/edit', [
+            'post' => $post,
+            'categories' => $categories,
+            'tags' => $tags,
+            'postTags' => $postTags,
+            'preparedBlocks' => $preparedBlocks,
+            'postBlockManager' => $this->postBlockManager,
+            'pageTitle' => 'Редактирование поста'
+        ]);
+    }
+
+    /**
+     * Обрабатывает ошибку при редактировании поста
+     * 
+     * @param \Exception $e Исключение
+     * @param array|null $post Данные поста
+     * @param array $categories Список категорий
+     * @param array $tags Список тегов
+     * @param array $postTags Текущие теги поста
+     * @param array $preparedBlocks Подготовленные блоки
+     * @return void
+     */
+    private function handleError($e, $post, $categories, $tags, $postTags, $preparedBlocks) {
+        if ($this->isAjaxRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false, 
+                'message' => $e->getMessage()
+            ]);
+            exit;
+        }
+
+        \Notification::error($e->getMessage());
+        
+        $this->render('admin/posts/edit', [
+            'post' => array_merge($post ?? [], $_POST),
+            'categories' => $categories,
+            'tags' => $tags,
+            'postTags' => $postTags,
+            'preparedBlocks' => $preparedBlocks,
+            'postBlockManager' => $this->postBlockManager
+        ]);
+    }
+}
