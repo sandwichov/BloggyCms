@@ -1,0 +1,56 @@
+.icon-preview-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+.icon-preview-small svg {
+    max-width: 24px;
+    max-height: 24px;
+}
+
+.icon-select-btn {
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.icon-select-btn:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.icon-select-btn:active {
+    background-color: #e9ecef;
+}
+
+.icon-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+}
+
+.footer-column-item,
+.social-link-item {
+    border-left: 4px solid #0d6efd;
+}
+
+.remove-column:disabled,
+.remove-social-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#iconModal .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.icon-select-btn small {
+    font-size: 0.7em;
+    line-height: 1.2;
+}

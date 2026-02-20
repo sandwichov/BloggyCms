@@ -1,0 +1,17 @@
+.image-carousel-slide-item {
+    transition: all 0.3s ease;
+}
+
+.image-carousel-slide-item:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.remove-image-slide:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#image-carousel-slides-list {
+    max-height: 600px;
+    overflow-y: auto;
+}

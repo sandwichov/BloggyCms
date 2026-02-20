@@ -1,0 +1,236 @@
+.nav-tabs-custom {
+    border-bottom: 2px solid #f0f0f0;
+}
+.nav-tabs-custom .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 1rem 1.5rem;
+    position: relative;
+}
+.nav-tabs-custom .nav-link:hover {
+    color: #000;
+}
+.nav-tabs-custom .nav-link.active {
+    color: #0d6efd;
+    background: none;
+}
+.nav-tabs-custom .nav-link.active:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #0d6efd;
+}
+
+.components-sidebar {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.components-sidebar-title {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.components-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.component-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.component-item:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+    text-decoration: none;
+    color: inherit;
+}
+
+.component-item.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.component-item.active .component-name {
+    color: white;
+}
+
+.component-item.active .component-author {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.component-item.active .component-description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.component-content {
+    flex: 1;
+}
+
+.component-name {
+    font-weight: 500;
+    color: #212529;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.component-meta {
+    margin-bottom: 0.25rem;
+}
+
+.component-author {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.component-description {
+    color: #6c757d;
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.components-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #6c757d;
+}
+
+.components-empty i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.components-empty p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.component-header {
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.component-title-section {
+    margin-bottom: 1rem;
+}
+
+.component-title {
+    margin: 0 0 0.5rem 0;
+    color: #212529;
+    font-weight: 500;
+    font-size: 1.25rem;
+}
+
+.component-meta-large {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.component-meta-large .component-author {
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.component-meta-large .component-version {
+    color: #28a745;
+    background: #f8fff9;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.component-description-panel {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
+    font-size: 0.9rem;
+    color: #495057;
+    line-height: 1.4;
+}
+
+.component-settings-form {
+    background: white;
+    margin-bottom: 1.5rem;
+}
+
+.component-footer {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: right;
+    border: 1px solid #e9ecef;
+}
+
+.component-footer .btn {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+.component-not-found,
+.component-welcome {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.component-not-found i,
+.component-welcome i {
+    font-size: 18px;
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.component-not-found h5,
+.component-welcome h5 {
+    color: #212529;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.component-not-found p,
+.component-welcome p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .components-sidebar {
+        margin-bottom: 1rem;
+    }
+    
+    .component-meta-large {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

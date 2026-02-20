@@ -1,0 +1,32 @@
+.image-select-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.image-select-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.image-preview {
+    background-color: #f8f9fa;
+}
+
+.image-preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+.browse-image-btn {
+    border-left: 1px solid #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .image-select-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .image-select-card .card-title {
+        font-size: 0.9rem;
+    }
+}

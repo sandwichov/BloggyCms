@@ -1,0 +1,37 @@
+.features-block .feature-item {
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.features-block .feature-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.features-block .feature-item .card-body {
+    padding: 1.25rem;
+}
+
+.features-block .remove-feature {
+    transition: all 0.3s ease;
+}
+
+.features-block .remove-feature:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.features-block .remove-feature:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+@keyframes featureHighlight {
+    0% { background-color: rgba(40, 167, 69, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.features-block .feature-item.highlight {
+    animation: featureHighlight 1.5s ease;
+}

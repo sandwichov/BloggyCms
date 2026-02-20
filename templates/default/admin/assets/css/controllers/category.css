@@ -1,0 +1,94 @@
+.sortable-item {
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #e9ecef;
+    border: 2px dashed #6c757d;
+}
+
+.sortable-chosen {
+    background-color: #f8f9fa;
+    transform: rotate(2deg);
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+    transform: rotate(5deg);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: 5px;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.drag-handle:hover {
+    color: #6c757d !important;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.cursor-move {
+    cursor: move;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.img-thumbnail {
+    transition: transform 0.2s ease;
+}
+
+.img-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.04);
+}
+
+.search-input {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+.search-input:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group-text {
+    border-right: 0 !important;
+}
+
+.clear-search {
+    border-left: 0;
+    transition: all 0.2s ease;
+}
+
+.clear-search:hover {
+    background-color: #f8f9fa;
+    color: #dc3545;
+}
+
+.search-input {
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

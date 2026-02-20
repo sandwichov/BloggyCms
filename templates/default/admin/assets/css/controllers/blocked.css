@@ -1,0 +1,46 @@
+body {
+    background-color: #000;
+    color: #ff0000;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.blocked-container {
+    text-align: center;
+    padding: 40px;
+    border: 2px solid #ff0000;
+    border-radius: 10px;
+    background-color: #1a1a1a;
+    max-width: 500px;
+    width: 90%;
+}
+.blocked-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+.blocked-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #ff0000;
+}
+.blocked-message {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #ff6b6b;
+}
+.blocked-time {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff0000;
+    margin: 20px 0;
+}
+.attempts-info {
+    font-size: 14px;
+    color: #ccc;
+    margin-top: 20px;
+}

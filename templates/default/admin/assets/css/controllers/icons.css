@@ -1,0 +1,25 @@
+.nav-tabs-custom {
+    border-bottom: 2px solid #f0f0f0;
+}
+.nav-tabs-custom .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 1rem 1.5rem;
+    position: relative;
+}
+.nav-tabs-custom .nav-link:hover {
+    color: #000;
+}
+.nav-tabs-custom .nav-link.active {
+    color: #0d6efd;
+    background: none;
+}
+.nav-tabs-custom .nav-link.active:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #0d6efd;
+}
