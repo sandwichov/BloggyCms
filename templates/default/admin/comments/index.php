@@ -1,7 +1,7 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-chat-dots me-2"></i>
+            <?php echo bloggy_icon('bs', 'chat-dots', '24', '#000', 'me-2'); ?>
             Управление комментариями
         </h4>
     </div>
@@ -22,20 +22,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($comments as $comment): ?>
+                        <?php foreach ($comments as $comment) { ?>
                             <tr>
-                                <td class="text-muted">#<?= $comment['id'] ?></td>
+                                <td class="text-muted">#<?php echo $comment['id']; ?></td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 200px;">
-                                        <?= html($comment['post_title']) ?>
+                                        <?php echo html($comment['post_title']); ?>
                                     </div>
                                 </td>
                                 <td>
-                                    <?= html($comment['author_username'] ?? $comment['author_name']) ?>
+                                    <?php echo html($comment['author_username'] ?? $comment['author_name']); ?>
                                 </td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 300px;">
-                                        <?= nl2br(html($comment['content'])) ?>
+                                        <?php echo nl2br(html($comment['content'])); ?>
                                     </div>
                                 </td>
                                 <td>
@@ -46,54 +46,54 @@
                                         'spam' => 'danger'
                                     ][$comment['status']] ?? 'secondary';
                                     ?>
-                                    <span class="badge bg-<?= $statusClass ?>">
-                                        <?= $comment['status'] ?>
+                                    <span class="badge bg-<?php echo $statusClass; ?>">
+                                        <?php echo $comment['status']; ?>
                                     </span>
                                 </td>
                                 <td>
                                     <small class="text-muted">
-                                        <?= date('d.m.Y H:i', strtotime($comment['created_at'])) ?>
+                                        <?php echo date('d.m.Y H:i', strtotime($comment['created_at'])); ?>
                                     </small>
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="<?= ADMIN_URL ?>/comments/edit/<?= $comment['id'] ?>" 
+                                        <a href="<?php echo ADMIN_URL; ?>/comments/edit/<?php echo $comment['id']; ?>" 
                                            class="btn btn-sm btn-outline-primary"
                                            title="Редактировать">
-                                            <i class="bi bi-pencil"></i>
+                                            <?php echo bloggy_icon('bs', 'pencil', '16', '#000'); ?>
                                         </a>
-                                        <?php if ($comment['status'] === 'pending'): ?>
-                                            <a href="<?= ADMIN_URL ?>/comments/approve/<?= $comment['id'] ?>" 
+                                        <?php if ($comment['status'] === 'pending') { ?>
+                                            <a href="<?php echo ADMIN_URL; ?>/comments/approve/<?php echo $comment['id']; ?>" 
                                                class="btn btn-sm btn-outline-success"
                                                title="Одобрить">
-                                                <i class="bi bi-check-lg"></i>
+                                                <?php echo bloggy_icon('bs', 'check-lg', '16', '#000'); ?>
                                             </a>
-                                        <?php endif; ?>
-                                        <a href="<?= ADMIN_URL ?>/comments/delete/<?= $comment['id'] ?>" 
+                                        <?php } ?>
+                                        <a href="<?php echo ADMIN_URL; ?>/comments/delete/<?php echo $comment['id']; ?>" 
                                            class="btn btn-sm btn-outline-danger"
                                            onclick="return confirm('Вы уверены, что хотите удалить этот комментарий?')"
                                            title="Удалить">
-                                            <i class="bi bi-trash"></i>
+                                            <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
 
-            <?php if ($pages > 1): ?>
+            <?php if ($pages > 1) { ?>
                 <nav class="mt-4">
                     <ul class="pagination justify-content-center">
-                        <?php for ($i = 1; $i <= $pages; $i++): ?>
-                            <li class="page-item <?= $i === $current_page ? 'active' : '' ?>">
-                                <a class="page-link" href="<?= ADMIN_URL ?>/comments?page=<?= $i ?>"><?= $i ?></a>
+                        <?php for ($i = 1; $i <= $pages; $i++) { ?>
+                            <li class="page-item <?php echo $i === $current_page ? 'active' : ''; ?>">
+                                <a class="page-link" href="<?php echo ADMIN_URL; ?>/comments?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                             </li>
-                        <?php endfor; ?>
+                        <?php } ?>
                     </ul>
                 </nav>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 </div>

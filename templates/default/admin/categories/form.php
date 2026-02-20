@@ -5,11 +5,12 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-folder-plus me-2"></i>
-            <?= isset($category) ? 'Редактирование категории' : 'Создание категории' ?>
+            <?php echo bloggy_icon('bs', 'folder-plus', '24 24', null, 'me-2'); ?>
+            <?php echo isset($category) ? 'Редактирование категории' : 'Создание категории'; ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/categories" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к списку
+        <a href="<?php echo ADMIN_URL; ?>/categories" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16 16', null, 'me-1'); ?>
+            Назад к списку
         </a>
     </div>
 
@@ -26,7 +27,7 @@
                             <input type="text" 
                                    name="name" 
                                    class="form-control form-control-lg" 
-                                   value="<?= isset($category) ? html($category['name']) : ($data['name'] ?? '') ?>" 
+                                   value="<?php echo isset($category) ? html($category['name']) : (isset($data['name']) ? html($data['name']) : ''); ?>" 
                                    placeholder="Введите название категории"
                                    required>
                         </div>
@@ -34,11 +35,11 @@
                         <div class="mb-4">
                             <label class="form-label">URL Slug</label>
                             <div class="input-group">
-                                <span class="input-group-text"><?= BASE_URL ?>/category/</span>
+                                <span class="input-group-text"><?php echo BASE_URL; ?>/category/</span>
                                 <input type="text" 
                                        name="slug" 
                                        class="form-control" 
-                                       value="<?= isset($category) ? html($category['slug']) : ($data['slug'] ?? '') ?>" 
+                                       value="<?php echo isset($category) ? html($category['slug']) : (isset($data['slug']) ? html($data['slug']) : ''); ?>" 
                                        placeholder="автоматически-сгенерированный-url">
                             </div>
                             <div class="form-text">Уникальный идентификатор в URL. Если оставить пустым, сгенерируется автоматически</div>
@@ -49,7 +50,7 @@
                             <textarea name="description" 
                                       class="form-control" 
                                       rows="4" 
-                                      placeholder="Добавьте описание категории"><?= isset($category) ? html($category['description']) : ($data['description'] ?? '') ?></textarea>
+                                      placeholder="Добавьте описание категории"><?php echo isset($category) ? html($category['description']) : (isset($data['description']) ? html($data['description']) : ''); ?></textarea>
                             <div class="form-text">Это описание будет отображаться на странице категории</div>
                         </div>
 
@@ -57,40 +58,40 @@
                         $fieldModel = new FieldModel($this->db);
                         $customFields = $fieldModel->getActiveByEntityType('category');
                         
-                        if (!empty($customFields)): 
+                        if (!empty($customFields)) { 
                         ?>
                             <div class="mb-4">
                                 <h6 class="card-title mb-3">Дополнительные поля</h6>
                                 <?php 
-                                $currentFieldValues = [];
+                                $currentFieldValues = array();
                                 if (isset($category['id'])) {
                                     foreach ($customFields as $field) {
                                         $currentFieldValues[$field['system_name']] = $fieldModel->getFieldValue('category', $category['id'], $field['system_name']);
                                     }
                                 }
                                 
-                                foreach ($customFields as $field): 
-                                    $currentValue = $currentFieldValues[$field['system_name']] ?? '';
+                                foreach ($customFields as $field) { 
+                                    $currentValue = isset($currentFieldValues[$field['system_name']]) ? $currentFieldValues[$field['system_name']] : '';
                                     $fieldManager = new FieldManager($this->db);
                                     $config = is_array($field['config']) ? $field['config'] : json_decode($field['config'] ?? '{}', true);
                                 ?>
                                     <div class="mb-3">
-                                        <label class="form-label"><?= html($field['name']) ?></label>
-                                        <?= $fieldManager->renderFieldInput(
+                                        <label class="form-label"><?php echo html($field['name']); ?></label>
+                                        <?php echo $fieldManager->renderFieldInput(
                                             $field['type'],
                                             $field['system_name'],
                                             $currentValue,
                                             $config,
                                             'category',
-                                            $category['id'] ?? 0
-                                        ) ?>
-                                        <?php if (!empty($field['description'])): ?>
-                                            <div class="form-text"><?= html($field['description']) ?></div>
-                                        <?php endif; ?>
+                                            isset($category['id']) ? $category['id'] : 0
+                                        ); ?>
+                                        <?php if (!empty($field['description'])) { ?>
+                                            <div class="form-text"><?php echo html($field['description']); ?></div>
+                                        <?php } ?>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </div>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
                 </div>
 
@@ -104,7 +105,7 @@
                             <input type="text" 
                                    name="meta_title" 
                                    class="form-control" 
-                                   value="<?= isset($category) ? html($category['meta_title']) : ($data['meta_title'] ?? '') ?>" 
+                                   value="<?php echo isset($category) ? html($category['meta_title']) : (isset($data['meta_title']) ? html($data['meta_title']) : ''); ?>" 
                                    placeholder="Если не указан, используется название категории">
                             <div class="form-text">До 60 символов</div>
                         </div>
@@ -114,7 +115,7 @@
                             <textarea name="meta_description" 
                                       class="form-control" 
                                       rows="3"
-                                      placeholder="Краткое описание для поисковых систем"><?= isset($category) ? html($category['meta_description']) : ($data['meta_description'] ?? '') ?></textarea>
+                                      placeholder="Краткое описание для поисковых систем"><?php echo isset($category) ? html($category['meta_description']) : (isset($data['meta_description']) ? html($data['meta_description']) : ''); ?></textarea>
                             <div class="form-text">До 160 символов</div>
                         </div>
                         
@@ -123,7 +124,7 @@
                             <input type="url" 
                                    name="canonical_url" 
                                    class="form-control" 
-                                   value="<?= isset($category) ? html($category['canonical_url']) : ($data['canonical_url'] ?? '') ?>" 
+                                   value="<?php echo isset($category) ? html($category['canonical_url']) : (isset($data['canonical_url']) ? html($data['canonical_url']) : ''); ?>" 
                                    placeholder="https://example.com/category">
                         </div>
                         
@@ -132,7 +133,7 @@
                                    type="checkbox" 
                                    name="noindex" 
                                    id="noindex"
-                                   <?= (isset($category) && $category['noindex']) || (isset($data['noindex']) && $data['noindex']) ? 'checked' : '' ?>>
+                                   <?php echo (isset($category) && $category['noindex']) || (isset($data['noindex']) && $data['noindex']) ? 'checked' : ''; ?>>
                             <label class="form-check-label" for="noindex">Noindex (запретить индексацию)</label>
                         </div>
                     </div>
@@ -145,21 +146,22 @@
                         <h5 class="card-title mb-0">Изображение категории</h5>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($category['image'])): ?>
+                        <?php if (!empty($category['image'])) { ?>
                             <div class="mb-3 text-center">
-                                <img src="/uploads/images/<?= html($category['image']) ?>" 
+                                <img src="/uploads/images/<?php echo html($category['image']); ?>" 
                                     class="img-thumbnail mb-2" 
                                     style="max-height: 150px;"
                                     alt="Изображение категории">
                                 <div class="form-text text-center">
-                                    <a href="/uploads/images/<?= html($category['image']) ?>" 
+                                    <a href="/uploads/images/<?php echo html($category['image']); ?>" 
                                     target="_blank" 
                                     class="text-decoration-none">
+                                        <?php echo bloggy_icon('bs', 'eye', '16 16', null, 'me-1'); ?>
                                         Просмотреть оригинал
                                     </a>
                                 </div>
                             </div>
-                        <?php endif; ?>
+                        <?php } ?>
                         
                         <div class="mb-3">
                             <label for="image" class="form-label">Загрузить изображение</label>
@@ -174,17 +176,18 @@
                             </div>
                         </div>
                         
-                        <?php if (!empty($category['image'])): ?>
+                        <?php if (!empty($category['image'])) { ?>
                             <div class="form-check">
                                 <input class="form-check-input" 
                                     type="checkbox" 
                                     name="delete_image" 
                                     id="delete_image">
                                 <label class="form-check-label text-danger" for="delete_image">
+                                    <?php echo bloggy_icon('bs', 'trash', '16 16', null, 'me-1'); ?>
                                     Удалить текущее изображение
                                 </label>
                             </div>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
                 </div>
 
@@ -198,7 +201,7 @@
                             <input type="number" 
                                    name="sort_order" 
                                    class="form-control" 
-                                   value="<?= isset($category) ? (int)$category['sort_order'] : ($data['sort_order'] ?? 0) ?>" 
+                                   value="<?php echo isset($category) ? (int)$category['sort_order'] : (isset($data['sort_order']) ? (int)$data['sort_order'] : 0); ?>" 
                                    min="0" 
                                    max="999">
                             <div class="form-text">Чем меньше число, тем выше в списке. 0 - по умолчанию</div>
@@ -217,7 +220,7 @@
                                        type="checkbox" 
                                        id="password_protected" 
                                        name="password_protected"
-                                       <?= (isset($category) && $category['password_protected']) || (isset($data['password_protected']) && $data['password_protected']) ? 'checked' : '' ?>>
+                                       <?php echo (isset($category) && $category['password_protected']) || (isset($data['password_protected']) && $data['password_protected']) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="password_protected">
                                     Защитить паролем
                                 </label>
@@ -225,22 +228,22 @@
                         </div>
                         
                         <div class="password-field" 
-                             style="display: <?= (isset($category) && $category['password_protected']) || (isset($data['password_protected']) && $data['password_protected']) ? 'block' : 'none' ?>;">
+                             style="display: <?php echo (isset($category) && $category['password_protected']) || (isset($data['password_protected']) && $data['password_protected']) ? 'block' : 'none'; ?>;">
                             <div class="mb-4">
                                 <label for="password" class="form-label">Пароль для доступа</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-lock"></i>
+                                        <?php echo bloggy_icon('bs', 'lock', '16 16'); ?>
                                     </span>
                                     <input type="text" 
                                            class="form-control" 
                                            id="password" 
                                            name="password"
                                            placeholder="Введите пароль" 
-                                           value="<?= isset($category) ? html($category['password'] ?? '') : ($data['password'] ?? '') ?>">
+                                           value="<?php echo isset($category) ? html($category['password'] ?? '') : (isset($data['password']) ? html($data['password']) : ''); ?>">
                                 </div>
                                 <div class="form-text text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>
+                                    <?php echo bloggy_icon('bs', 'info-circle', '14 14', null, 'me-1'); ?>
                                     Все посты в этой категории будут защищены этим паролем
                                 </div>
                             </div>
@@ -249,11 +252,12 @@
                     <div class="card-footer bg-white border-0">
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i> 
-                                <?= isset($category) ? 'Обновить категорию' : 'Создать категорию' ?>
+                                <?php echo bloggy_icon('bs', 'check-lg', '16 16', null, 'me-1'); ?>
+                                <?php echo isset($category) ? 'Обновить категорию' : 'Создать категорию'; ?>
                             </button>
-                            <a href="<?= ADMIN_URL ?>/categories" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-lg me-1"></i> Отмена
+                            <a href="<?php echo ADMIN_URL; ?>/categories" class="btn btn-outline-secondary">
+                                <?php echo bloggy_icon('bs', 'x-lg', '16 16', null, 'me-1'); ?>
+                                Отмена
                             </a>
                         </div>
                     </div>

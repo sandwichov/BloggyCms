@@ -1,17 +1,18 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-chat-left-text me-2"></i>
+            <?php echo bloggy_icon('bs', 'chat-left-text', '24', '#000', 'me-2'); ?>
             Редактирование комментария
         </h4>
-        <a href="<?= ADMIN_URL ?>/comments" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к комментариям
+        <a href="<?php echo ADMIN_URL; ?>/comments" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?>
+            Назад к комментариям
         </a>
     </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <form action="<?= ADMIN_URL ?>/comments/edit/<?= $comment['id'] ?>" method="post">
+            <form action="<?php echo ADMIN_URL; ?>/comments/edit/<?php echo $comment['id']; ?>" method="post">
                 <div class="mb-4">
                     <label class="form-label">Комментарий:</label>
                     <textarea 
@@ -20,19 +21,19 @@
                         rows="5" 
                         class="form-control"
                         placeholder="Текст комментария"
-                    ><?= html($comment['content']) ?></textarea>
+                    ><?php echo html($comment['content']); ?></textarea>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Статус:</label>
                     <select name="status" id="status" class="form-select">
-                        <option value="pending" <?= $comment['status'] === 'pending' ? 'selected' : '' ?>>
+                        <option value="pending" <?php echo $comment['status'] === 'pending' ? 'selected' : ''; ?>>
                             🕒 На модерации
                         </option>
-                        <option value="approved" <?= $comment['status'] === 'approved' ? 'selected' : '' ?>>
+                        <option value="approved" <?php echo $comment['status'] === 'approved' ? 'selected' : ''; ?>>
                             ✅ Одобрен
                         </option>
-                        <option value="spam" <?= $comment['status'] === 'spam' ? 'selected' : '' ?>>
+                        <option value="spam" <?php echo $comment['status'] === 'spam' ? 'selected' : ''; ?>>
                             ⚠️ Спам
                         </option>
                     </select>
@@ -40,10 +41,12 @@
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i> Сохранить
+                        <?php echo bloggy_icon('bs', 'check-lg', '16', '#fff', 'me-1'); ?>
+                        Сохранить
                     </button>
-                    <a href="<?= ADMIN_URL ?>/comments" class="btn btn-outline-secondary">
-                        <i class="bi bi-x-lg me-1"></i> Отмена
+                    <a href="<?php echo ADMIN_URL; ?>/comments" class="btn btn-outline-secondary">
+                        <?php echo bloggy_icon('bs', 'x-lg', '16', '#000', 'me-1'); ?>
+                        Отмена
                     </a>
                 </div>
             </form>

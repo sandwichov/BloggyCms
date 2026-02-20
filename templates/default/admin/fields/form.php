@@ -1,16 +1,17 @@
 <?php
     add_admin_js('templates/default/admin/assets/js/controllers/fields-form.js');
-    $config = isset($field) && !empty($field['config']) ? json_decode($field['config'], true) : [];
+    $config = isset($field) && !empty($field['config']) ? json_decode($field['config'], true) : array();
 ?>
 
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-plus-circle me-2"></i>
-            <?= isset($field) ? 'Редактирование поля' : 'Создание поля' ?>
+            <?php echo bloggy_icon('bs', 'plus-circle', '24', '#000', 'me-2'); ?>
+            <?php echo isset($field) ? 'Редактирование поля' : 'Создание поля'; ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/fields/entity/<?= $entityType ?>" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Назад к полям
+        <a href="<?php echo ADMIN_URL; ?>/fields/entity/<?php echo $entityType; ?>" class="btn btn-outline-secondary">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?>
+            Назад к полям
         </a>
     </div>
 
@@ -29,7 +30,7 @@
                                     <input type="text" 
                                            class="form-control" 
                                            name="name" 
-                                           value="<?= isset($field) ? html($field['name']) : (isset($data['name']) ? html($data['name']) : '') ?>" 
+                                           value="<?php echo isset($field) ? html($field['name']) : (isset($data['name']) ? html($data['name']) : ''); ?>" 
                                            placeholder="Например: Цена, Телефон, Email"
                                            required>
                                     <div class="form-text">Человеко-понятное название поля</div>
@@ -41,7 +42,7 @@
                                     <input type="text" 
                                            class="form-control" 
                                            name="system_name" 
-                                           value="<?= isset($field) ? html($field['system_name']) : (isset($data['system_name']) ? html($data['system_name']) : '') ?>" 
+                                           value="<?php echo isset($field) ? html($field['system_name']) : (isset($data['system_name']) ? html($data['system_name']) : ''); ?>" 
                                            placeholder="Например: price, phone, email"
                                            pattern="[a-z0-9_]+"
                                            required>
@@ -54,12 +55,12 @@
                             <label class="form-label">Тип поля *</label>
                             <select class="form-select" name="type" id="field-type" required>
                                 <option value="">Выберите тип поля</option>
-                                <?php foreach($fieldTypes as $type => $name): ?>
-                                    <option value="<?= $type ?>" 
-                                        <?= (isset($field) && $field['type'] == $type) ? 'selected' : ((isset($data['type']) && $data['type'] == $type) ? 'selected' : '') ?>>
-                                        <?= html($name) ?>
+                                <?php foreach($fieldTypes as $type => $name) { ?>
+                                    <option value="<?php echo $type; ?>" 
+                                        <?php echo (isset($field) && $field['type'] == $type) ? 'selected' : ((isset($data['type']) && $data['type'] == $type) ? 'selected' : ''); ?>>
+                                        <?php echo html($name); ?>
                                     </option>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </select>
                         </div>
 
@@ -68,7 +69,7 @@
                             <textarea class="form-control" 
                                       name="description" 
                                       rows="2" 
-                                      placeholder="Необязательное описание поля"><?= isset($field) ? html($field['description']) : (isset($data['description']) ? html($data['description']) : '') ?></textarea>
+                                      placeholder="Необязательное описание поля"><?php echo isset($field) ? html($field['description']) : (isset($data['description']) ? html($data['description']) : ''); ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -78,7 +79,7 @@
                         <h5 class="card-title mb-0">Настройки поля</h5>
                     </div>
                     <div class="card-body" id="field-settings-content">
-                        <?php if (isset($field) && !empty($field['type'])): ?>
+                        <?php if (isset($field) && !empty($field['type'])) { ?>
                             <?php
                             $fieldManager = new FieldManager($this->db);
                             $fieldInstance = $fieldManager->getFieldInstance(
@@ -89,7 +90,7 @@
                                 echo $fieldInstance->getSettingsForm();
                             }
                             ?>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -105,7 +106,7 @@
                             <input type="number" 
                                 class="form-control" 
                                 name="sort_order" 
-                                value="<?= isset($field) ? html($field['sort_order']) : (isset($data['sort_order']) ? html($data['sort_order']) : '0') ?>" 
+                                value="<?php echo isset($field) ? html($field['sort_order']) : (isset($data['sort_order']) ? html($data['sort_order']) : '0'); ?>" 
                                 min="0">
                             <div class="form-text">Чем меньше число, тем выше в списке</div>
                         </div>
@@ -117,7 +118,7 @@
                                     name="is_required" 
                                     id="is_required"
                                     value="1"
-                                    <?= (isset($field) && $field['is_required']) ? 'checked' : ((isset($data['is_required']) && $data['is_required']) ? 'checked' : '') ?>>
+                                    <?php echo (isset($field) && $field['is_required']) ? 'checked' : ((isset($data['is_required']) && $data['is_required']) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="is_required">
                                     Обязательное поле
                                 </label>
@@ -131,7 +132,7 @@
                                     name="is_active" 
                                     id="is_active"
                                     value="1"
-                                    <?= (!isset($field) || $field['is_active']) ? 'checked' : ((isset($data['is_active']) && $data['is_active']) ? 'checked' : '') ?>>
+                                    <?php echo (!isset($field) || $field['is_active']) ? 'checked' : ((isset($data['is_active']) && $data['is_active']) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="is_active">
                                     Активное поле
                                 </label>
@@ -145,7 +146,7 @@
                                     name="show_in_post" 
                                     id="show_in_post"
                                     value="1"
-                                    <?= (!isset($field) || ($field['show_in_post'] ?? true)) ? 'checked' : ((isset($data['show_in_post']) && $data['show_in_post']) ? 'checked' : '') ?>>
+                                    <?php echo (!isset($field) || ($field['show_in_post'] ?? true)) ? 'checked' : ((isset($data['show_in_post']) && $data['show_in_post']) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="show_in_post">
                                     Показывать в записи
                                 </label>
@@ -160,7 +161,7 @@
                                     name="show_in_list" 
                                     id="show_in_list"
                                     value="1"
-                                    <?= (isset($field) && $field['show_in_list']) ? 'checked' : ((isset($data['show_in_list']) && $data['show_in_list']) ? 'checked' : '') ?>>
+                                    <?php echo (isset($field) && $field['show_in_list']) ? 'checked' : ((isset($data['show_in_list']) && $data['show_in_list']) ? 'checked' : ''); ?>>
                                 <label class="form-check-label" for="show_in_list">
                                     Показывать в списке
                                 </label>
@@ -172,23 +173,23 @@
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-check-lg me-2"></i>
-                        <?= isset($field) ? 'Обновить поле' : 'Создать поле' ?>
+                        <?php echo bloggy_icon('bs', 'check-lg', '20', '#fff', 'me-2'); ?>
+                        <?php echo isset($field) ? 'Обновить поле' : 'Создать поле'; ?>
                     </button>
                 </div>
             </div>
         </div>
         
-        <?php if (!empty($config)): ?>
-            <?php foreach ($config as $key => $value): ?>
-                <?php if (is_array($value)): ?>
-                    <?php foreach ($value as $subKey => $subValue): ?>
-                        <input type="hidden" name="config[<?= html($key) ?>][<?= html($subKey) ?>]" value="<?= html($subValue) ?>">
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <input type="hidden" name="config[<?= html($key) ?>]" value="<?= html($value) ?>">
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php endif; ?>
+        <?php if (!empty($config)) { ?>
+            <?php foreach ($config as $key => $value) { ?>
+                <?php if (is_array($value)) { ?>
+                    <?php foreach ($value as $subKey => $subValue) { ?>
+                        <input type="hidden" name="config[<?php echo html($key); ?>][<?php echo html($subKey); ?>]" value="<?php echo html($subValue); ?>">
+                    <?php } ?>
+                <?php } else { ?>
+                    <input type="hidden" name="config[<?php echo html($key); ?>]" value="<?php echo html($value); ?>">
+                <?php } ?>
+            <?php } ?>
+        <?php } ?>
     </form>
 </div>
