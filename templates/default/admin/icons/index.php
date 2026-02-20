@@ -49,18 +49,25 @@
                     
                     <div class="row g-3">
                         <?php foreach($set['icons'] as $icon): ?>
-                        <div class="col-md-3 col-lg-2 icon-item" data-icon-id="<?= html($icon['id']) ?>">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body text-center p-3">
-                                    <div class="mb-2" style="font-size: 2rem;">
-                                        <?= $icon['preview'] ?>
-                                    </div>
-                                    <div class="small text-muted">
-                                        <code><?= html($icon['id']) ?></code>
+                            <div class="col-md-3 col-lg-2 icon-item" data-icon-id="<?= html($icon['id']) ?>">
+                                <div class="card border-0 shadow-sm h-100 position-relative">
+                                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2" 
+                                            onclick="copyIconCode('<?= addslashes($icon['code']) ?>')"
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="left" 
+                                            title="Копировать код">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                    <div class="card-body text-center p-3">
+                                        <div class="mb-2" style="font-size: 2rem;">
+                                            <?= $icon['preview'] ?>
+                                        </div>
+                                        <div class="small text-muted">
+                                            <code><?= html($icon['id']) ?></code>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         <?php endforeach; ?>
                     </div>
                 </div>

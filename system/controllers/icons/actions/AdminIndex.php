@@ -78,7 +78,8 @@ class AdminIndex {
                     'icons' => array_map(function($id) use ($set) {
                         return [
                             'id' => $id,
-                            'preview' => bloggy_icon($set, $id, '24 24')
+                            'preview' => bloggy_icon($set, $id, '24 24'),
+                            'code' => "<?php echo bloggy_icon('{$set}', '{$id}'); ?>"
                         ];
                     }, $matches[1])
                 ];
