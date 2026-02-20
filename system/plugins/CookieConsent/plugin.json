@@ -1,0 +1,8 @@
+{
+    "name": "Согласие с Cookies",
+    "system_name": "CookieConsent",
+    "version": "1.0.0",
+    "author": "BloggyCMS",
+    "description": "Отображает уведомление о cookies и запрашивает согласие пользователя в соответствии с GDPR",
+    "has_settings": true
+}

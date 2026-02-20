@@ -1,0 +1,8 @@
+{
+    "name": "Кнопка «Вверх»",
+    "system_name": "ScrollToTop",
+    "version": "1.0.0",
+    "author": "BloggyCMS",
+    "description": "Добавляет на сайт кнопку для быстрой прокрутки страницы вверх",
+    "has_settings": true
+}

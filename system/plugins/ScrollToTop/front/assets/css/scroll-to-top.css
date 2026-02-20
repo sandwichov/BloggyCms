@@ -1,0 +1,36 @@
+.scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    opacity: 0.8;
+}
+
+.scroll-to-top:hover {
+    opacity: 1;
+}
+
+.scroll-to-top.right {
+    right: 20px;
+}
+
+.scroll-to-top.left {
+    left: 20px;
+}
+
+.scroll-to-top i {
+    font-size: 20px;
+}
+
+.scroll-to-top.visible {
+    display: flex;
+}
