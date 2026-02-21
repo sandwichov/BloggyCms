@@ -55,8 +55,8 @@
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <a href="<?php echo ADMIN_URL; ?>/post-blocks/edit?system_name=<?php echo $block['system_name']; ?>" 
-                                       class="btn btn-sm btn-outline-primary w-100">
-                                        <?php echo bloggy_icon('bs', 'gear', '14', '#0d6efd', 'me-1'); ?>
+                                       class="btn btn-sm btn-success">
+                                        <?php echo bloggy_icon('bs', 'gear', '14', '#fefefe', 'me-1'); ?>
                                         Настройки
                                     </a>
                                 </div>

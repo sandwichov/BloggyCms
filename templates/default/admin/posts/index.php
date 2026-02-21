@@ -24,6 +24,13 @@
         </div>
     </div>
 
+    <?php 
+    $categoryModel = new CategoryModel($this->db);
+    $allCategories = $categoryModel->getAll();
+    $hasCategories = !empty($allCategories);
+    ?>
+
+    <?php if ($hasCategories) { ?>
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-3 align-items-end">
@@ -32,8 +39,6 @@
                     <select name="category" class="form-select">
                         <option value="">Все категории</option>
                         <?php 
-                        $categoryModel = new CategoryModel($this->db);
-                        $allCategories = $categoryModel->getAll();
                         $selectedCategory = $_GET['category'] ?? '';
                         foreach ($allCategories as $cat) { 
                         ?>
@@ -60,6 +65,7 @@
             </form>
         </div>
     </div>
+    <?php } ?>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
@@ -84,7 +90,7 @@
                                 <th>Категория</th>
                                 <th>Статус</th>
                                 <th>Просмотры</th>
-                                <th>Рейтинг</th>
+                                <th>Лайки</th>
                                 <th>Дата создания</th>
                                 <th class="text-end">Действия</th>
                             </tr>
@@ -116,9 +122,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-light text-dark">
-                                        <?php echo html($post['category_name']); ?>
-                                    </span>
+                                    <?php if (!empty($post['category_name'])) { ?>
+                                        <span class="badge bg-light text-dark">
+                                            <?php echo html($post['category_name']); ?>
+                                        </span>
+                                    <?php } else { ?>
+                                        <span class="text-muted">—</span>
+                                    <?php } ?>
                                 </td>
                                 <td>
                                     <span class="badge bg-<?php echo $post['status'] === 'published' ? 'success' : 'warning'; ?>">
@@ -133,15 +143,12 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-1">
-                                        <?php if (($post['rating'] ?? 0) > 0) { ?>
-                                            <?php echo bloggy_icon('bs', 'arrow-up-circle', '16', '#198754'); ?>
-                                            <span class="fw-medium text-success">+<?php echo $post['rating'] ?? 0; ?></span>
-                                        <?php } elseif (($post['rating'] ?? 0) < 0) { ?>
-                                            <?php echo bloggy_icon('bs', 'arrow-down-circle', '16', '#dc3545'); ?>
-                                            <span class="fw-medium text-danger"><?php echo $post['rating'] ?? 0; ?></span>
+                                        <?php if (($post['likes_count'] ?? 0) > 0) { ?>
+                                            <?php echo bloggy_icon('bs', 'heart-fill', '16', '#ff6161'); ?>
+                                            <span class="likes-count-stat"><?php echo $post['likes_count'] ?? 0; ?></span>
                                         <?php } else { ?>
-                                            <?php echo bloggy_icon('bs', 'dash-circle', '16', '#6C6C6C'); ?>
-                                            <span class="fw-medium text-muted">0</span>
+                                            <?php echo bloggy_icon('bs', 'heart-fill', '16', '#878787'); ?>
+                                            <span class="fw-bold text-muted">0</span>
                                         <?php } ?>
                                     </div>
                                 </td>

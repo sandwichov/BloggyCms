@@ -60,7 +60,7 @@
                     <?php if (!empty($type['template']) && $type['template'] !== 'all') { ?>
                         <div class="mb-2">
                             <span class="badge bg-info">
-                                <?php echo bloggy_icon('bs', 'palette', '16', '#fff', 'me-1'); ?>
+                                <?php echo bloggy_icon('bs', 'palette', '16', '#35acb2', 'me-1'); ?>
                                 Шаблон: <?php echo html($type['template']); ?>
                             </span>
                         </div>

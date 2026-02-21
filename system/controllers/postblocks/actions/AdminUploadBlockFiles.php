@@ -22,7 +22,6 @@ class AdminUploadBlockFiles extends PostBlockAction {
      * @return void
      */
     public function execute() {
-        // Проверка прав доступа администратора
         if (!$this->checkAdminAccess()) {
             $this->jsonResponse([
                 'success' => false,
@@ -32,16 +31,17 @@ class AdminUploadBlockFiles extends PostBlockAction {
         }
         
         try {
-            // Получение данных из POST-запроса
             $blockId = $_POST['block_id'] ?? '';
             $blockType = $_POST['block_type'] ?? '';
             
-            // Проверка наличия типа блока
             if (empty($blockType)) {
                 throw new \Exception('Не указан тип блока');
             }
 
-            // Получение экземпляра блока через менеджер
+            $contentJson = $_POST['content_json'] ?? '{}';
+            $settingsJson = $_POST['settings_json'] ?? '{}';
+            $content = json_decode($contentJson, true) ?: [];
+            $settings = json_decode($settingsJson, true) ?: [];
             $postBlock = $this->postBlockManager->getPostBlock($blockType);
             
             if (!$postBlock || !$postBlock['class']) {
@@ -50,11 +50,6 @@ class AdminUploadBlockFiles extends PostBlockAction {
 
             $blockInstance = $postBlock['class'];
             
-            // Инициализация данных
-            $content = [];
-            $settings = [];
-            
-            // Обработка загрузки файлов через методы блока (если существуют)
             if (method_exists($blockInstance, 'prepareContent')) {
                 $content = $blockInstance->prepareContent($content);
             }
@@ -63,13 +58,10 @@ class AdminUploadBlockFiles extends PostBlockAction {
                 $settings = $blockInstance->prepareSettings($settings);
             }
 
-            // Для блоков без специальной обработки файлов, обрабатываем обычные поля
             if (empty($content) && empty($_FILES)) {
-                // Обработка полей формы из POST
                 $this->processPostFields($content, $settings);
             }
 
-            // Возврат успешного ответа с данными блока
             $this->jsonResponse([
                 'success' => true,
                 'message' => 'Данные блока успешно сохранены',
@@ -80,7 +72,6 @@ class AdminUploadBlockFiles extends PostBlockAction {
             ]);
 
         } catch (\Exception $e) {
-            // Возврат ответа с ошибкой
             $this->jsonResponse([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -103,11 +94,11 @@ class AdminUploadBlockFiles extends PostBlockAction {
      */
     private function processPostFields(&$content, &$settings) {
         foreach ($_POST as $key => $value) {
-            // Обработка полей контента
+
             if (strpos($key, 'content[') === 0) {
                 $this->processContentField($key, $value, $content);
             } 
-            // Обработка полей настроек
+
             elseif (strpos($key, 'settings[') === 0) {
                 $this->processSettingsField($key, $value, $settings);
             }
@@ -124,8 +115,7 @@ class AdminUploadBlockFiles extends PostBlockAction {
      */
     private function processContentField($key, $value, &$content) {
         $contentKey = str_replace(['content[', ']'], '', $key);
-        
-        // Обработка массивов (например, items[])
+
         if (strpos($contentKey, '[]') !== false) {
             $arrayKey = str_replace('[]', '', $contentKey);
             if (!isset($content[$arrayKey])) {
@@ -137,7 +127,6 @@ class AdminUploadBlockFiles extends PostBlockAction {
                 $content[$arrayKey][] = $value;
             }
         } else {
-            // Обычное поле
             $content[$contentKey] = $value;
         }
     }
@@ -161,7 +150,11 @@ class AdminUploadBlockFiles extends PostBlockAction {
      * @param array $data Данные для JSON-ответа
      * @return void
      */
-    private function jsonResponse($data) {
+    protected function jsonResponse($data) { 
+        if (ob_get_level()) {
+            ob_clean();
+        }
+        
         header('Content-Type: application/json');
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;

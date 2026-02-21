@@ -527,6 +527,9 @@
     }
 
     async saveBlockSettings(blockId, modal) {
+        let saveButton = null;
+        let originalText = '';
+        
         try {
             const block = this.blocksData.find(b => b.id === blockId);
             if (!block) throw new Error('Блок не найден');
@@ -569,16 +572,24 @@
             uploadFormData.append('content_json', JSON.stringify(contentData));
             uploadFormData.append('settings_json', JSON.stringify(settingsData));
             
-            const saveButton = modal.querySelector('#save-post-block-settings');
-            const originalText = saveButton.innerHTML;
-            saveButton.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Сохранение...';
-            saveButton.disabled = true;
+            saveButton = modal.querySelector('#save-post-block-settings');
+            if (saveButton) {
+                originalText = saveButton.innerHTML;
+                saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Сохранение...';
+                saveButton.disabled = true;
+            }
+            
             const response = await fetch(`${window.ADMIN_URL}/post-blocks/upload-block-files`, {
                 method: 'POST',
                 body: uploadFormData
             });
             
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text.substring(0, 200));
+                throw new Error('Сервер вернул не JSON. Возможно, ошибка PHP или редирект');
+            }
             
             const data = await response.json();
             
@@ -590,17 +601,15 @@
                 
                 this.closeCurrentModal();
                 await this.updateBlockPreview(blockId);
-                
                 this.updateHiddenField();
-                
                 this.showNotification('Настройки блока сохранены', 'success');
             } else {
                 throw new Error(data.message || 'Ошибка сохранения');
             }
         } catch (error) {
+            console.error('Save error:', error);
             this.showNotification('Ошибка сохранения: ' + error.message, 'error');
         } finally {
-            const saveButton = modal.querySelector('#save-post-block-settings');
             if (saveButton) {
                 saveButton.innerHTML = originalText;
                 saveButton.disabled = false;

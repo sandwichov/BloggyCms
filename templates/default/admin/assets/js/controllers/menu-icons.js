@@ -272,25 +272,31 @@ class MenuIconManager {
     }
 
     selectIconInModal(iconCard) {
-        
         document.querySelectorAll('.icon-selector-card').forEach(card => {
             card.classList.remove('selected');
         });
 
         iconCard.classList.add('selected');
 
+        const setParts = iconCard.dataset.set.split('/');
+        const template = setParts[0];
+        const iconSet = setParts[1];
+        
         this.selectedIcon = {
-            set: iconCard.dataset.set,
+            template: template,
+            set: iconSet,
+            fullSet: iconCard.dataset.set,
             id: iconCard.dataset.iconId
         };
         
+        console.log('Выбрана иконка:', this.selectedIcon);
     }
 
     highlightSelectedIcon() {
         if (!this.selectedIcon) return;
 
         const iconCard = document.querySelector(
-            `.icon-selector-card[data-set="${this.selectedIcon.set}"][data-icon-id="${this.selectedIcon.id}"]`
+            `.icon-selector-card[data-set="${this.selectedIcon.fullSet}"][data-icon-id="${this.selectedIcon.id}"]`
         );
 
         if (iconCard) {
@@ -313,11 +319,11 @@ class MenuIconManager {
     }
 
     setSelectedIcon(iconData) {
-        
         this.selectedIcon = iconData;
+        
         const iconIdInput = document.getElementById('item-icon-id');
         if (iconIdInput) {
-            iconIdInput.value = `${iconData.set}/${iconData.id}`;
+            iconIdInput.value = `${iconData.template}/${iconData.set}/${iconData.id}`;
         }
         
         this.updateIconPreview();
@@ -341,12 +347,18 @@ class MenuIconManager {
         const size = sizeInput.value || 48;
         const color = colorInput.value || '#000000';
         
-        if (this.iconsCache && this.iconsCache[this.selectedIcon.set]) {
-            const icon = this.iconsCache[this.selectedIcon.set].icons.find(i => i.id === this.selectedIcon.id);
+        if (this.iconsCache && 
+            this.iconsCache[this.selectedIcon.template] && 
+            this.iconsCache[this.selectedIcon.template][this.selectedIcon.set]) {
+            
+            const setData = this.iconsCache[this.selectedIcon.template][this.selectedIcon.set];
+            const icon = setData.icons.find(i => i.id === this.selectedIcon.id);
+            
             if (icon) {
                 let updatedPreview = icon.preview;
                 updatedPreview = updatedPreview.replace(/width="[^"]*"/, `width="${size}"`);
                 updatedPreview = updatedPreview.replace(/height="[^"]*"/, `height="${size}"`);
+                
                 if (updatedPreview.includes('style="')) {
                     updatedPreview = updatedPreview.replace(/style="[^"]*"/, `style="fill: ${color}"`);
                 } else {
@@ -400,21 +412,31 @@ class MenuIconManager {
     }
 
     setIconData(iconData) {
-    
         this.clearSelectedIcon();
         
         if (!iconData || !iconData.id) {
             return;
         }
 
+        let template = iconData.template || 'default';
+        let iconSet = iconData.set || 'bs';
+        
+        if (iconData.fullSet) {
+            const parts = iconData.fullSet.split('/');
+            template = parts[0];
+            iconSet = parts[1];
+        }
+
         this.selectedIcon = {
-            set: iconData.set || 'bs',
+            template: template,
+            set: iconSet,
+            fullSet: `${template}/${iconSet}`,
             id: iconData.id
         };
 
         const iconIdInput = document.getElementById('item-icon-id');
         if (iconIdInput) {
-            iconIdInput.value = `${this.selectedIcon.set}/${this.selectedIcon.id}`;
+            iconIdInput.value = `${template}/${iconSet}/${iconData.id}`;
         }
         
         const sizeInput = document.getElementById('item-icon-size');
@@ -433,6 +455,7 @@ class MenuIconManager {
         }
         
         this.updateIconPreview();
+        
         const previewContainer = document.getElementById('icon-preview');
         if (previewContainer) {
             previewContainer.style.display = 'block';
@@ -440,7 +463,6 @@ class MenuIconManager {
     }
 
     getIconData() {
-        
         if (!this.selectedIcon || !this.selectedIcon.id) {
             return null;
         }
@@ -454,6 +476,7 @@ class MenuIconManager {
         const iconOnly = iconOnlyCheckbox?.checked;
 
         const iconData = {
+            template: this.selectedIcon.template || 'default',
             set: this.selectedIcon.set || 'bs',
             id: this.selectedIcon.id,
             size: size ? parseInt(size) : null,
@@ -467,18 +490,60 @@ class MenuIconManager {
     async loadIcons() {
         try {
             const iconsUrl = window.location.origin + '/admin/icons/data';
+            console.log('Загрузка иконок с URL:', iconsUrl);
+            
             const response = await fetch(iconsUrl);
+            console.log('Статус ответа:', response.status);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const text = await response.text();
-            this.iconsCache = JSON.parse(text);
+            console.log('Сырой ответ от сервера:', text.substring(0, 200) + '...');
+            
+            try {
+                const responseData = JSON.parse(text);
+                console.log('Распарсенные данные:', responseData);
+                
+                if (responseData.success && responseData.data) {
+                    this.iconsCache = responseData.data;
+                    console.log('Иконки загружены:', this.iconsCache);
+                } else if (responseData.data) {
+                    this.iconsCache = responseData.data;
+                } else {
+                    this.iconsCache = responseData;
+                    console.warn('Неожиданная структура данных, используем как есть');
+                }
+                
+                if (this.iconsCache && typeof this.iconsCache === 'object') {
+                    const sets = Object.keys(this.iconsCache);
+                    console.log('Найденные наборы иконок:', sets);
+                    
+                    sets.forEach(setName => {
+                        const setData = this.iconsCache[setName];
+                        console.log(`Набор "${setName}":`, setData);
+                        if (setData && setData.icons) {
+                            console.log(`Количество иконок в "${setName}":`, setData.icons.length);
+                        } else {
+                            console.warn(`В наборе "${setName}" нет свойства icons или оно пустое`);
+                        }
+                    });
+                } else {
+                    console.error('Данные не являются объектом:', this.iconsCache);
+                }
+                
+            } catch (parseError) {
+                console.error('Ошибка парсинга JSON:', parseError);
+                console.error('Текст ответа:', text);
+                throw parseError;
+            }
             
         } catch (error) {
             console.error('Failed to load icons:', error);
+            console.log('Используем тестовые данные');
             this.iconsCache = this.createTestIconsData();
+            console.log('Тестовые данные:', this.iconsCache);
         }
     }
 
@@ -504,72 +569,100 @@ class MenuIconManager {
         contentContainer.innerHTML = '';
 
         let isFirst = true;
-        for (const [setName, setData] of Object.entries(this.iconsCache)) {
-            const tabButton = document.createElement('button');
-            tabButton.className = `nav-link ${isFirst ? 'active' : ''}`;
-            tabButton.id = `${setName}-selector-tab`;
-            tabButton.type = 'button';
-            tabButton.role = 'tab';
-            tabButton.textContent = this.capitalizeFirstLetter(setName);
+        
+        for (const [templateName, templateData] of Object.entries(this.iconsCache)) {
             
-            tabButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                contentContainer.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove('show', 'active');
-                });
+            for (const [setName, setData] of Object.entries(templateData)) {
                 
-                tabsContainer.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('active');
-                });
-                
-                const targetId = `${setName}-selector-content`;
-                const target = document.getElementById(targetId);
-                if (target) {
-                    target.classList.add('show', 'active');
-                    tabButton.classList.add('active');
+                if (!setData || !setData.icons || !Array.isArray(setData.icons)) {
+                    console.warn(`Набор иконок "${setName}" в шаблоне "${templateName}" не содержит массив icons или пуст`);
+                    continue;
                 }
-            });
 
-            const tabLi = document.createElement('li');
-            tabLi.className = 'nav-item';
-            tabLi.role = 'presentation';
-            tabLi.appendChild(tabButton);
-            tabsContainer.appendChild(tabLi);
-            const tabContent = document.createElement('div');
-            tabContent.className = `tab-pane fade ${isFirst ? 'show active' : ''}`;
-            tabContent.id = `${setName}-selector-content`;
-            tabContent.role = 'tabpanel';
+                const tabLabel = this.capitalizeFirstLetter(setName);
+                const tabId = `${templateName}-${setName}-selector-tab`;
+                const contentId = `${templateName}-${setName}-selector-content`;
 
-            const iconsGrid = document.createElement('div');
-            iconsGrid.className = 'row g-2';
+                const tabButton = document.createElement('button');
+                tabButton.className = `nav-link ${isFirst ? 'active' : ''}`;
+                tabButton.id = tabId;
+                tabButton.type = 'button';
+                tabButton.role = 'tab';
+                tabButton.textContent = tabLabel;
+                
+                tabButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    contentContainer.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    
+                    tabsContainer.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    
+                    const target = document.getElementById(contentId);
+                    if (target) {
+                        target.classList.add('show', 'active');
+                        tabButton.classList.add('active');
+                    }
+                });
 
-            setData.icons.forEach(icon => {
-                const iconCard = document.createElement('div');
-                iconCard.className = 'col-3 col-md-2 icon-selector-card';
-                iconCard.dataset.set = setName;
-                iconCard.dataset.iconId = icon.id;
-                iconCard.title = icon.id;
-                iconCard.style.cursor = 'pointer';
-                iconCard.innerHTML = `
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body text-center p-2">
-                            <div class="mb-1" style="font-size: 1.5rem;">
-                                ${icon.preview}
-                            </div>
-                            <div class="small text-muted text-truncate">
-                                ${icon.id}
+                const tabLi = document.createElement('li');
+                tabLi.className = 'nav-item';
+                tabLi.role = 'presentation';
+                tabLi.appendChild(tabButton);
+                tabsContainer.appendChild(tabLi);
+                
+                const tabContent = document.createElement('div');
+                tabContent.className = `tab-pane fade ${isFirst ? 'show active' : ''}`;
+                tabContent.id = contentId;
+                tabContent.role = 'tabpanel';
+                const iconsGrid = document.createElement('div');
+                iconsGrid.className = 'row g-2';
+
+                setData.icons.forEach(icon => {
+                    const iconCard = document.createElement('div');
+                    iconCard.className = 'col-3 col-md-2 icon-selector-card';
+                    iconCard.dataset.set = `${templateName}/${setName}`;
+                    iconCard.dataset.iconId = icon.id;
+                    iconCard.title = icon.id;
+                    iconCard.style.cursor = 'pointer';
+                    iconCard.innerHTML = `
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center p-2">
+                                <div class="mb-1" style="font-size: 1.5rem;">
+                                    ${icon.preview}
+                                </div>
+                                <div class="small text-muted text-truncate">
+                                    ${icon.id}
+                                </div>
                             </div>
                         </div>
+                    `;
+                    iconsGrid.appendChild(iconCard);
+                });
+
+                tabContent.appendChild(iconsGrid);
+                contentContainer.appendChild(tabContent);
+
+                isFirst = false;
+            }
+        }
+        
+        if (tabsContainer.children.length === 0) {
+            contentContainer.innerHTML = `
+                <div class="alert alert-info text-center p-4">
+                    <div class="mb-2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
                     </div>
-                `;
-                iconsGrid.appendChild(iconCard);
-            });
-
-            tabContent.appendChild(iconsGrid);
-            contentContainer.appendChild(tabContent);
-
-            isFirst = false;
+                    <p class="mb-0">Иконки не найдены</p>
+                </div>
+            `;
         }
         
         setTimeout(() => this.setupIconClickHandlers(), 0);

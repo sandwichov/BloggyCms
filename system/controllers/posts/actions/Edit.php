@@ -21,36 +21,29 @@ class Edit extends PostAction {
      * @throws \Exception Если ID не указан
      */
     public function execute() {
-        // Получение ID поста из параметров
         $id = $this->params['id'] ?? null;
         if (!$id) {
             throw new \Exception('ID поста не указан');
         }
 
         try {
-            // Загрузка данных поста
             $post = $this->loadPost($id);
-            
-            // Загрузка всех необходимых данных для формы
             $this->postBlockManager->loadAllPostBlockAssets();
             $categories = $this->categoryModel->getAll();
             $tags = $this->tagModel->getAll();
             $postTags = $this->tagModel->getForPost($id);
-            
-            // Загрузка и подготовка блоков поста
             $preparedBlocks = $this->loadPostBlocks($id);
+            $hasCategories = !empty($categories);
 
-            // Обработка POST-запроса (сохранение изменений)
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $this->handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks);
+                $this->handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks, $hasCategories);
                 return;
             }
 
-            // Отображение формы редактирования
-            $this->renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks);
+            $this->renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks, $hasCategories);
 
         } catch (\Exception $e) {
-            $this->handleError($e, $post ?? null, $categories ?? [], $tags ?? [], $postTags ?? [], $preparedBlocks ?? []);
+            $this->handleError($e, $post ?? null, $categories ?? [], $tags ?? [], $postTags ?? [], $preparedBlocks ?? [], $hasCategories ?? true);
         }
     }
 
@@ -124,46 +117,35 @@ class Edit extends PostAction {
      * @param array $tags Список всех тегов
      * @param array $postTags Текущие теги поста
      * @param array $preparedBlocks Подготовленные блоки
+     * @param bool $hasCategories Флаг наличия категорий
      * @return void
      */
-    private function handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks) {
-        // Валидация обязательных полей
-        $this->validateRequiredFields();
-        
-        // Подготовка данных для обновления
-        $data = $this->preparePostData($id, $post);
-        
-        // Обновление основного поста
+    private function handlePostRequest($id, $post, $categories, $tags, $postTags, $preparedBlocks, $hasCategories) {
+        $this->validateRequiredFields($hasCategories);
+        $data = $this->preparePostData($id, $post, $hasCategories);
         $this->postModel->update($id, $data);
-        
-        // Обновление блоков
         $this->updatePostBlocks($id);
-        
-        // Обновление тегов
         $this->updatePostTags($id);
-        
-        // Обновление пользовательских полей
         $this->updateCustomFields($id);
-        
-        // Обработка успешного сохранения
         $this->handleUpdateSuccess();
     }
 
     /**
      * Валидирует обязательные поля формы
      * 
+     * @param bool $hasCategories Флаг наличия категорий
      * @throws \Exception При ошибках валидации
      * @return void
      */
-    private function validateRequiredFields() {
+    private function validateRequiredFields($hasCategories) {
         if (empty($_POST['title'])) {
             throw new \Exception('Заголовок обязателен');
         }
-        if (empty($_POST['category_id'])) {
+        
+        if ($hasCategories && empty($_POST['category_id'])) {
             throw new \Exception('Категория обязательна');
         }
 
-        // ВАЛИДАЦИЯ МАКСИМАЛЬНОГО КОЛИЧЕСТВА ТЕГОВ
         if (!empty($_POST['tags_json'])) {
             $tagsData = json_decode($_POST['tags_json'], true);
             
@@ -176,7 +158,6 @@ class Edit extends PostAction {
             }
         }
 
-        // Валидация даты публикации
         if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
             $publishDate = $_POST['publish_date'];
             $selectedDate = new \DateTime($publishDate);
@@ -193,14 +174,20 @@ class Edit extends PostAction {
      * 
      * @param int $id ID поста
      * @param array $post Текущие данные поста
+     * @param bool $hasCategories Флаг наличия категорий
      * @return array Подготовленные данные
      */
-    private function preparePostData($id, $post) {
+    private function preparePostData($id, $post, $hasCategories) {
+        $categoryId = null;
+        if ($hasCategories && isset($_POST['category_id']) && $_POST['category_id'] !== '') {
+            $categoryId = (int)$_POST['category_id'];
+        }
+        
         $data = [
             'title' => trim($_POST['title']),
             'short_description' => $_POST['short_description'] ?? null,
             'slug' => $this->postModel->createSlug($_POST['title'], $id),
-            'category_id' => (int)$_POST['category_id'],
+            'category_id' => $categoryId,
             'status' => $_POST['status'] ?? 'draft',
             'meta_description' => $_POST['meta_description'] ?? null,
             'seo_title' => $_POST['seo_title'] ?? null,
@@ -210,12 +197,10 @@ class Edit extends PostAction {
             'hide_from_groups' => !empty($_POST['hide_from_groups']) ? json_encode($_POST['hide_from_groups']) : null
         ];
 
-        // Обработка даты публикации
         if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
             $data['created_at'] = $_POST['publish_date'];
         }
 
-        // Обработка главного изображения
         $data['featured_image'] = $this->processFeaturedImage($post);
 
         return $data;
@@ -228,24 +213,20 @@ class Edit extends PostAction {
      * @return string|null Путь к изображению или null
      */
     private function processFeaturedImage($post) {
-        // Если передано уже загруженное изображение
         if (!empty($_POST['uploaded_image_path'])) {
             $this->deleteOldImage($post['featured_image']);
             return $_POST['uploaded_image_path'];
         }
         
-        // Если загружается новое изображение
         if (!empty($_FILES['featured_image']['tmp_name'])) {
             return $this->uploadNewImage($post['featured_image']);
         }
         
-        // Если запрошено удаление изображения
         if (isset($_POST['remove_featured_image']) && $_POST['remove_featured_image'] == '1') {
             $this->deleteOldImage($post['featured_image']);
             return null;
         }
         
-        // Оставляем текущее изображение
         return $post['featured_image'] ?? null;
     }
 
@@ -309,10 +290,8 @@ class Edit extends PostAction {
      * @return void
      */
     private function updatePostTags($postId) {
-        // Удаляем существующие связи с тегами
         $this->db->query("DELETE FROM post_tags WHERE post_id = ?", [$postId]);
         
-        // Добавляем новые теги
         if (!empty($_POST['tags_json'])) {
             $tagsData = json_decode($_POST['tags_json'], true);
             
@@ -342,17 +321,13 @@ class Edit extends PostAction {
         $fieldModel = new \FieldModel($this->db);
         $fieldManager = new \FieldManager($this->db);
         $customFields = $fieldModel->getActiveByEntityType('post');
-
-        // Получение текущих значений полей
         $currentValues = $this->getCurrentFieldValues($customFields, $postId, $fieldModel);
 
-        // Валидация полей
         $validationErrors = $this->validateCustomFields($customFields, $currentValues, $fieldManager);
         if (!empty($validationErrors)) {
             throw new \Exception(implode('<br>', $validationErrors));
         }
 
-        // Сохранение полей
         foreach ($customFields as $field) {
             $this->saveCustomField($field, $postId, $currentValues, $fieldModel, $fieldManager);
         }
@@ -455,9 +430,10 @@ class Edit extends PostAction {
      * @param array $tags Список всех тегов
      * @param array $postTags Текущие теги поста
      * @param array $preparedBlocks Подготовленные блоки
+     * @param bool $hasCategories Флаг наличия категорий
      * @return void
      */
-    private function renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks) {
+    private function renderEditForm($post, $categories, $tags, $postTags, $preparedBlocks, $hasCategories) {
         $this->render('admin/posts/edit', [
             'post' => $post,
             'categories' => $categories,
@@ -465,6 +441,7 @@ class Edit extends PostAction {
             'postTags' => $postTags,
             'preparedBlocks' => $preparedBlocks,
             'postBlockManager' => $this->postBlockManager,
+            'hasCategories' => $hasCategories,
             'pageTitle' => 'Редактирование поста'
         ]);
     }
@@ -478,9 +455,10 @@ class Edit extends PostAction {
      * @param array $tags Список тегов
      * @param array $postTags Текущие теги поста
      * @param array $preparedBlocks Подготовленные блоки
+     * @param bool $hasCategories Флаг наличия категорий
      * @return void
      */
-    private function handleError($e, $post, $categories, $tags, $postTags, $preparedBlocks) {
+    private function handleError($e, $post, $categories, $tags, $postTags, $preparedBlocks, $hasCategories) {
         if ($this->isAjaxRequest()) {
             header('Content-Type: application/json');
             echo json_encode([
@@ -498,7 +476,8 @@ class Edit extends PostAction {
             'tags' => $tags,
             'postTags' => $postTags,
             'preparedBlocks' => $preparedBlocks,
-            'postBlockManager' => $this->postBlockManager
+            'postBlockManager' => $this->postBlockManager,
+            'hasCategories' => $hasCategories
         ]);
     }
 }

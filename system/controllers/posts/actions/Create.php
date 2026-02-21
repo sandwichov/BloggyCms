@@ -20,25 +20,21 @@ class Create extends PostAction {
      */
     public function execute() {
         try {
-            // Загрузка данных для формы
             $categories = $this->categoryModel->getAll();
             $tags = $this->tagModel->getAll();
             $this->postBlockManager->loadAllPostBlockAssets();
-
-            // Получение максимального количества тегов из настроек
             $maxTags = \SettingsHelper::get('controller_tags', 'max_tags_per_post', 10);
+            $hasCategories = !empty($categories);
 
-            // Обработка POST-запроса (отправка формы)
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $this->handlePostRequest($categories, $tags, $maxTags);
+                $this->handlePostRequest($categories, $tags, $maxTags, $hasCategories);
                 return;
             }
 
-            // Отображение формы создания
-            $this->renderCreateForm($categories, $tags, $maxTags);
+            $this->renderCreateForm($categories, $tags, $maxTags, $hasCategories);
 
         } catch (\Exception $e) {
-            $this->handleError($e, $categories, $tags, $maxTags);
+            $this->handleError($e, $categories, $tags, $maxTags, $hasCategories ?? true);
         }
     }
 
@@ -48,29 +44,18 @@ class Create extends PostAction {
      * @param array $categories Список категорий
      * @param array $tags Список тегов
      * @param int $maxTags Максимальное количество тегов
+     * @param bool $hasCategories Флаг наличия категорий
      * @throws \Exception При ошибках валидации
      * @return void
      */
-    private function handlePostRequest($categories, $tags, $maxTags) {
-        // Валидация обязательных полей
-        $this->validateRequiredFields($maxTags);
-        
-        // Подготовка данных поста
+    private function handlePostRequest($categories, $tags, $maxTags, $hasCategories) {
+        $this->validateRequiredFields($maxTags, $hasCategories);
         $postData = $this->preparePostData();
-        
-        // Создание поста в базе данных
         $postId = $this->postModel->create($postData);
-        
-        // Обработка блоков поста
         $this->processPostBlocks($postId);
-        
-        // Обработка тегов
         $this->processPostTags($postId);
-        
-        // Обработка пользовательских полей
         $this->processCustomFields($postId);
         
-        // Уведомление об успехе и перенаправление
         \Notification::success('Пост успешно создан');
         $this->redirect(ADMIN_URL . '/posts');
     }
@@ -79,18 +64,19 @@ class Create extends PostAction {
      * Валидирует обязательные поля формы
      * 
      * @param int $maxTags Максимальное количество тегов
+     * @param bool $hasCategories Флаг наличия категорий
      * @throws \Exception При ошибках валидации
      * @return void
      */
-    private function validateRequiredFields($maxTags) {
+    private function validateRequiredFields($maxTags, $hasCategories) {
         if (empty($_POST['title'])) {
             throw new \Exception('Заголовок обязателен');
         }
-        if (empty($_POST['category_id'])) {
+        
+        if ($hasCategories && empty($_POST['category_id'])) {
             throw new \Exception('Категория обязательна');
         }
 
-        // ВАЛИДАЦИЯ МАКСИМАЛЬНОГО КОЛИЧЕСТВА ТЕГОВ
         if (!empty($_POST['tags_json'])) {
             $tags = json_decode($_POST['tags_json'], true);
             if (is_array($tags)) {
@@ -100,7 +86,6 @@ class Create extends PostAction {
             }
         }
 
-        // Валидация даты публикации
         if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
             $publishDate = $_POST['publish_date'];
             $selectedDate = new \DateTime($publishDate);
@@ -119,11 +104,16 @@ class Create extends PostAction {
      * @throws \Exception При ошибке загрузки изображения
      */
     private function preparePostData() {
+        $categoryId = null;
+        if (isset($_POST['category_id']) && $_POST['category_id'] !== '' && $_POST['category_id'] !== 'NULL') {
+            $categoryId = $_POST['category_id'];
+        }
+        
         $postData = [
             'title' => $_POST['title'],
             'short_description' => $_POST['short_description'] ?? null,
             'slug' => $this->postModel->createSlug($_POST['title']),
-            'category_id' => $_POST['category_id'],
+            'category_id' => $categoryId,
             'user_id' => $_SESSION['user_id'],
             'status' => $_POST['status'] ?? 'draft',
             'meta_description' => $_POST['meta_description'] ?? null,
@@ -134,12 +124,10 @@ class Create extends PostAction {
             'hide_from_groups' => !empty($_POST['hide_from_groups']) ? json_encode($_POST['hide_from_groups']) : null
         ];
 
-        // Обработка даты публикации
         if (isset($_POST['change_publish_date']) && $_POST['change_publish_date'] && !empty($_POST['publish_date'])) {
             $postData['created_at'] = $_POST['publish_date'];
         }
 
-        // Обработка главного изображения
         $postData['featured_image'] = $this->processFeaturedImage();
 
         return $postData;
@@ -175,16 +163,22 @@ class Create extends PostAction {
 
     /**
      * Обрабатывает и сохраняет блоки поста
+     * Переопределяет родительский метод для работы с данными из POST-запроса
      * 
      * @param int $postId ID созданного поста
+     * @param array $blocksData Данные блоков (передаются из родительского вызова)
      * @return void
      */
-    private function processPostBlocks($postId) {
-        if (!empty($_POST['post_blocks'])) {
-            $blocksData = json_decode($_POST['post_blocks'], true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($blocksData)) {
-                $this->processPostBlocks($postId, $blocksData);
+    protected function processPostBlocks($postId, $blocksData = []) {
+        if (empty($blocksData) && !empty($_POST['post_blocks'])) {
+            $decodedData = json_decode($_POST['post_blocks'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedData)) {
+                $blocksData = $decodedData;
             }
+        }
+        
+        if (!empty($blocksData)) {
+            parent::processPostBlocks($postId, $blocksData);
         }
     }
 
@@ -220,13 +214,11 @@ class Create extends PostAction {
         $fieldManager = new \FieldManager($this->db);
         $customFields = $fieldModel->getActiveByEntityType('post');
 
-        // Валидация полей
         $validationErrors = $this->validateCustomFields($customFields, $fieldModel, $fieldManager);
         if (!empty($validationErrors)) {
             throw new \Exception(implode('<br>', $validationErrors));
         }
 
-        // Сохранение полей
         foreach ($customFields as $field) {
             $this->saveCustomField($field, $postId, $fieldModel, $fieldManager);
         }
@@ -290,14 +282,16 @@ class Create extends PostAction {
      * @param array $categories Список категорий
      * @param array $tags Список тегов
      * @param int $maxTags Максимальное количество тегов
+     * @param bool $hasCategories Флаг наличия категорий
      * @return void
      */
-    private function renderCreateForm($categories, $tags, $maxTags) {
+    private function renderCreateForm($categories, $tags, $maxTags, $hasCategories) {
         $this->render('admin/posts/create', [
             'categories' => $categories,
             'tags' => $tags,
             'postBlockManager' => $this->postBlockManager,
             'maxTags' => $maxTags,
+            'hasCategories' => $hasCategories,
             'pageTitle' => 'Создание поста'
         ]);
     }
@@ -309,9 +303,10 @@ class Create extends PostAction {
      * @param array $categories Список категорий
      * @param array $tags Список тегов
      * @param int $maxTags Максимальное количество тегов
+     * @param bool $hasCategories Флаг наличия категорий
      * @return void
      */
-    private function handleError($e, $categories, $tags, $maxTags) {
+    private function handleError($e, $categories, $tags, $maxTags, $hasCategories) {
         \Notification::error($e->getMessage());
         
         $this->render('admin/posts/create', [
@@ -319,7 +314,8 @@ class Create extends PostAction {
             'tags' => $tags,
             'post' => $_POST,
             'postBlockManager' => $this->postBlockManager,
-            'maxTags' => $maxTags
+            'maxTags' => $maxTags,
+            'hasCategories' => $hasCategories
         ]);
     }
 }

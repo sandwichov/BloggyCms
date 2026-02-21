@@ -53,8 +53,6 @@
                     <?= admin_menu_item('plugins', ADMIN_URL . '/plugins', 'plug', 'Плагины') ?>
                     <?= admin_menu_item('settings', ADMIN_URL . '/settings', 'gear', 'Настройки') ?>
                     <?= admin_menu_item('templates', ADMIN_URL . '/templates', 'palette', 'Шаблон') ?>
-                    <?= admin_menu_item('addons', ADMIN_URL . '/addons', 'plugin', 'Дополнения') ?>
-                    <?= admin_menu_item('docs', ADMIN_URL . '/docs', 'filetype-doc', 'Документация') ?>
                 </nav>
             </aside>
 

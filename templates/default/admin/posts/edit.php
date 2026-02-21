@@ -307,21 +307,23 @@ add_admin_css('templates/default/admin/assets/css/controllers/post-blocks.css');
                     </div>
                 </div>
                 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0">
-                        <h5 class="card-title mb-0">Категория</h5>
+                <?php if ($hasCategories) { ?>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0">Категория</h5>
+                        </div>
+                        <div class="card-body">
+                            <select class="form-select" name="category_id" required>
+                                <option value="">Выберите категорию</option>
+                                <?php foreach ($categories as $category) { ?>
+                                    <option value="<?php echo $category['id']; ?>" <?php echo $post['category_id'] == $category['id'] ? 'selected' : ''; ?>>
+                                        <?php echo html($category['name']); ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <select class="form-select" name="category_id" required>
-                            <option value="">Выберите категорию</option>
-                            <?php foreach ($categories as $category) { ?>
-                                <option value="<?php echo $category['id']; ?>" <?php echo $post['category_id'] == $category['id'] ? 'selected' : ''; ?>>
-                                    <?php echo html($category['name']); ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
+                <?php } ?>
                 
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-0">

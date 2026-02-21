@@ -257,21 +257,25 @@ const BASE_URL = '<?php echo BASE_URL; ?>';
                     </div>
                 </div>
                 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0">
-                        <h5 class="card-title mb-0">Категория</h5>
+                <?php if ($hasCategories) { ?>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0">Категория</h5>
+                        </div>
+                        <div class="card-body">
+                            <select class="form-select" name="category_id" required>
+                                <option value="">Выберите категорию</option>
+                                <?php foreach ($categories as $category) { ?>
+                                    <option value="<?php echo $category['id']; ?>" <?php echo isset($post['category_id']) && $post['category_id'] == $category['id'] ? 'selected' : ''; ?>>
+                                        <?php echo html($category['name']); ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <select class="form-select" name="category_id" required>
-                            <option value="">Выберите категорию</option>
-                            <?php foreach ($categories as $category) { ?>
-                                <option value="<?php echo $category['id']; ?>">
-                                    <?php echo html($category['name']); ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
+                <?php } else { ?>
+                    <input type="hidden" name="category_id" value="NULL">
+                <?php } ?>
                 
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-0">
