@@ -1,7 +1,7 @@
 <?php
 /**
  * Profile Menu Template
- * Шаблон выпадающего меню профиля в стиле Telegram Desktop
+ * Шаблон выпадающего меню профиля
  * 
  */
 
@@ -184,4 +184,5 @@ $currentUrl = $_SERVER['REQUEST_URI'];
             </div>
         <?php } ?>
     <?php } ?>
+
 </div>
