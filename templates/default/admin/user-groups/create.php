@@ -1,11 +1,11 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-diagram-3 me-2"></i>
-            <?= $pageTitle ?>
+            <?php echo bloggy_icon('bs', 'diagram-3', '24', '#000', 'me-2'); ?>
+            <?php echo $pageTitle; ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/user-groups" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к группам
+        <a href="<?php echo ADMIN_URL; ?>/user-groups" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?> Назад к группам
         </a>
     </div>
 
@@ -20,14 +20,14 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control" name="name" 
-                                value="<?= html($group['name'] ?? '') ?>" 
+                                value="<?php echo html($group['name'] ?? ''); ?>" 
                                 required maxlength="100">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Описание</label>
                             <textarea class="form-control" name="description" rows="3" 
-                                maxlength="500"><?= html($group['description'] ?? '') ?></textarea>
+                                maxlength="500"><?php echo html($group['description'] ?? ''); ?></textarea>
                             <div class="form-text">Краткое описание назначения группы</div>
                         </div>
                     </div>
@@ -41,7 +41,7 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" name="is_default" 
                                        id="is_default" value="1" 
-                                       <?= ($group['is_default'] ?? 0) ? 'checked' : '' ?>>
+                                       <?php echo ($group['is_default'] ?? 0) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="is_default">
                                     Группа по умолчанию
                                 </label>
@@ -55,10 +55,10 @@
                 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i>
-                        <?= isset($group) ? 'Обновить группу' : 'Создать группу' ?>
+                        <?php echo bloggy_icon('bs', 'check-lg', '18', '#fff', 'me-1'); ?>
+                        <?php echo isset($group) ? 'Обновить группу' : 'Создать группу'; ?>
                     </button>
-                    <a href="<?= ADMIN_URL ?>/user-groups" class="btn btn-outline-secondary">
+                    <a href="<?php echo ADMIN_URL; ?>/user-groups" class="btn btn-outline-secondary">
                         Отмена
                     </a>
                 </div>

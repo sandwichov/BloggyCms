@@ -1,11 +1,11 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-diagram-3 me-2"></i>
-            Группы пользователя: <?= html($user['username']) ?>
+            <?php echo bloggy_icon('bs', 'diagram-3', '24', '#000', 'me-2'); ?>
+            Группы пользователя: <?php echo html($user['username']); ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/users" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к пользователям
+        <a href="<?php echo ADMIN_URL; ?>/users" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?> Назад к пользователям
         </a>
     </div>
 
@@ -17,39 +17,39 @@
                         <div class="mb-3">
                             <label class="form-label mb-3">Выберите группы для пользователя</label>
                             <div class="row">
-                                <?php foreach($allGroups as $group): ?>
+                                <?php foreach ($allGroups as $group) { ?>
                                 <div class="col-md-6 mb-3">
                                     <div class="card border h-100">
                                         <div class="card-body p-3">
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input" type="checkbox" 
-                                                       name="groups[]" value="<?= $group['id'] ?>"
-                                                       id="group_<?= $group['id'] ?>"
-                                                       <?= in_array($group['id'], $userGroups) ? 'checked' : '' ?>>
-                                                <label class="form-check-label fw-bold" for="group_<?= $group['id'] ?>">
-                                                    <?= html($group['name']) ?>
-                                                    <?php if($group['is_default']): ?>
+                                                       name="groups[]" value="<?php echo $group['id']; ?>"
+                                                       id="group_<?php echo $group['id']; ?>"
+                                                       <?php echo in_array($group['id'], $userGroups) ? 'checked' : ''; ?>>
+                                                <label class="form-check-label fw-bold" for="group_<?php echo $group['id']; ?>">
+                                                    <?php echo html($group['name']); ?>
+                                                    <?php if ($group['is_default']) { ?>
                                                         <span class="badge bg-success ms-1">по умолчанию</span>
-                                                    <?php endif; ?>
+                                                    <?php } ?>
                                                 </label>
                                             </div>
-                                            <?php if($group['description']): ?>
+                                            <?php if ($group['description']) { ?>
                                             <p class="small text-muted mb-0">
-                                                <?= html($group['description']) ?>
+                                                <?php echo html($group['description']); ?>
                                             </p>
-                                            <?php endif; ?>
+                                            <?php } ?>
                                         </div>
                                     </div>
                                 </div>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </div>
                         </div>
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i>Сохранить группы
+                                <?php echo bloggy_icon('bs', 'check-lg', '18', '#fff', 'me-1'); ?>Сохранить группы
                             </button>
-                            <a href="<?= ADMIN_URL ?>/users" class="btn btn-outline-secondary">
+                            <a href="<?php echo ADMIN_URL; ?>/users" class="btn btn-outline-secondary">
                                 Отмена
                             </a>
                         </div>
@@ -62,34 +62,34 @@
                     <div class="card-body">
                         <h6 class="card-title border-bottom pb-2 mb-3">Информация о пользователе</h6>
                         <div class="d-flex align-items-center mb-3">
-                            <?php if($user['avatar'] && $user['avatar'] !== 'default.jpg'): ?>
-                                <img src="<?= BASE_URL ?>/uploads/avatars/<?= $user['avatar'] ?>" 
+                            <?php if ($user['avatar'] && $user['avatar'] !== 'default.jpg') { ?>
+                                <img src="<?php echo BASE_URL; ?>/uploads/avatars/<?php echo $user['avatar']; ?>" 
                                      class="rounded-circle me-3" 
                                      style="width: 60px; height: 60px; object-fit: cover;"
-                                     alt="<?= html($user['username']) ?>">
-                            <?php else: ?>
+                                     alt="<?php echo html($user['username']); ?>">
+                            <?php } else { ?>
                                 <div class="rounded-circle me-3 d-flex align-items-center justify-content-center bg-light" 
                                      style="width: 60px; height: 60px;">
-                                    <i class="bi bi-person text-muted" style="font-size: 1.5rem;"></i>
+                                    <?php echo bloggy_icon('bs', 'person', '24', '#6C6C6C'); ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
                             <div>
-                                <strong><?= html($user['username']) ?></strong>
-                                <div class="text-muted small"><?= html($user['email']) ?></div>
+                                <strong><?php echo html($user['username']); ?></strong>
+                                <div class="text-muted small"><?php echo html($user['email']); ?></div>
                             </div>
                         </div>
                         
                         <div class="small text-muted">
                             <div class="mb-1">
-                                <i class="bi bi-circle-fill me-1 text-<?= $user['status'] === 'active' ? 'success' : 'danger' ?>"></i>
+                                <?php echo bloggy_icon('bs', 'circle-fill', '12', $user['status'] === 'active' ? '#198754' : '#dc3545', 'me-1'); ?>
                                 Статус: 
                                 <span class="fw-medium">
-                                    <?= $user['status'] === 'active' ? 'Активен' : 'Заблокирован' ?>
+                                    <?php echo $user['status'] === 'active' ? 'Активен' : 'Заблокирован'; ?>
                                 </span>
                             </div>
                             <div>
-                                <i class="bi bi-calendar me-1"></i>
-                                Зарегистрирован: <?= date('d.m.Y', strtotime($user['created_at'])) ?>
+                                <?php echo bloggy_icon('bs', 'calendar', '14', '#6C6C6C', 'me-1'); ?>
+                                Зарегистрирован: <?php echo date('d.m.Y', strtotime($user['created_at'])); ?>
                             </div>
                         </div>
                     </div>

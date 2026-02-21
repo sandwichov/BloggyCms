@@ -8,11 +8,12 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-gear me-2"></i>
-            Настройки: <?= html($postBlock['name']) ?>
+            <?php echo bloggy_icon('bs', 'gear', '24', '#000', 'me-2'); ?>
+            Настройки: <?php echo html($postBlock['name']); ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/post-blocks" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад
+        <a href="<?php echo ADMIN_URL; ?>/post-blocks" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?>
+            Назад
         </a>
     </div>
 
@@ -28,7 +29,7 @@
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" name="enable_in_posts" 
-                                           id="enable_in_posts" <?= $settings['enable_in_posts'] ? 'checked' : '' ?>>
+                                           id="enable_in_posts" <?php echo $settings['enable_in_posts'] ? 'checked' : ''; ?>>
                                     <label class="form-check-label" for="enable_in_posts">
                                         Включить в постах
                                     </label>
@@ -41,7 +42,7 @@
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" name="enable_in_pages" 
-                                           id="enable_in_pages" <?= $settings['enable_in_pages'] ? 'checked' : '' ?>>
+                                           id="enable_in_pages" <?php echo $settings['enable_in_pages'] ? 'checked' : ''; ?>>
                                     <label class="form-check-label" for="enable_in_pages">
                                         Включить в страницах
                                     </label>
@@ -58,11 +59,12 @@
                                         <small class="text-muted">Используйте шорткоды для динамического контента</small>
                                     </div>
                                     <button type="button" id="load-template" class="btn btn-sm btn-outline-secondary">
-                                        <i class="bi bi-arrow-clockwise"></i> Загрузить стандартный шаблон
+                                        <?php echo bloggy_icon('bs', 'arrow-clockwise', '14', '#000', 'me-1'); ?>
+                                        Загрузить стандартный шаблон
                                     </button>
                                 </div>
                                 <div id="template-editor" style="height: 400px; width: 100%; border: 1px solid #dee2e6; border-radius: 0.375rem;"></div>
-                                <textarea name="template" id="template" style="display: none;"><?= html($settings['template']) ?></textarea>
+                                <textarea name="template" id="template" style="display: none;"><?php echo html($settings['template']); ?></textarea>
                                 <div class="form-text">
                                     Используйте шорткоды для динамического контента. Оставьте пустым для использования стандартного шаблона.
                                 </div>
@@ -71,7 +73,8 @@
                         
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i> Сохранить настройки
+                                <?php echo bloggy_icon('bs', 'check-lg', '16', '#fff', 'me-1'); ?>
+                                Сохранить настройки
                             </button>
                         </div>
                     </form>
@@ -80,7 +83,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0">Пресеты блока</h5>
                             <button type="button" class="btn btn-sm btn-success" id="add-preset-btn">
-                                <i class="bi bi-plus-circle me-1"></i> Добавить пресет
+                                <?php echo bloggy_icon('bs', 'plus-circle', '14', '#fff', 'me-1'); ?>
+                                Добавить пресет
                             </button>
                         </div>
                         
@@ -88,7 +92,7 @@
                             <div class="card-body">
                                 <div id="presets-container">
                                     <div class="text-center text-muted py-4" id="no-presets-message">
-                                        <?php echo bloggy_icon('bs', 'pencil', '32', '#000'); ?>
+                                        <?php echo bloggy_icon('bs', 'pencil', '32', '#6C6C6C', 'mb-2'); ?>
                                         <p class="mb-0">Пресеты не добавлены</p>
                                     </div>
                                 </div>
@@ -108,28 +112,32 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <div class="post-block-icon me-3">
-                            <i class="<?= $postBlock['icon'] ?>"></i>
+                            <?php 
+                            $iconClass = $postBlock['icon'] ?? 'bi bi-puzzle';
+                            $iconName = str_replace('bi bi-', '', $iconClass);
+                            echo bloggy_icon('bs', $iconName, '24', '#000');
+                            ?>
                         </div>
                         <div>
-                            <h6 class="mb-1"><?= html($postBlock['name']) ?></h6>
-                            <p class="text-muted small mb-0"><?= html($postBlock['description']) ?></p>
+                            <h6 class="mb-1"><?php echo html($postBlock['name']); ?></h6>
+                            <p class="text-muted small mb-0"><?php echo html($postBlock['description']); ?></p>
                         </div>
                     </div>
                     
                     <div class="small">
                         <div class="mb-2">
                             <strong>Системное имя:</strong>
-                            <code class="d-block mt-1"><?= $postBlock['system_name'] ?></code>
+                            <code class="d-block mt-1"><?php echo $postBlock['system_name']; ?></code>
                         </div>
                         <div class="mb-2">
                             <strong>Категория:</strong>
-                            <span class="badge bg-secondary"><?= $postBlock['category'] ?></span>
+                            <span class="badge bg-secondary"><?php echo $postBlock['category']; ?></span>
                         </div>
                         <div class="mb-2">
-                            <strong>Версия:</strong> <?= $postBlock['version'] ?>
+                            <strong>Версия:</strong> <?php echo $postBlock['version']; ?>
                         </div>
                         <div class="mb-2">
-                            <strong>Автор:</strong> <?= $postBlock['author'] ?>
+                            <strong>Автор:</strong> <?php echo $postBlock['author']; ?>
                         </div>
                     </div>
                 </div>
@@ -140,18 +148,18 @@
                     <h5 class="mb-0">Доступные шорткоды</h5>
                 </div>
                 <div class="card-body">
-                    <?php if(empty($shortcodes)): ?>
+                    <?php if (empty($shortcodes)) { ?>
                         <p class="text-muted mb-0">Для этого блока нет специальных шорткодов.</p>
-                    <?php else: ?>
+                    <?php } else { ?>
                         <div class="shortcodes-list">
-                            <?php foreach($shortcodes as $shortcode => $description): ?>
+                            <?php foreach ($shortcodes as $shortcode => $description) { ?>
                                 <div class="shortcode-item mb-3 p-3 border rounded">
-                                    <code class="text-primary d-block mb-1 shortcode-insert" data-shortcode="<?= html($shortcode) ?>"><?= html($shortcode) ?></code>
-                                    <div class="text-muted small"><?= html($description) ?></div>
+                                    <code class="text-primary d-block mb-1 shortcode-insert" data-shortcode="<?php echo html($shortcode); ?>"><?php echo html($shortcode); ?></code>
+                                    <div class="text-muted small"><?php echo html($description); ?></div>
                                 </div>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </div>
-                    <?php endif; ?>
+                    <?php } ?>
                 </div>
             </div>
         </div>
@@ -168,7 +176,7 @@
             <div class="modal-body">
                 <form id="presetForm">
                     <input type="hidden" name="preset_id" id="preset_id">
-                    <input type="hidden" name="system_name" id="preset_system_name" value="<?= $postBlock['system_name'] ?>">
+                    <input type="hidden" name="system_name" id="preset_system_name" value="<?php echo $postBlock['system_name']; ?>">
                     
                     <div class="mb-3">
                         <label class="form-label">Имя пресета</label>
@@ -189,10 +197,12 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                 <button type="button" class="btn btn-danger" id="delete-preset-btn" style="display: none;">
-                    <i class="bi bi-trash me-1"></i> Удалить
+                    <?php echo bloggy_icon('bs', 'trash', '14', '#fff', 'me-1'); ?>
+                    Удалить
                 </button>
                 <button type="button" class="btn btn-primary" id="save-preset-btn">
-                    <i class="bi bi-check-lg me-1"></i> Сохранить
+                    <?php echo bloggy_icon('bs', 'check-lg', '14', '#fff', 'me-1'); ?>
+                    Сохранить
                 </button>
             </div>
         </div>
@@ -200,7 +210,7 @@
 </div>
 
 <div id="postblock-data" 
-     data-system-name="<?= $postBlock['system_name'] ?>"
-     data-admin-url="<?= ADMIN_URL ?>"
+     data-system-name="<?php echo $postBlock['system_name']; ?>"
+     data-admin-url="<?php echo ADMIN_URL; ?>"
      style="display: none;">
 </div>

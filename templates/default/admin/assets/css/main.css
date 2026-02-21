@@ -3012,3 +3012,14 @@ h6.card-title {
         transform: scale(1);
     }
 }
+
+.favicon-preview {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.favicon-preview img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+}

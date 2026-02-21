@@ -3,13 +3,14 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-gear me-2"></i>
-            Настройки плагина: <?= html($plugin->getName()) ?>
+            <?php echo bloggy_icon('bs', 'gear', '24', '#000', 'me-2'); ?>
+            Настройки плагина: <?php echo html($plugin->getName()); ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/plugins" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i>Назад к списку
+        <a href="<?php echo ADMIN_URL; ?>/plugins" class="btn btn-outline-secondary">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-2'); ?>
+            Назад к списку
         </a>
     </div>
 
-    <?= $plugin->renderAdminPage() ?>
+    <?php echo $plugin->renderAdminPage(); ?>
 </div>

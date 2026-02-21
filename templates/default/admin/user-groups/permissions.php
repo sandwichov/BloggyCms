@@ -1,11 +1,11 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-shield-lock me-2"></i>
-            Права доступа: <?= html($group['name']) ?>
+            <?php echo bloggy_icon('bs', 'shield-lock', '24', '#000', 'me-2'); ?>
+            Права доступа: <?php echo html($group['name']); ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/user-groups" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к группам
+        <a href="<?php echo ADMIN_URL; ?>/user-groups" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?> Назад к группам
         </a>
     </div>
 
@@ -14,53 +14,54 @@
             <div class="col-lg-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
-                        <?php if(empty($allPermissions)): ?>
+                        <?php if (empty($allPermissions)) { ?>
                             <div class="text-center py-4">
-                                <i class="bi bi-shield-slash text-muted" style="font-size: 3rem;"></i>
+                                <?php echo bloggy_icon('bs', 'shield-slash', '48', '#6C6C6C', 'mb-3'); ?>
                                 <h5 class="text-muted mt-3">Нет доступных прав</h5>
                                 <p class="text-muted">Создайте файлы permissions.php в контроллерах</p>
                             </div>
-                        <?php else: ?>
-                            <?php foreach($allPermissions as $controller => $permissions): ?>
+                        <?php } else { ?>
+                            <?php foreach ($allPermissions as $controller => $permissions) { ?>
                             <div class="mb-4 pb-3 border-bottom">
                                 <h6 class="mb-3 text-uppercase text-primary fw-bold">
-                                    <i class="bi bi-folder me-2"></i>
-                                    <?= html(ucfirst($controller)) ?>
+                                    <?php echo bloggy_icon('bs', 'folder', '16', '#0d6efd', 'me-2'); ?>
+                                    <?php echo html(ucfirst($controller)); ?>
                                 </h6>
                                 
                                 <div class="row">
-                                    <?php foreach($permissions as $key => $permission): ?>
+                                    <?php foreach ($permissions as $key => $permission) { ?>
                                     <div class="col-md-6 col-lg-4 mb-3">
                                         <div class="card border h-100">
                                             <div class="card-body p-3">
                                                 <div class="form-check mb-2">
                                                     <input class="form-check-input" type="checkbox" 
-                                                           name="permissions[]" value="<?= $key ?>"
-                                                           id="perm_<?= $key ?>"
-                                                           <?= in_array($key, $groupPermissions) ? 'checked' : '' ?>>
-                                                    <label class="form-check-label fw-bold" for="perm_<?= $key ?>">
-                                                        <?= html($permission['title']) ?>
+                                                           name="permissions[]" value="<?php echo $key; ?>"
+                                                           id="perm_<?php echo $key; ?>"
+                                                           <?php echo in_array($key, $groupPermissions) ? 'checked' : ''; ?>>
+                                                    <label class="form-check-label fw-bold" for="perm_<?php echo $key; ?>">
+                                                        <?php echo html($permission['title']); ?>
                                                     </label>
                                                 </div>
-                                                <?php if(!empty($permission['description'])): ?>
+                                                <?php if (!empty($permission['description'])) { ?>
                                                 <p class="small text-muted mb-0">
-                                                    <?= html($permission['description']) ?>
+                                                    <?php echo html($permission['description']); ?>
                                                 </p>
-                                                <?php endif; ?>
+                                                <?php } ?>
                                             </div>
                                         </div>
                                     </div>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                            <?php } ?>
+                        <?php } ?>
 
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i>Сохранить права
+                                <?php echo bloggy_icon('bs', 'check-lg', '18', '#fff', 'me-1'); ?>
+                                Сохранить права
                             </button>
-                            <a href="<?= ADMIN_URL ?>/user-groups" class="btn btn-outline-secondary">
+                            <a href="<?php echo ADMIN_URL; ?>/user-groups" class="btn btn-outline-secondary">
                                 Отмена
                             </a>
                         </div>

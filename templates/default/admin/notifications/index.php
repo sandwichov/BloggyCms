@@ -1,15 +1,17 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-bell me-2"></i>
+            <?php echo bloggy_icon('bs', 'bell', '24', '#000', 'me-2'); ?>
             Уведомления
         </h4>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-outline-success" id="mark-all-read-btn">
-                <i class="bi bi-check2-all me-1"></i> Отметить все как прочитанные
+                <?php echo bloggy_icon('bs', 'check2-all', '16', '#000', 'me-1'); ?>
+                Отметить все как прочитанные
             </button>
             <button type="button" class="btn btn-outline-danger" id="clear-read-btn">
-                <i class="bi bi-trash me-1"></i> Очистить прочитанные
+                <?php echo bloggy_icon('bs', 'trash', '16', '#000', 'me-1'); ?>
+                Очистить прочитанные
             </button>
         </div>
     </div>
@@ -25,15 +27,15 @@
                         ?>
                         <div class="d-flex justify-content-between align-items-center">
                             <span>Всего:</span>
-                            <span class="badge bg-secondary"><?= $stats['total'] ?? 0 ?></span>
+                            <span class="badge bg-secondary"><?php echo $stats['total'] ?? 0; ?></span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span>Непрочитанные:</span>
-                            <span class="badge bg-primary"><?= $stats['unread'] ?? 0 ?></span>
+                            <span class="badge bg-primary"><?php echo $stats['unread'] ?? 0; ?></span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span>Прочитанные:</span>
-                            <span class="badge bg-success"><?= $stats['read_count'] ?? 0 ?></span>
+                            <span class="badge bg-success"><?php echo $stats['read_count'] ?? 0; ?></span>
                         </div>
                     </div>
                 </div>
@@ -52,6 +54,6 @@
 
 <script>
 if (typeof ADMIN_URL === 'undefined') {
-    window.ADMIN_URL = '<?= ADMIN_URL ?>';
+    window.ADMIN_URL = '<?php echo ADMIN_URL; ?>';
 }
 </script>

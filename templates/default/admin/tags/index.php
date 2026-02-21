@@ -2,12 +2,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0"><?php echo bloggy_icon('bs', 'tag', '24', '#000', 'me-2 controller-svg'); ?>Управление тегами</h4>
         <div class="d-flex gap-2">
-            <a href="<?= ADMIN_URL ?>/settings?tab=components&controller=tags" class="btn btn-outline-secondary"><?php echo bloggy_icon('bs', 'gear-fill', '20'); ?>Настройки</a>
-            <a href="<?= ADMIN_URL ?>/tags/create" class="btn btn-primary"><?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>Добавить тег</a>
+            <a href="<?php echo ADMIN_URL; ?>/settings?tab=components&controller=tags" class="btn btn-outline-secondary"><?php echo bloggy_icon('bs', 'gear-fill', '20', '#000', 'me-2'); ?>Настройки</a>
+            <a href="<?php echo ADMIN_URL; ?>/tags/create" class="btn btn-primary"><?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>Добавить тег</a>
         </div>
     </div>
 
-    <?php if(SettingsHelper::get('controller_tags', 'show_info') == true) { ?>
+    <?php if (SettingsHelper::get('controller_tags', 'show_info') == true) { ?>
         <div class="alert alert-info d-flex align-items-center mb-3">
             <?php echo bloggy_icon('bs', 'info-circle', '16', '#5AAFC9', 'me-2'); ?>
             <span><?php echo html($randomHint); ?></span>
@@ -16,12 +16,12 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <?php if(empty($tags)) { ?>
+            <?php if (empty($tags)) { ?>
                 <div class="text-center py-5">
-                    <div class="mb-3"><?php echo bloggy_icon('bs', 'tags', '24', '#000'); ?></div>
+                    <div class="mb-3"><?php echo bloggy_icon('bs', 'tags', '48', '#6C6C6C'); ?></div>
                     <h5 class="text-muted">Теги пока не созданы</h5>
                     <p class="text-muted">Создайте первый тег для ваших постов</p>
-                    <a href="<?= ADMIN_URL ?>/tags/create" class="btn btn-primary"><?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>Добавить тег</a>
+                    <a href="<?php echo ADMIN_URL; ?>/tags/create" class="btn btn-primary"><?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>Добавить тег</a>
                 </div>
             <?php } else { ?>
                 <div class="table-responsive">
@@ -35,24 +35,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($tags as $tag) { ?>
+                            <?php foreach ($tags as $tag) { ?>
                                 <tr>
                                     <td>
-                                        <strong><?php echo SettingsHelper::get('controller_tags', 'tag_prefix', '#'); ?><?php echo html($tag['name']) ?></strong>
+                                        <strong><?php echo SettingsHelper::get('controller_tags', 'tag_prefix', '#'); ?><?php echo html($tag['name']); ?></strong>
                                     </td>
                                     <td>
-                                        <code class="text-muted"><?php echo html($tag['slug']) ?></code>
+                                        <code class="text-muted"><?php echo html($tag['slug']); ?></code>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark">
-                                            <?= $tag['posts_count'] ?? 0 ?> <?= plural_form($tag['posts_count'], ['пост', 'поста', 'постов']) ?>
+                                            <?php echo $tag['posts_count'] ?? 0; ?> <?php echo plural_form($tag['posts_count'] ?? 0, array('пост', 'поста', 'постов')); ?>
                                         </span>
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a href="<?= BASE_URL ?>/tag/<?= $tag['slug'] ?>" class="btn btn-sm btn-secondary" target="_blank"title="Просмотр"><?php echo bloggy_icon('bs', 'eye', '16', '#000'); ?></a>
-                                            <a href="<?= ADMIN_URL ?>/tags/edit/<?= $tag['id'] ?>" class="btn btn-sm btn-success"title="Редактировать"><?php echo bloggy_icon('bs', 'pencil', '16', '#fff'); ?></a>
-                                            <a href="<?= ADMIN_URL ?>/tags/delete/<?= $tag['id'] ?>" class="btn btn-sm btn-danger"onclick="return confirm('Вы уверены, что хотите удалить этот тег?')"title="Удалить"><?php echo bloggy_icon('bs', 'trash', '16', '#fff'); ?></a>
+                                            <a href="<?php echo BASE_URL; ?>/tag/<?php echo $tag['slug']; ?>" class="btn btn-sm btn-secondary" target="_blank" title="Просмотр"><?php echo bloggy_icon('bs', 'eye', '16', '#000'); ?></a>
+                                            <a href="<?php echo ADMIN_URL; ?>/tags/edit/<?php echo $tag['id']; ?>" class="btn btn-sm btn-success" title="Редактировать"><?php echo bloggy_icon('bs', 'pencil', '16', '#fff'); ?></a>
+                                            <a href="<?php echo ADMIN_URL; ?>/tags/delete/<?php echo $tag['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот тег?')" title="Удалить"><?php echo bloggy_icon('bs', 'trash', '16', '#fff'); ?></a>
                                         </div>
                                     </td>
                                 </tr>

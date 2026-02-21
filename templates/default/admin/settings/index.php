@@ -13,20 +13,20 @@
         <div class="card-header bg-white border-0 pb-0">
             <ul class="nav nav-tabs nav-tabs-custom">
                 <li class="nav-item">
-                    <a class="nav-link <?= $activeTab === 'general' ? 'active' : '' ?>" 
-                       href="<?= ADMIN_URL ?>/settings?tab=general">
+                    <a class="nav-link <?php echo $activeTab === 'general' ? 'active' : ''; ?>" 
+                       href="<?php echo ADMIN_URL; ?>/settings?tab=general">
                        <?php echo bloggy_icon('bs', 'sliders', '14', '#000', 'me-1 controller-svg'); ?> Общее
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $activeTab === 'site' ? 'active' : '' ?>" 
-                       href="<?= ADMIN_URL ?>/settings?tab=site">
+                    <a class="nav-link <?php echo $activeTab === 'site' ? 'active' : ''; ?>" 
+                       href="<?php echo ADMIN_URL; ?>/settings?tab=site">
                        <?php echo bloggy_icon('bs', 'globe', '14', '#000', 'me-1 controller-svg'); ?> Сайт
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= $activeTab === 'components' ? 'active' : '' ?>" 
-                       href="<?= ADMIN_URL ?>/settings?tab=components">
+                    <a class="nav-link <?php echo $activeTab === 'components' ? 'active' : ''; ?>" 
+                       href="<?php echo ADMIN_URL; ?>/settings?tab=components">
                        <?php echo bloggy_icon('bs', 'puzzle', '14', '#000', 'me-1 controller-svg'); ?> Компоненты
                     </a>
                 </li>
@@ -63,23 +63,23 @@
                             <?php if (!empty($controllersWithSettings)) { ?>
                                 <div class="components-list">
                                     <?php foreach ($controllersWithSettings as $controller) { ?>
-                                        <a href="<?= ADMIN_URL ?>/settings?tab=components&controller=<?= $controller['key'] ?>" 
-                                        class="component-item <?= $selectedController === $controller['key'] ? 'active' : '' ?>">
+                                        <a href="<?php echo ADMIN_URL; ?>/settings?tab=components&controller=<?php echo $controller['key']; ?>" 
+                                           class="component-item <?php echo $selectedController === $controller['key'] ? 'active' : ''; ?>">
                                             <div class="component-content">
-                                                <div class="component-name"><?= $controller['name'] ?></div>
+                                                <div class="component-name"><?php echo $controller['name']; ?></div>
                                                 <div class="component-meta">
-                                                    <span class="component-author"><?= $controller['author'] ?></span>
+                                                    <span class="component-author"><?php echo $controller['author']; ?></span>
                                                 </div>
-                                                <?php if (!empty($controller['description'])): ?>
-                                                    <div class="component-description"><?= $controller['description'] ?></div>
-                                                <?php endif; ?>
+                                                <?php if (!empty($controller['description'])) { ?>
+                                                    <div class="component-description"><?php echo $controller['description']; ?></div>
+                                                <?php } ?>
                                             </div>
                                         </a>
                                     <?php } ?>
                                 </div>
                             <?php } else { ?>
                                 <div class="components-empty">
-                                    <?php echo bloggy_icon('bs', 'inboxes', '24', '#000'); ?>
+                                    <?php echo bloggy_icon('bs', 'inboxes', '24', '#6C6C6C', 'mb-2'); ?>
                                     <p>Нет компонентов с настройками</p>
                                 </div>
                             <?php } ?>
@@ -97,22 +97,22 @@
                                 <form method="POST" class="component-settings" enctype="multipart/form-data">
                                     <div class="component-header">
                                         <div class="component-title-section">
-                                            <h5 class="component-title"><?= $controller['name'] ?></h5>
+                                            <h5 class="component-title"><?php echo $controller['name']; ?></h5>
                                             <div class="component-meta-large">
-                                                <span class="component-author">Разработчик: <?= $controller['author'] ?></span>
-                                                <span class="component-version">Версия <?= $controller['version'] ?></span>
+                                                <span class="component-author">Разработчик: <?php echo $controller['author']; ?></span>
+                                                <span class="component-version">Версия <?php echo $controller['version']; ?></span>
                                             </div>
                                         </div>
                                         
                                         <?php if (!empty($controller['description'])) { ?>
                                             <div class="component-description-panel">
-                                                <?= $controller['description'] ?>
+                                                <?php echo $controller['description']; ?>
                                             </div>
                                         <?php } ?>
                                     </div>
                                     
                                     <div class="component-settings-form">
-                                        <?= $settingsForm ?>
+                                        <?php echo $settingsForm; ?>
                                     </div>
                                     
                                     <div class="component-footer">
@@ -123,18 +123,18 @@
                                 </form>
                             <?php } else { ?>
                                 <div class="component-not-found">
-                                    <?php echo bloggy_icon('bs', 'gear', '20', '#000'); ?>
+                                    <?php echo bloggy_icon('bs', 'gear', '48', '#6C6C6C', 'mb-3'); ?>
                                     <h5>Настройки не найдены</h5>
                                     <p>Для этого компонента не найдены настройки</p>
-                                    <a href="<?= ADMIN_URL ?>/settings?tab=components" class="btn btn-outline-secondary">
-                                        <?php echo bloggy_icon('bs', 'check-lg', '20', '#000', 'me-2'); ?>Назад к списку
+                                    <a href="<?php echo ADMIN_URL; ?>/settings?tab=components" class="btn btn-outline-secondary">
+                                        <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-2'); ?>Назад к списку
                                     </a>
                                 </div>
                             <?php } ?>
                             
                         <?php } else { ?>
                             <div class="component-welcome">
-                                <?php echo bloggy_icon('bs', 'puzzle', '24', '#464343', 'my-3'); ?>
+                                <?php echo bloggy_icon('bs', 'puzzle', '48', '#6C6C6C', 'my-3'); ?>
                                 <h5>Выберите компонент</h5>
                                 <p>Выберите компонент из списка слева для настройки его параметров</p>
                             </div>

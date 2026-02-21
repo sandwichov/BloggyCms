@@ -4,8 +4,8 @@
             <?php echo bloggy_icon('bs', 'trophy', '24', '#000', 'me-2'); ?>
             Создание ачивки
         </h4>
-        <a href="<?= ADMIN_URL ?>/user-achievements" class="btn btn-outline-secondary btn-sm">
-            <?php echo bloggy_icon('bs', 'arrow-left', '18'); ?> Назад
+        <a href="<?php echo ADMIN_URL; ?>/user-achievements" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '18', '#000', 'me-1'); ?> Назад
         </a>
     </div>
     
@@ -20,14 +20,14 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control" name="name" 
-                                value="<?= html($achievement['name'] ?? '') ?>" 
+                                value="<?php echo html($achievement['name'] ?? ''); ?>" 
                                 required maxlength="255">
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Описание</label>
                             <textarea class="form-control" name="description" rows="3"
-                                maxlength="500"><?= html($achievement['description'] ?? '') ?></textarea>
+                                maxlength="500"><?php echo html($achievement['description'] ?? ''); ?></textarea>
                         </div>
                         
                         <div class="mb-4">
@@ -70,7 +70,7 @@
                                             <div class="col-md-1 d-flex align-items-end">
                                                 <button type="button" class="btn btn-sm btn-outline-danger remove-condition" 
                                                     style="margin-bottom: 8px;">
-                                                    <?php echo bloggy_icon('bs', 'trash', '16'); ?>
+                                                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
                                             </div>
                                         </div>
@@ -80,7 +80,7 @@
                             </div>
                             
                             <button type="button" class="btn btn-sm btn-outline-primary" id="addCondition">
-                                <?php echo bloggy_icon('bs', 'plus', '16', '#000', 'me-1'); ?>
+                                <?php echo bloggy_icon('bs', 'plus', '16', '#0d6efd', 'me-1'); ?>
                                 Добавить условие
                             </button>
                             
@@ -116,10 +116,10 @@
                         <div class="mb-3">
                             <label class="form-label">Тип ачивки</label>
                             <select class="form-select" name="type">
-                                <option value="auto" <?= ($achievement['type'] ?? 'auto') == 'auto' ? 'selected' : '' ?>>
+                                <option value="auto" <?php echo ($achievement['type'] ?? 'auto') == 'auto' ? 'selected' : ''; ?>>
                                     Автоматическая (по условиям)
                                 </option>
-                                <option value="manual" <?= ($achievement['type'] ?? 'auto') == 'manual' ? 'selected' : '' ?>>
+                                <option value="manual" <?php echo ($achievement['type'] ?? 'auto') == 'manual' ? 'selected' : ''; ?>>
                                     Ручная (только администратор)
                                 </option>
                             </select>
@@ -128,13 +128,13 @@
                         <div class="mb-3">
                             <label class="form-label">Приоритет</label>
                             <input type="number" class="form-control" name="priority"
-                                value="<?= html($achievement['priority'] ?? 0) ?>" min="0">
+                                value="<?php echo html($achievement['priority'] ?? 0); ?>" min="0">
                             <div class="form-text">Чем выше число, тем выше приоритет в списке</div>
                         </div>
                         
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" name="is_active" 
-                                id="isActive" <?= ($achievement['is_active'] ?? 1) ? 'checked' : '' ?>>
+                                id="isActive" <?php echo ($achievement['is_active'] ?? 1) ? 'checked' : ''; ?>>
                             <label class="form-check-label" for="isActive">
                                 Ачивка активна
                             </label>
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-sm btn-outline-danger remove-condition" 
                             style="margin-bottom: 8px;">
-                            <i class="bi bi-trash"></i>
+                            <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                         </button>
                     </div>
                 </div>

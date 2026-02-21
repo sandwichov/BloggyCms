@@ -1,28 +1,30 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-diagram-3 me-2"></i>
+            <?php echo bloggy_icon('bs', 'diagram-3', '24', '#000', 'me-2'); ?>
             Группы пользователей
         </h4>
-        <a href="<?= ADMIN_URL ?>/user-groups/create" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-2"></i>Добавить группу
+        <a href="<?php echo ADMIN_URL; ?>/user-groups/create" class="btn btn-primary">
+            <?php echo bloggy_icon('bs', 'plus-lg', '16', '#fff', 'me-2'); ?>
+            Добавить группу
         </a>
     </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <?php if(empty($groups)): ?>
+            <?php if (empty($groups)) { ?>
                 <div class="text-center py-5">
                     <div class="mb-3">
-                        <i class="bi bi-diagram-3 text-muted" style="font-size: 3rem;"></i>
+                        <?php echo bloggy_icon('bs', 'diagram-3', '48', '#6C6C6C'); ?>
                     </div>
                     <h5 class="text-muted">Группы не найдены</h5>
                     <p class="text-muted">Создайте первую группу пользователей</p>
-                    <a href="<?= ADMIN_URL ?>/user-groups/create" class="btn btn-primary">
-                        <i class="bi bi-plus-lg me-2"></i>Добавить группу
+                    <a href="<?php echo ADMIN_URL; ?>/user-groups/create" class="btn btn-primary">
+                        <?php echo bloggy_icon('bs', 'plus-lg', '16', '#fff', 'me-2'); ?>
+                        Добавить группу
                     </a>
                 </div>
-            <?php else: ?>
+            <?php } else { ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
@@ -35,58 +37,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($groups as $group): ?>
+                            <?php foreach ($groups as $group) { ?>
                             <tr>
                                 <td>
-                                    <strong><?= html($group['name']) ?></strong>
+                                    <strong><?php echo html($group['name']); ?></strong>
                                 </td>
                                 <td>
-                                    <?= html($group['description'] ?? '') ?>
+                                    <?php echo html($group['description'] ?? ''); ?>
                                 </td>
                                 <td>
                                     <?php
                                         $userCount = $db->fetchValue(
                                             "SELECT COUNT(*) FROM users_groups WHERE group_id = ?", 
-                                            [$group['id']]
+                                            array($group['id'])
                                         );
                                     ?>
-                                    <span class="badge bg-secondary"><?= $userCount ?></span>
+                                    <span class="badge bg-secondary"><?php echo $userCount; ?></span>
                                 </td>
                                 <td>
-                                    <?php if($group['is_default']): ?>
+                                    <?php if ($group['is_default']) { ?>
                                         <span class="badge bg-success">Да</span>
-                                    <?php else: ?>
+                                    <?php } else { ?>
                                         <span class="badge bg-light text-dark">Нет</span>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-end gap-1">
-                                        <a href="<?= ADMIN_URL ?>/user-groups/permissions/<?= $group['id'] ?>" 
+                                        <a href="<?php echo ADMIN_URL; ?>/user-groups/permissions/<?php echo $group['id']; ?>" 
                                            class="btn btn-sm btn-outline-warning"
                                            title="Права доступа">
-                                            <i class="bi bi-shield-lock"></i>
+                                            <?php echo bloggy_icon('bs', 'shield-lock', '16', '#000'); ?>
                                         </a>
-                                        <a href="<?= ADMIN_URL ?>/user-groups/edit/<?= $group['id'] ?>" 
+                                        <a href="<?php echo ADMIN_URL; ?>/user-groups/edit/<?php echo $group['id']; ?>" 
                                            class="btn btn-sm btn-outline-primary"
                                            title="Редактировать">
-                                            <i class="bi bi-pencil"></i>
+                                            <?php echo bloggy_icon('bs', 'pencil', '16', '#000'); ?>
                                         </a>
-                                        <?php if(!$group['is_default']): ?>
-                                        <a href="<?= ADMIN_URL ?>/user-groups/delete/<?= $group['id'] ?>" 
+                                        <?php if (!$group['is_default']) { ?>
+                                        <a href="<?php echo ADMIN_URL; ?>/user-groups/delete/<?php echo $group['id']; ?>" 
                                            class="btn btn-sm btn-outline-danger"
                                            onclick="return confirm('Вы уверены, что хотите удалить эту группу?')"
                                            title="Удалить">
-                                            <i class="bi bi-trash"></i>
+                                            <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                         </a>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </div>
                                 </td>
                             </tr>
-                            <?php endforeach; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
-            <?php endif; ?>
+            <?php } ?>
         </div>
     </div>
 </div>

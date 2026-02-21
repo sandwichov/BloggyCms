@@ -1,18 +1,21 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-envelope me-2"></i>
-            Отправки формы: <?= html($form['name']) ?>
+            <?php echo bloggy_icon('bs', 'envelope', '24', '#000', 'me-2'); ?>
+            Отправки формы: <?php echo html($form['name']); ?>
         </h4>
         <div>
-            <a href="<?= ADMIN_URL ?>/forms" class="btn btn-outline-secondary me-2">
-                <i class="bi bi-arrow-left me-2"></i>Назад
+            <a href="<?php echo ADMIN_URL; ?>/forms" class="btn btn-outline-secondary me-2">
+                <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-2'); ?>
+                Назад
             </a>
-            <a href="<?= ADMIN_URL ?>/forms/edit/<?= $form['id'] ?>" class="btn btn-outline-primary me-2">
-                <i class="bi bi-pencil me-2"></i>Редактировать
+            <a href="<?php echo ADMIN_URL; ?>/forms/edit/<?php echo $form['id']; ?>" class="btn btn-outline-primary me-2">
+                <?php echo bloggy_icon('bs', 'pencil', '16', '#000', 'me-2'); ?>
+                Редактировать
             </a>
             <button type="button" class="btn btn-success" onclick="exportToCSV()">
-                <i class="bi bi-download me-2"></i>Экспорт в CSV
+                <?php echo bloggy_icon('bs', 'download', '16', '#fff', 'me-2'); ?>
+                Экспорт в CSV
             </button>
         </div>
     </div>
@@ -23,10 +26,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <i class="bi bi-envelope display-6"></i>
+                            <?php echo bloggy_icon('bs', 'envelope', '32', '#fff'); ?>
                         </div>
                         <div>
-                            <h3 class="mb-0"><?= $submissionsCount ?></h3>
+                            <h3 class="mb-0"><?php echo $submissionsCount; ?></h3>
                             <small>Всего отправок</small>
                         </div>
                     </div>
@@ -39,10 +42,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <i class="bi bi-envelope-open display-6"></i>
+                            <?php echo bloggy_icon('bs', 'envelope-open', '32', '#fff'); ?>
                         </div>
                         <div>
-                            <h3 class="mb-0"><?= $newCount ?></h3>
+                            <h3 class="mb-0"><?php echo $newCount; ?></h3>
                             <small>Новых отправок</small>
                         </div>
                     </div>
@@ -55,10 +58,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <i class="bi bi-check-circle display-6"></i>
+                            <?php echo bloggy_icon('bs', 'check-circle', '32', '#fff'); ?>
                         </div>
                         <div>
-                            <h3 class="mb-0"><?= $processedCount ?></h3>
+                            <h3 class="mb-0"><?php echo $processedCount; ?></h3>
                             <small>Обработано</small>
                         </div>
                     </div>
@@ -71,10 +74,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <i class="bi bi-shield-slash display-6"></i>
+                            <?php echo bloggy_icon('bs', 'shield-slash', '32', '#fff'); ?>
                         </div>
                         <div>
-                            <h3 class="mb-0"><?= $spamCount ?></h3>
+                            <h3 class="mb-0"><?php echo $spamCount; ?></h3>
                             <small>Спам</small>
                         </div>
                     </div>
@@ -83,26 +86,29 @@
         </div>
     </div>
 
-    <?php if (empty($submissions)): ?>
+    <?php if (empty($submissions)) { ?>
     <div class="card border-0 shadow-sm">
         <div class="card-body text-center py-5">
-            <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+            <?php echo bloggy_icon('bs', 'inbox', '48', '#6C6C6C', 'mb-3'); ?>
             <h5 class="text-muted">Отправок нет</h5>
             <p class="text-muted mb-4">Еще никто не отправил эту форму</p>
-            <a href="<?= ADMIN_URL ?>/forms/preview/<?= $form['id'] ?>" class="btn btn-primary">
-                <i class="bi bi-eye me-2"></i>Предпросмотр формы
+            <a href="<?php echo ADMIN_URL; ?>/forms/preview/<?php echo $form['id']; ?>" class="btn btn-primary">
+                <?php echo bloggy_icon('bs', 'eye', '16', '#fff', 'me-2'); ?>
+                Предпросмотр формы
             </a>
         </div>
     </div>
-    <?php else: ?>
+    <?php } else { ?>
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">
-                <i class="bi bi-list-ul me-2"></i>Список отправок
+                <?php echo bloggy_icon('bs', 'list-ul', '20', '#000', 'me-2'); ?>
+                Список отправок
             </h5>
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteAllSubmissions()">
-                    <i class="bi bi-trash me-1"></i>Удалить все
+                    <?php echo bloggy_icon('bs', 'trash', '16', '#000', 'me-1'); ?>
+                    Удалить все
                 </button>
             </div>
         </div>
@@ -120,8 +126,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($submissions as $submission): 
-                            $dataPreview = [];
+                        <?php foreach ($submissions as $submission) { 
+                            $dataPreview = array();
                             foreach ($submission['data'] as $key => $value) {
                                 if ($key === 'files' && is_array($value)) {
                                     foreach ($value as $fieldName => $fileInfo) {
@@ -142,68 +148,68 @@
                         ?>
                         <tr>
                             <td>
-                                <strong>#<?= html($submission['id']) ?></strong>
+                                <strong>#<?php echo html($submission['id']); ?></strong>
                             </td>
                             <td>
                                 <small class="text-muted">
-                                    <?= date('d.m.Y H:i', strtotime($submission['created_at'])) ?>
+                                    <?php echo date('d.m.Y H:i', strtotime($submission['created_at'])); ?>
                                 </small>
                             </td>
                             <td>
-                                <code><?= html($submission['ip_address']) ?></code>
+                                <code><?php echo html($submission['ip_address']); ?></code>
                             </td>
                             <td>
-                                <small><?= implode('<br>', $dataPreview) ?></small>
+                                <small><?php echo implode('<br>', $dataPreview); ?></small>
                             </td>
                             <td>
                                 <select class="form-select form-select-sm status-select" 
-                                        data-id="<?= $submission['id'] ?>"
-                                        data-original-value="<?= $submission['status'] ?>"
+                                        data-id="<?php echo $submission['id']; ?>"
+                                        data-original-value="<?php echo $submission['status']; ?>"
                                         style="width: 120px;">
-                                    <option value="new" <?= $submission['status'] === 'new' ? 'selected' : '' ?>>Новый</option>
-                                    <option value="read" <?= $submission['status'] === 'read' ? 'selected' : '' ?>>Прочитан</option>
-                                    <option value="processed" <?= $submission['status'] === 'processed' ? 'selected' : '' ?>>Обработан</option>
-                                    <option value="spam" <?= $submission['status'] === 'spam' ? 'selected' : '' ?>>Спам</option>
+                                    <option value="new" <?php echo $submission['status'] === 'new' ? 'selected' : ''; ?>>Новый</option>
+                                    <option value="read" <?php echo $submission['status'] === 'read' ? 'selected' : ''; ?>>Прочитан</option>
+                                    <option value="processed" <?php echo $submission['status'] === 'processed' ? 'selected' : ''; ?>>Обработан</option>
+                                    <option value="spam" <?php echo $submission['status'] === 'spam' ? 'selected' : ''; ?>>Спам</option>
                                 </select>
                             </td>
                             <td class="end">
                                 <div class="btn-group btn-group-sm">
                                     <button type="button" 
                                             class="btn btn-outline-primary view-submission"
-                                            data-id="<?= $submission['id'] ?>"
+                                            data-id="<?php echo $submission['id']; ?>"
                                             data-bs-toggle="modal" 
                                             data-bs-target="#viewSubmissionModal">
-                                        <i class="bi bi-eye"></i>
+                                        <?php echo bloggy_icon('bs', 'eye', '16', '#000'); ?>
                                     </button>
                                     <button type="button" 
                                             class="btn btn-outline-danger delete-submission"
-                                            data-id="<?= $submission['id'] ?>">
-                                        <i class="bi bi-trash"></i>
+                                            data-id="<?php echo $submission['id']; ?>">
+                                        <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <?php if ($totalPages > 1): ?>
+        <?php if ($totalPages > 1) { ?>
         <div class="card-footer bg-white border-0">
             <nav aria-label="Навигация по страницам">
                 <ul class="pagination justify-content-center mb-0">
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <li class="page-item <?= $i == $currentPage ? 'active' : '' ?>">
-                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+                        <li class="page-item <?php echo $i == $currentPage ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                         </li>
-                    <?php endfor; ?>
+                    <?php } ?>
                 </ul>
             </nav>
         </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
-    <?php endif; ?>
+    <?php } ?>
 </div>
 
 <div class="modal fade" id="viewSubmissionModal" tabindex="-1" aria-labelledby="viewSubmissionModalLabel" aria-hidden="true">
@@ -211,7 +217,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="viewSubmissionModalLabel">
-                    <i class="bi bi-envelope-open me-2"></i>Просмотр отправки
+                    <?php echo bloggy_icon('bs', 'envelope-open', '20', '#000', 'me-2'); ?>
+                    Просмотр отправки
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -224,10 +231,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i>Закрыть
+                    <?php echo bloggy_icon('bs', 'x-circle', '16', '#000', 'me-1'); ?>
+                    Закрыть
                 </button>
                 <button type="button" class="btn btn-primary" onclick="printSubmission()">
-                    <i class="bi bi-printer me-1"></i>Печать
+                    <?php echo bloggy_icon('bs', 'printer', '16', '#fff', 'me-1'); ?>
+                    Печать
                 </button>
             </div>
         </div>
@@ -246,7 +255,7 @@
                 const originalValue = this.dataset.originalValue;
                 const originalColor = this.style.borderColor;
                 this.style.borderColor = '#ffc107';
-                fetch('<?= ADMIN_URL ?>/forms/update-submission-status/' + submissionId + '?status=' + newStatus, {
+                fetch('<?php echo ADMIN_URL; ?>/forms/update-submission-status/' + submissionId + '?status=' + newStatus, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
@@ -305,7 +314,7 @@
                 </div>
             `;
             
-            fetch('<?= ADMIN_URL ?>/forms/get-submission/' + submissionId, {
+            fetch('<?php echo ADMIN_URL; ?>/forms/get-submission/' + submissionId, {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
@@ -353,7 +362,7 @@
                         
                         <hr>
                         
-                        <h6 class="mb-3"><i class="bi bi-card-text me-2"></i>Данные формы:</h6>
+                        <h6 class="mb-3"><?php echo bloggy_icon('bs', 'card-text', '16', '#000', 'me-2'); ?>Данные формы:</h6>
                     `;
                     
                     if (submission.data && Object.keys(submission.data).length > 0) {
@@ -381,7 +390,7 @@
                     if (submission.files && submission.files.length > 0) {
                         html += `
                             <hr>
-                            <h6 class="mb-3"><i class="bi bi-paperclip me-2"></i>Прикрепленные файлы:</h6>
+                            <h6 class="mb-3"><?php echo bloggy_icon('bs', 'paperclip', '16', '#000', 'me-2'); ?>Прикрепленные файлы:</h6>
                             <div class="row">
                         `;
                         
@@ -392,14 +401,14 @@
                                         <div class="card-body p-2">
                                             <div class="d-flex align-items-center">
                                                 <div class="me-2">
-                                                    <i class="bi bi-file-earmark display-6"></i>
+                                                    <?php echo bloggy_icon('bs', 'file-earmark', '32', '#000'); ?>
                                                 </div>
                                                 <div>
                                                     <div class="small"><strong>${escapeHtml(file.file_name)}</strong></div>
                                                     <div class="small text-muted">${formatFileSize(file.file_size)}</div>
                                                     <div class="small">
-                                                        <a href="<?= BASE_URL ?>/${escapeHtml(file.file_path)}" target="_blank" class="text-decoration-none">
-                                                            <i class="bi bi-download me-1"></i>Скачать
+                                                        <a href="<?php echo BASE_URL; ?>/${escapeHtml(file.file_path)}" target="_blank" class="text-decoration-none">
+                                                            <?php echo bloggy_icon('bs', 'download', '16', '#000', 'me-1'); ?>Скачать
                                                         </a>
                                                     </div>
                                                 </div>
@@ -417,7 +426,7 @@
                 } else {
                     modalBody.innerHTML = `
                         <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <?php echo bloggy_icon('bs', 'exclamation-triangle', '16', '#000', 'me-2'); ?>
                             ${data.message || 'Ошибка при загрузке данных'}
                         </div>
                     `;
@@ -427,11 +436,11 @@
                 console.error('Error:', error);
                 modalBody.innerHTML = `
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <?php echo bloggy_icon('bs', 'exclamation-triangle', '16', '#000', 'me-2'); ?>
                         Ошибка: ${error.message}
                         <div class="mt-2">
                             <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
-                                <i class="bi bi-arrow-clockwise me-1"></i>Обновить страницу
+                                <?php echo bloggy_icon('bs', 'arrow-clockwise', '16', '#000', 'me-1'); ?>Обновить страницу
                             </button>
                         </div>
                     </div>
@@ -445,10 +454,10 @@
             const submissionId = this.dataset.id;
             
             if (confirm('Удалить эту отправку?')) {
-                this.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+                this.innerHTML = '<?php echo bloggy_icon('bs', 'hourglass-split', '16', '#000'); ?>';
                 this.disabled = true;
                 
-                fetch('<?= ADMIN_URL ?>/forms/delete-submission/' + submissionId, {
+                fetch('<?php echo ADMIN_URL; ?>/forms/delete-submission/' + submissionId, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -470,14 +479,14 @@
                             showNotification('Отправка удалена', 'success');
                         }, 300);
                     } else {
-                        this.innerHTML = '<i class="bi bi-trash"></i>';
+                        this.innerHTML = '<?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>';
                         this.disabled = false;
                         showNotification(data.message || 'Ошибка при удалении', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    this.innerHTML = '<i class="bi bi-trash"></i>';
+                    this.innerHTML = '<?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>';
                     this.disabled = false;
                     showNotification('Ошибка сети: ' + error.message, 'error');
                 });
@@ -486,17 +495,17 @@
     });
     
     function exportToCSV() {
-        window.location.href = '<?= ADMIN_URL ?>/forms/export/<?= $form['id'] ?>';
+        window.location.href = '<?php echo ADMIN_URL; ?>/forms/export/<?php echo $form['id']; ?>';
     }
     
     function deleteAllSubmissions() {
         if (confirm('Вы уверены, что хотите удалить ВСЕ отправки этой формы?')) {
             const button = event.target;
             const originalText = button.innerHTML;
-            button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Удаление...';
+            button.innerHTML = '<?php echo bloggy_icon('bs', 'hourglass-split', '16', '#000', 'me-1'); ?>Удаление...';
             button.disabled = true;
             
-            fetch('<?= ADMIN_URL ?>/forms/delete-all-submissions/<?= $form['id'] ?>', {
+            fetch('<?php echo ADMIN_URL; ?>/forms/delete-all-submissions/<?php echo $form['id']; ?>', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -572,12 +581,12 @@
         document.body.innerHTML = `
             <html>
                 <head>
-                    <title>Отправка формы - <?= html($form['name']) ?></title>
+                    <title>Отправка формы - <?php echo html($form['name']); ?></title>
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 </head>
                 <body>
                     <div class="container mt-4">
-                        <h4>Отправка формы: <?= html($form['name']) ?></h4>
+                        <h4>Отправка формы: <?php echo html($form['name']); ?></h4>
                         <hr>
                         ${printContent}
                     </div>

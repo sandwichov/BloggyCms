@@ -1,38 +1,42 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-code-square me-2"></i>
-            <?= isset($block) ? 'Редактирование блока' : 'Создание блока' ?>
-            <?php if($selectedType !== 'DefaultBlock'): ?>
+            <?php echo bloggy_icon('bs', 'code-square', '24', '#000', 'me-2'); ?>
+            <?php echo isset($block) ? 'Редактирование блока' : 'Создание блока'; ?>
+            <?php if ($selectedType !== 'DefaultBlock') { ?>
                 <span class="badge bg-primary ms-2">
-                    <?= html($blockTypes[$selectedType]['name'] ?? $selectedType) ?>
+                    <?php echo html($blockTypes[$selectedType]['name'] ?? $selectedType); ?>
                 </span>
-            <?php endif; ?>
+            <?php } ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/html-blocks" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Назад к блокам
+        <a href="<?php echo ADMIN_URL; ?>/html-blocks" class="btn btn-outline-secondary btn-sm">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-1'); ?>
+            Назад к блокам
         </a>
     </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <form method="POST" id="blockForm" enctype="multipart/form-data">
-                <input type="hidden" name="block_type" value="<?= $selectedType ?>">
+                <input type="hidden" name="block_type" value="<?php echo $selectedType; ?>">
                 
                 <nav class="px-4 pt-4">
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" id="nav-basic-tab" data-bs-toggle="tab" data-bs-target="#nav-basic" type="button" role="tab">
-                            <i class="bi bi-info-circle me-2"></i>Основное
+                            <?php echo bloggy_icon('bs', 'info-circle', '16', '#000', 'me-2'); ?>
+                            Основное
                         </button>
                         
-                        <?php if($selectedType !== 'DefaultBlock'): ?>
+                        <?php if ($selectedType !== 'DefaultBlock') { ?>
                         <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab">
-                            <i class="bi bi-gear me-2"></i>Настройки
+                            <?php echo bloggy_icon('bs', 'gear', '16', '#000', 'me-2'); ?>
+                            Настройки
                         </button>
-                        <?php endif; ?>
+                        <?php } ?>
                         
                         <button class="nav-link" id="nav-assets-tab" data-bs-toggle="tab" data-bs-target="#nav-assets" type="button" role="tab">
-                            <i class="bi bi-palette me-2"></i>Стили и скрипты
+                            <?php echo bloggy_icon('bs', 'palette', '16', '#000', 'me-2'); ?>
+                            Стили и скрипты
                         </button>
                     </div>
                 </nav>
@@ -47,7 +51,7 @@
                                     <input type="text" 
                                            name="name" 
                                            class="form-control form-control-lg" 
-                                           value="<?= html($block['name'] ?? '') ?>" 
+                                           value="<?php echo html($block['name'] ?? ''); ?>" 
                                            placeholder="Введите название блока"
                                            required>
                                     <div class="form-text">Отображаемое название блока в админке</div>
@@ -62,14 +66,14 @@
                                     <input type="text" 
                                            name="slug" 
                                            class="form-control" 
-                                           value="<?= html($block['slug'] ?? '') ?>" 
+                                           value="<?php echo html($block['slug'] ?? ''); ?>" 
                                            placeholder="например: header_menu"
                                            required>
                                     <div class="form-text">Уникальный идентификатор для использования в коде</div>
                                 </div>
                             </div>
 
-                            <?php if($selectedType !== 'DefaultBlock'): ?>
+                            <?php if ($selectedType !== 'DefaultBlock') { ?>
                                 <div class="col-md-4">
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold">Шаблон отображения</label>
@@ -77,42 +81,42 @@
                                         $blockType = $blockTypes[$selectedType] ?? null;
                                         $availableTemplates = $blockType && $blockType['class'] ? 
                                             $blockType['class']->getAvailableTemplates() : 
-                                            ['default' => 'Стандартный шаблон'];
+                                            array('default' => 'Стандартный шаблон');
                                         
                                         $selectedTemplate = $block['template'] ?? 'default';
                                         ?>
                                         <select name="template" class="form-select" id="block-template-select">
-                                            <?php foreach($availableTemplates as $templateKey => $templateName): ?>
-                                                <option value="<?= html($templateKey) ?>" 
-                                                        <?= $selectedTemplate === $templateKey ? 'selected' : '' ?>>
-                                                    <?= html($templateName) ?>
+                                            <?php foreach ($availableTemplates as $templateKey => $templateName) { ?>
+                                                <option value="<?php echo html($templateKey); ?>" 
+                                                        <?php echo $selectedTemplate === $templateKey ? 'selected' : ''; ?>>
+                                                    <?php echo html($templateName); ?>
                                                 </option>
-                                            <?php endforeach; ?>
+                                            <?php } ?>
                                         </select>
                                         <div class="form-text">
                                             Выберите шаблон для отображения этого блока на сайте
                                         </div>
                                     </div>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
                         </div>
                         
-                        <?php if($selectedType !== 'DefaultBlock'): ?>
+                        <?php if ($selectedType !== 'DefaultBlock') { ?>
                         <div class="alert alert-info">
                             <div class="d-flex">
-                                <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+                                <?php echo bloggy_icon('bs', 'info-circle-fill', '16', '#000', 'me-2 mt-1'); ?>
                                 <div>
-                                    <strong>Тип блока:</strong> <?= html($blockTypes[$selectedType]['name'] ?? $selectedType) ?>
-                                    <?php if(isset($blockTypes[$selectedType]['description'])): ?>
-                                        <br><small><?= html($blockTypes[$selectedType]['description']) ?></small>
-                                    <?php endif; ?>
+                                    <strong>Тип блока:</strong> <?php echo html($blockTypes[$selectedType]['name'] ?? $selectedType); ?>
+                                    <?php if (isset($blockTypes[$selectedType]['description'])) { ?>
+                                        <br><small><?php echo html($blockTypes[$selectedType]['description']); ?></small>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
-                        <?php endif; ?>
+                        <?php } ?>
                     </div>
 
-                    <?php if($selectedType !== 'DefaultBlock'): ?>
+                    <?php if ($selectedType !== 'DefaultBlock') { ?>
                     <div class="tab-pane fade" id="nav-settings" role="tabpanel">
                         <div class="mb-4">
                             <h6 class="fw-semibold mb-3">Настройки блока</h6>
@@ -120,20 +124,20 @@
                                 <?php 
                                 $blockType = $blockTypes[$selectedType] ?? null;
                                 if ($blockType && $blockType['class']) {
-                                    echo $blockType['class']->getSettingsForm($settings ?? []);
+                                    echo $blockType['class']->getSettingsForm($settings ?? array());
                                 }
                                 ?>
                             </div>
                         </div>
                         
                     </div>
-                    <?php endif; ?>
+                    <?php } ?>
 
                     <div class="tab-pane fade" id="nav-assets" role="tabpanel">
                         
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-flex align-items-center">
-                                <i class="bi bi-filetype-css text-primary me-2"></i>
+                                <?php echo bloggy_icon('bs', 'filetype-css', '16', '#0d6efd', 'me-2'); ?>
                                 Встроенные стили (CSS)
                             </label>
                             <div class="mb-2">
@@ -142,12 +146,12 @@
                             <div id="inline-css-container" class="border rounded">
                                 <div id="inline-css-editor" style="height: 200px;"></div>
                             </div>
-                            <textarea name="inline_css" id="inline_css" style="display: none;"><?= html($inlineCss ?? '') ?></textarea>
+                            <textarea name="inline_css" id="inline_css" style="display: none;"><?php echo html($inlineCss ?? ''); ?></textarea>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-flex align-items-center">
-                                <i class="bi bi-filetype-js text-warning me-2"></i>
+                                <?php echo bloggy_icon('bs', 'filetype-js', '16', '#ffc107', 'me-2'); ?>
                                 Встроенный JavaScript
                             </label>
                             <div class="mb-2">
@@ -156,54 +160,54 @@
                             <div id="inline-js-container" class="border rounded">
                                 <div id="inline-js-editor" style="height: 200px;"></div>
                             </div>
-                            <textarea name="inline_js" id="inline_js" style="display: none;"><?= html($inlineJs ?? '') ?></textarea>
+                            <textarea name="inline_js" id="inline_js" style="display: none;"><?php echo html($inlineJs ?? ''); ?></textarea>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-flex align-items-center">
-                                <i class="bi bi-file-earmark-css text-success me-2"></i>
+                                <?php echo bloggy_icon('bs', 'file-earmark-css', '16', '#198754', 'me-2'); ?>
                                 Внешние CSS файлы
-                                <?php if(!empty($systemCss)): ?>
+                                <?php if (!empty($systemCss)) { ?>
                                     <span class="badge bg-info ms-2" data-bs-toggle="tooltip" title="Системные файлы (нельзя удалить)">Системные</span>
-                                <?php endif; ?>
+                                <?php } ?>
                             </label>
                             
-                            <?php if(!empty($systemCss)): ?>
+                            <?php if (!empty($systemCss)) { ?>
                                 <div class="mb-3">
                                     <small class="text-muted d-block mb-2">Системные файлы (автоматически подключаются):</small>
-                                    <?php foreach($systemCss as $systemCssFile): ?>
+                                    <?php foreach ($systemCss as $systemCssFile) { ?>
                                         <div class="input-group mb-2">
                                             <input type="text" 
                                                    class="form-control system-asset" 
-                                                   value="<?= html($systemCssFile) ?>" 
+                                                   value="<?php echo html($systemCssFile); ?>" 
                                                    readonly
                                                    placeholder="Системный CSS файл">
                                             <span class="input-group-text text-muted bg-light">
-                                                <i class="bi bi-lock-fill" data-bs-toggle="tooltip" title="Системный файл"></i>
+                                                <?php echo bloggy_icon('bs', 'lock-fill', '16', '#6c757d', null, array('data-bs-toggle' => 'tooltip', 'title' => 'Системный файл')); ?>
                                             </span>
                                         </div>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
                             
                             <small class="text-muted d-block mb-2">Дополнительные CSS файлы:</small>
                             <div id="css-files-container">
-                                <?php if(!empty($cssFiles)): ?>
-                                    <?php foreach($cssFiles as $index => $cssFile): ?>
-                                        <?php if(!in_array($cssFile, $systemCss)): ?>
+                                <?php if (!empty($cssFiles)) { ?>
+                                    <?php foreach ($cssFiles as $index => $cssFile) { ?>
+                                        <?php if (!in_array($cssFile, $systemCss)) { ?>
                                             <div class="input-group mb-2 css-file-row">
                                                 <input type="text" 
                                                        name="css_files[]" 
                                                        class="form-control" 
-                                                       value="<?= html($cssFile) ?>" 
+                                                       value="<?php echo html($cssFile); ?>" 
                                                        placeholder="templates/default/front/assets/css/my-block.css">
                                                 <button type="button" class="btn btn-outline-danger remove-asset" data-type="css">
-                                                    <i class="bi bi-trash"></i>
+                                                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
                                             </div>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
                                 
                                 <div class="input-group mb-2 css-file-row">
                                     <input type="text" 
@@ -212,61 +216,62 @@
                                            value="" 
                                            placeholder="templates/default/front/assets/css/my-block.css">
                                     <button type="button" class="btn btn-outline-danger remove-asset" data-type="css">
-                                        <i class="bi bi-trash"></i>
+                                        <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                     </button>
                                 </div>
                             </div>
                             
                             <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-css-file">
-                                <i class="bi bi-plus"></i> Добавить CSS файл
+                                <?php echo bloggy_icon('bs', 'plus', '16', '#000', 'me-1'); ?>
+                                Добавить CSS файл
                             </button>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-flex align-items-center">
-                                <i class="bi bi-file-earmark-js text-info me-2"></i>
+                                <?php echo bloggy_icon('bs', 'file-earmark-js', '16', '#0dcaf0', 'me-2'); ?>
                                 Внешние JavaScript файлы
-                                <?php if(!empty($systemJs)): ?>
+                                <?php if (!empty($systemJs)) { ?>
                                     <span class="badge bg-info ms-2" data-bs-toggle="tooltip" title="Системные файлы (нельзя удалить)">Системные</span>
-                                <?php endif; ?>
+                                <?php } ?>
                             </label>
                             
-                            <?php if(!empty($systemJs)): ?>
+                            <?php if (!empty($systemJs)) { ?>
                                 <div class="mb-3">
                                     <small class="text-muted d-block mb-2">Системные файлы (автоматически подключаются):</small>
-                                    <?php foreach($systemJs as $systemJsFile): ?>
+                                    <?php foreach ($systemJs as $systemJsFile) { ?>
                                         <div class="input-group mb-2">
                                             <input type="text" 
                                                    class="form-control system-asset" 
-                                                   value="<?= html($systemJsFile) ?>" 
+                                                   value="<?php echo html($systemJsFile); ?>" 
                                                    readonly
                                                    placeholder="Системный JS файл">
                                             <span class="input-group-text text-muted bg-light">
-                                                <i class="bi bi-lock-fill" data-bs-toggle="tooltip" title="Системный файл"></i>
+                                                <?php echo bloggy_icon('bs', 'lock-fill', '16', '#6c757d', null, array('data-bs-toggle' => 'tooltip', 'title' => 'Системный файл')); ?>
                                             </span>
                                         </div>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php } ?>
                             
                             <small class="text-muted d-block mb-2">Дополнительные JavaScript файлы:</small>
                             <div id="js-files-container">
-                                <?php if(!empty($jsFiles)): ?>
-                                    <?php foreach($jsFiles as $index => $jsFile): ?>
-                                        <?php if(!in_array($jsFile, $systemJs)): ?>
+                                <?php if (!empty($jsFiles)) { ?>
+                                    <?php foreach ($jsFiles as $index => $jsFile) { ?>
+                                        <?php if (!in_array($jsFile, $systemJs)) { ?>
                                             <div class="input-group mb-2 js-file-row">
                                                 <input type="text" 
                                                        name="js_files[]" 
                                                        class="form-control" 
-                                                       value="<?= html($jsFile) ?>" 
+                                                       value="<?php echo html($jsFile); ?>" 
                                                        placeholder="templates/default/front/assets/js/my-block.js">
                                                 <button type="button" class="btn btn-outline-danger remove-asset" data-type="js">
-                                                    <i class="bi bi-trash"></i>
+                                                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
                                             </div>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
                                 
                                 <div class="input-group mb-2 js-file-row">
                                     <input type="text" 
@@ -275,13 +280,14 @@
                                            value="" 
                                            placeholder="templates/default/front/assets/js/my-block.js">
                                     <button type="button" class="btn btn-outline-danger remove-asset" data-type="js">
-                                        <i class="bi bi-trash"></i>
+                                        <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                     </button>
                                 </div>
                             </div>
                             
                             <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-js-file">
-                                <i class="bi bi-plus"></i> Добавить JS файл
+                                <?php echo bloggy_icon('bs', 'plus', '16', '#000', 'me-1'); ?>
+                                Добавить JS файл
                             </button>
                         </div>
                     </div>
@@ -290,19 +296,21 @@
                 <div class="border-top px-4 py-3 bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted small">
-                            <i class="bi bi-clock-history me-1"></i>
-                            <?php if(isset($block['updated_at'])): ?>
-                                Последнее изменение: <?= date('d.m.Y H:i', strtotime($block['updated_at'])) ?>
-                            <?php else: ?>
+                            <?php echo bloggy_icon('bs', 'clock-history', '16', '#6c757d', 'me-1'); ?>
+                            <?php if (isset($block['updated_at'])) { ?>
+                                Последнее изменение: <?php echo date('d.m.Y H:i', strtotime($block['updated_at'])); ?>
+                            <?php } else { ?>
                                 Создание нового блока
-                            <?php endif; ?>
+                            <?php } ?>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="<?= ADMIN_URL ?>/html-blocks" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-lg me-1"></i> Отмена
+                            <a href="<?php echo ADMIN_URL; ?>/html-blocks" class="btn btn-outline-secondary">
+                                <?php echo bloggy_icon('bs', 'x-lg', '16', '#000', 'me-1'); ?>
+                                Отмена
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i> Сохранить блок
+                                <?php echo bloggy_icon('bs', 'check-lg', '16', '#fff', 'me-1'); ?>
+                                Сохранить блок
                             </button>
                         </div>
                     </div>
@@ -313,7 +321,6 @@
 </div>
 
 <?php
-
     add_admin_js('templates/default/admin/assets/js/controllers/ace.js');
     add_admin_js('templates/default/admin/assets/js/controllers/mode-html.js');
     add_admin_js('templates/default/admin/assets/js/controllers/mode-css.js');
@@ -386,7 +393,7 @@
             newRow.innerHTML = `
                 <input type="text" name="${type}_files[]" class="form-control" value="" placeholder="templates/default/front/assets/${type}/my-block.${type}">
                 <button type="button" class="btn btn-outline-danger remove-asset" data-type="${type}">
-                    <i class="bi bi-trash"></i>
+                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                 </button>
             `;
             container.appendChild(newRow);
@@ -460,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function fetchAvailableTemplates(blockType) {
-        fetch(`/admin/html-blocks/get-block-templates?block_type=${encodeURIComponent(blockType)}`)
+        fetch(`<?php echo ADMIN_URL; ?>/html-blocks/get-block-templates?block_type=${encodeURIComponent(blockType)}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

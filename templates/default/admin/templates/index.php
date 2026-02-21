@@ -1,15 +1,15 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-palette me-2"></i>
+            <?php echo bloggy_icon('bs', 'palette', '24', '#000', 'me-2'); ?>
             Управление шаблонами
         </h4>
         <div class="d-flex gap-2">
-            <a href="<?= ADMIN_URL ?>/settings/cleanup-backups" class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-trash me-1"></i> Очистить все резервные копии
+            <a href="<?php echo ADMIN_URL; ?>/settings/cleanup-backups" class="btn btn-sm btn-outline-danger">
+                <?php echo bloggy_icon('bs', 'trash', '14', '#000', 'me-1'); ?> Очистить все резервные копии
             </a>
-            <a href="<?= ADMIN_URL ?>/settings?tab=site" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-gear me-1"></i> Настройки шаблонов
+            <a href="<?php echo ADMIN_URL; ?>/settings?tab=site" class="btn btn-outline-secondary btn-sm">
+                <?php echo bloggy_icon('bs', 'gear', '14', '#000', 'me-1'); ?> Настройки шаблонов
             </a>
         </div>
     </div>
@@ -22,20 +22,20 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        <?php foreach($templates as $template): ?>
-                            <a href="#" class="list-group-item list-group-item-action template-selector <?= $template['name'] === $currentTemplate ? 'active' : '' ?>" 
-                               data-template="<?= $template['name'] ?>">
+                        <?php foreach ($templates as $template) { ?>
+                            <a href="#" class="list-group-item list-group-item-action template-selector <?php echo $template['name'] === $currentTemplate ? 'active' : ''; ?>" 
+                               data-template="<?php echo $template['name']; ?>">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span>
-                                        <i class="bi bi-folder me-2"></i>
-                                        <?= html(ucfirst($template['name'])) ?>
+                                        <?php echo bloggy_icon('bs', 'folder', '16', '#000', 'me-2'); ?>
+                                        <?php echo html(ucfirst($template['name'])); ?>
                                     </span>
-                                    <?php if($template['name'] === $currentTemplate): ?>
+                                    <?php if ($template['name'] === $currentTemplate) { ?>
                                         <span class="badge bg-success rounded-pill">активен</span>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </div>
                             </a>
-                        <?php endforeach; ?>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0">Файлы шаблона</h6>
                     <button class="btn btn-sm btn-outline-secondary" id="refreshFiles" title="Обновить список">
-                        <i class="bi bi-arrow-clockwise"></i>
+                        <?php echo bloggy_icon('bs', 'arrow-clockwise', '14', '#000'); ?>
                     </button>
                 </div>
                 <div class="card-body p-0">
@@ -65,10 +65,10 @@
                     <h6 class="card-title mb-0" id="currentFile">Выберите файл для редактирования</h6>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-outline-secondary" id="refreshFile" title="Обновить" style="display: none;">
-                            <i class="bi bi-arrow-clockwise"></i>
+                            <?php echo bloggy_icon('bs', 'arrow-clockwise', '14', '#000'); ?>
                         </button>
                         <button class="btn btn-sm btn-success" id="saveFile" disabled style="display: none;">
-                            <i class="bi bi-check-lg me-1"></i> Сохранить
+                            <?php echo bloggy_icon('bs', 'check-lg', '14', '#fff', 'me-1'); ?> Сохранить
                         </button>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                     </div>
                     <div id="editorPlaceholder" class="text-center py-5">
                         <div class="mb-3">
-                            <i class="bi bi-code-slash text-muted" style="font-size: 3rem;"></i>
+                            <?php echo bloggy_icon('bs', 'code-slash', '48', '#6C6C6C'); ?>
                         </div>
                         <h5 class="text-muted">Выберите файл для редактирования</h5>
                         <p class="text-muted">Файлы шаблона появятся после выбора шаблона</p>
@@ -125,7 +125,7 @@
 <?php ob_start(); ?>
 <script>
 let editor = null;
-let currentTemplate = '<?= $currentTemplate ?>';
+let currentTemplate = '<?php echo $currentTemplate; ?>';
 let currentFile = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -179,7 +179,7 @@ function loadTemplateFiles(template) {
     const fileList = document.getElementById('fileList');
     fileList.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm" role="status"></div></div>';
 
-    fetch(`<?= ADMIN_URL ?>/templates/get-files?template=${template}`)
+    fetch(`<?php echo ADMIN_URL; ?>/templates/get-files?template=${template}`)
         .then(response => response.json())
         .then(files => {
             renderFileList(files, template);
@@ -197,7 +197,7 @@ function renderFileList(files, template) {
         fileList.innerHTML = `
             <div class="text-center py-5">
                 <div class="mb-3">
-                    <i class="bi bi-file-earmark-x text-muted" style="font-size: 3rem;"></i>
+                    <?php echo bloggy_icon('bs', 'file-earmark-x', '48', '#6C6C6C'); ?>
                 </div>
                 <h5 class="text-muted">Шаблонные файлы не найдены</h5>
                 <p class="text-muted">Добавьте комментарии "Template Name" в PHP файлы шаблона</p>
@@ -215,7 +215,7 @@ function renderFileList(files, template) {
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-file-code me-3 text-primary" style="font-size: 1.2rem;"></i>
+                            <?php echo bloggy_icon('bs', 'file-code', '16', '#0d6efd', 'me-3'); ?>
                             <div>
                                 <div class="file-name fw-semibold">${file.name}</div>
                                 ${file.description ? `<div class="file-description">${file.description}</div>` : ''}
@@ -265,7 +265,7 @@ function loadFileContent(template, filePath) {
     const extension = fileName.split('.').pop().toLowerCase();
     setEditorMode(extension);
 
-    const url = `<?= ADMIN_URL ?>/templates/get-file?template=${template}&file=${encodeURIComponent(filePath)}`;
+    const url = `<?php echo ADMIN_URL; ?>/templates/get-file?template=${template}&file=${encodeURIComponent(filePath)}`;
 
     fetch(url)
         .then(response => {
@@ -317,7 +317,7 @@ function saveFile() {
 
     const content = editor.getValue();
     
-    fetch(`<?= ADMIN_URL ?>/templates/save`, {
+    fetch(`<?php echo ADMIN_URL; ?>/templates/save`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

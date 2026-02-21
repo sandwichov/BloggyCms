@@ -5,13 +5,13 @@
             Редактирование ачивки
         </h4>
         <div class="d-flex gap-2">
-            <a href="<?= ADMIN_URL ?>/user-achievements" class="btn btn-outline-secondary btn-sm">
-                <?php echo bloggy_icon('bs', 'arrow-left', '18'); ?> Назад
+            <a href="<?php echo ADMIN_URL; ?>/user-achievements" class="btn btn-outline-secondary btn-sm">
+                <?php echo bloggy_icon('bs', 'arrow-left', '18', '#000', 'me-1'); ?> Назад
             </a>
-            <a href="<?= ADMIN_URL ?>/user-achievements/delete/<?= $achievement['id'] ?>" 
+            <a href="<?php echo ADMIN_URL; ?>/user-achievements/delete/<?php echo $achievement['id']; ?>" 
                class="btn btn-outline-danger btn-sm"
                onclick="return confirm('Вы уверены, что хотите удалить эту ачивку?')">
-                <?php echo bloggy_icon('bs', 'trash', '18'); ?> Удалить
+                <?php echo bloggy_icon('bs', 'trash', '18', '#000', 'me-1'); ?> Удалить
             </a>
         </div>
     </div>
@@ -27,14 +27,14 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control" name="name" 
-                                value="<?= html($achievement['name'] ?? '') ?>" 
+                                value="<?php echo html($achievement['name'] ?? ''); ?>" 
                                 required maxlength="255">
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Описание</label>
                             <textarea class="form-control" name="description" rows="3"
-                                maxlength="500"><?= html($achievement['description'] ?? '') ?></textarea>
+                                maxlength="500"><?php echo html($achievement['description'] ?? ''); ?></textarea>
                         </div>
                         
                         <div class="mb-4">
@@ -46,53 +46,53 @@
                             <div id="conditionsContainer">
                                 <?php 
                                 $conditionIndex = 0;
-                                if (!empty($achievement['conditions'])): 
-                                    foreach ($achievement['conditions'] as $index => $condition): ?>
+                                if (!empty($achievement['conditions'])) { 
+                                    foreach ($achievement['conditions'] as $index => $condition) { ?>
                                     <div class="condition-item card mb-3">
                                         <div class="card-body">
                                             <div class="row g-3">
                                                 <div class="col-md-4">
                                                     <label class="form-label small">Тип условия</label>
-                                                    <select class="form-select condition-type" name="conditions[<?= $index ?>][type]">
+                                                    <select class="form-select condition-type" name="conditions[<?php echo $index; ?>][type]">
                                                         <option value="">Выберите тип</option>
-                                                        <option value="registration_days" <?= $condition['condition_type'] == 'registration_days' ? 'selected' : '' ?>>Дней с регистрации</option>
-                                                        <option value="comments_count" <?= $condition['condition_type'] == 'comments_count' ? 'selected' : '' ?>>Количество комментариев</option>
-                                                        <option value="posts_count" <?= $condition['condition_type'] == 'posts_count' ? 'selected' : '' ?>>Количество постов</option>
-                                                        <option value="login_days" <?= $condition['condition_type'] == 'login_days' ? 'selected' : '' ?>>Дней входа</option>
+                                                        <option value="registration_days" <?php echo $condition['condition_type'] == 'registration_days' ? 'selected' : ''; ?>>Дней с регистрации</option>
+                                                        <option value="comments_count" <?php echo $condition['condition_type'] == 'comments_count' ? 'selected' : ''; ?>>Количество комментариев</option>
+                                                        <option value="posts_count" <?php echo $condition['condition_type'] == 'posts_count' ? 'selected' : ''; ?>>Количество постов</option>
+                                                        <option value="login_days" <?php echo $condition['condition_type'] == 'login_days' ? 'selected' : ''; ?>>Дней входа</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label small">Оператор</label>
-                                                    <select class="form-select condition-operator" name="conditions[<?= $index ?>][operator]">
-                                                        <option value=">" <?= $condition['operator'] == '>' ? 'selected' : '' ?>>Больше</option>
-                                                        <option value="<" <?= $condition['operator'] == '<' ? 'selected' : '' ?>>Меньше</option>
-                                                        <option value="=" <?= $condition['operator'] == '=' ? 'selected' : '' ?>>Равно</option>
-                                                        <option value=">=" <?= $condition['operator'] == '>=' ? 'selected' : '' ?>>Больше или равно</option>
-                                                        <option value="<=" <?= $condition['operator'] == '<=' ? 'selected' : '' ?>>Меньше или равно</option>
-                                                        <option value="!=" <?= $condition['operator'] == '!=' ? 'selected' : '' ?>>Не равно</option>
+                                                    <select class="form-select condition-operator" name="conditions[<?php echo $index; ?>][operator]">
+                                                        <option value=">" <?php echo $condition['operator'] == '>' ? 'selected' : ''; ?>>Больше</option>
+                                                        <option value="<" <?php echo $condition['operator'] == '<' ? 'selected' : ''; ?>>Меньше</option>
+                                                        <option value="=" <?php echo $condition['operator'] == '=' ? 'selected' : ''; ?>>Равно</option>
+                                                        <option value=">=" <?php echo $condition['operator'] == '>=' ? 'selected' : ''; ?>>Больше или равно</option>
+                                                        <option value="<=" <?php echo $condition['operator'] == '<=' ? 'selected' : ''; ?>>Меньше или равно</option>
+                                                        <option value="!=" <?php echo $condition['operator'] == '!=' ? 'selected' : ''; ?>>Не равно</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label class="form-label small">Значение</label>
                                                     <input type="number" class="form-control condition-value" 
-                                                        name="conditions[<?= $index ?>][value]" min="0" 
-                                                        value="<?= html($condition['value']) ?>">
+                                                        name="conditions[<?php echo $index; ?>][value]" min="0" 
+                                                        value="<?php echo html($condition['value']); ?>">
                                                 </div>
                                                 <div class="col-md-1 d-flex align-items-end">
                                                     <button type="button" class="btn btn-sm btn-outline-danger remove-condition" 
                                                         style="margin-bottom: 8px;">
-                                                        <?php echo bloggy_icon('bs', 'trash', '16'); ?>
+                                                        <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="condition-description mt-2 small text-muted">
                                                 <?php 
-                                                $descriptions = [
+                                                $descriptions = array(
                                                     'registration_days' => 'Дней с момента регистрации пользователя',
                                                     'comments_count' => 'Количество оставленных комментариев',
                                                     'posts_count' => 'Количество опубликованных постов',
                                                     'login_days' => 'Количество дней с посещением сайта'
-                                                ];
+                                                );
                                                 echo $descriptions[$condition['condition_type']] ?? '';
                                                 ?>
                                             </div>
@@ -100,8 +100,8 @@
                                     </div>
                                     <?php 
                                     $conditionIndex = $index + 1;
-                                    endforeach; 
-                                else: ?>
+                                    } 
+                                } else { ?>
                                 <div class="condition-item card mb-3">
                                     <div class="card-body">
                                         <div class="row g-3">
@@ -135,18 +135,18 @@
                                             <div class="col-md-1 d-flex align-items-end">
                                                 <button type="button" class="btn btn-sm btn-outline-danger remove-condition" 
                                                     style="margin-bottom: 8px;">
-                                                    <?php echo bloggy_icon('bs', 'trash', '16'); ?>
+                                                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
                                             </div>
                                         </div>
                                         <div class="condition-description mt-2 small text-muted"></div>
                                     </div>
                                 </div>
-                                <?php endif; ?>
+                                <?php } ?>
                             </div>
                             
                             <button type="button" class="btn btn-sm btn-outline-primary" id="addCondition">
-                                <?php echo bloggy_icon('bs', 'plus', '16', '#000', 'me-1'); ?>
+                                <?php echo bloggy_icon('bs', 'plus', '16', '#0d6efd', 'me-1'); ?>
                                 Добавить условие
                             </button>
                             
@@ -161,12 +161,12 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body">
-                        <?php if (!empty($achievement['image'])): ?>
+                        <?php if (!empty($achievement['image'])) { ?>
                         <div class="mb-3 text-center">
-                            <img src="<?= BASE_URL ?>/uploads/achievements/<?= $achievement['image'] ?>" 
+                            <img src="<?php echo BASE_URL; ?>/uploads/achievements/<?php echo $achievement['image']; ?>" 
                                 class="img-thumbnail mb-2" 
                                 style="max-width: 128px; max-height: 128px;"
-                                alt="<?= html($achievement['name']) ?>">
+                                alt="<?php echo html($achievement['name']); ?>">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="remove_image" value="1" id="removeImage">
                                 <label class="form-check-label small" for="removeImage">
@@ -174,11 +174,11 @@
                                 </label>
                             </div>
                         </div>
-                        <?php endif; ?>
+                        <?php } ?>
                         
                         <div class="mb-3">
                             <label class="form-label">
-                                <?php echo !empty($achievement['image']) ? 'Заменить изображение' : 'Загрузить изображение' ?>
+                                <?php echo !empty($achievement['image']) ? 'Заменить изображение' : 'Загрузить изображение'; ?>
                             </label>
                             <input type="file" class="form-control" name="image" accept="image/*" 
                                 id="imageUpload">
@@ -196,10 +196,10 @@
                         <div class="mb-3">
                             <label class="form-label">Тип ачивки</label>
                             <select class="form-select" name="type">
-                                <option value="auto" <?= ($achievement['type'] ?? 'auto') == 'auto' ? 'selected' : '' ?>>
+                                <option value="auto" <?php echo ($achievement['type'] ?? 'auto') == 'auto' ? 'selected' : ''; ?>>
                                     Автоматическая (по условиям)
                                 </option>
-                                <option value="manual" <?= ($achievement['type'] ?? 'auto') == 'manual' ? 'selected' : '' ?>>
+                                <option value="manual" <?php echo ($achievement['type'] ?? 'auto') == 'manual' ? 'selected' : ''; ?>>
                                     Ручная (только администратор)
                                 </option>
                             </select>
@@ -208,13 +208,13 @@
                         <div class="mb-3">
                             <label class="form-label">Приоритет</label>
                             <input type="number" class="form-control" name="priority"
-                                value="<?= html($achievement['priority'] ?? 0) ?>" min="0">
+                                value="<?php echo html($achievement['priority'] ?? 0); ?>" min="0">
                             <div class="form-text">Чем выше число, тем выше приоритет в списке</div>
                         </div>
                         
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" name="is_active" 
-                                id="isActive" <?= ($achievement['is_active'] ?? 1) ? 'checked' : '' ?>>
+                                id="isActive" <?php echo ($achievement['is_active'] ?? 1) ? 'checked' : ''; ?>>
                             <label class="form-check-label" for="isActive">
                                 Ачивка активна
                             </label>
@@ -223,20 +223,20 @@
                         <div class="text-muted small">
                             <div class="d-flex justify-content-between mb-1">
                                 <span>Создана:</span>
-                                <span><?= date('d.m.Y H:i', strtotime($achievement['created_at'])) ?></span>
+                                <span><?php echo date('d.m.Y H:i', strtotime($achievement['created_at'])); ?></span>
                             </div>
-                            <?php if ($achievement['updated_at'] != $achievement['created_at']): ?>
+                            <?php if ($achievement['updated_at'] != $achievement['created_at']) { ?>
                             <div class="d-flex justify-content-between">
                                 <span>Обновлена:</span>
-                                <span><?= date('d.m.Y H:i', strtotime($achievement['updated_at'])) ?></span>
+                                <span><?php echo date('d.m.Y H:i', strtotime($achievement['updated_at'])); ?></span>
                             </div>
-                            <?php endif; ?>
-                            <?php if (isset($achievement['user_count'])): ?>
+                            <?php } ?>
+                            <?php if (isset($achievement['user_count'])) { ?>
                             <div class="d-flex justify-content-between">
                                 <span>Получили:</span>
-                                <span><?= $achievement['user_count'] ?> пользователей</span>
+                                <span><?php echo $achievement['user_count']; ?> пользователей</span>
                             </div>
-                            <?php endif; ?>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -246,7 +246,7 @@
                         <?php echo bloggy_icon('bs', 'check-lg', '18', '#fff', 'me-1'); ?>
                         Сохранить изменения
                     </button>
-                    <a href="<?= ADMIN_URL ?>/user-achievements" class="btn btn-outline-secondary">
+                    <a href="<?php echo ADMIN_URL; ?>/user-achievements" class="btn btn-outline-secondary">
                         Отмена
                     </a>
                 </div>
@@ -258,7 +258,7 @@
 <?php ob_start(); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let conditionIndex = <?= $conditionIndex ?>;
+    let conditionIndex = <?php echo $conditionIndex; ?>;
     const conditionTemplates = {
         'registration_days': 'Дней с момента регистрации пользователя',
         'comments_count': 'Количество оставленных комментариев',
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-sm btn-outline-danger remove-condition" 
                             style="margin-bottom: 8px;">
-                            <i class="bi bi-trash"></i>
+                            <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                         </button>
                     </div>
                 </div>

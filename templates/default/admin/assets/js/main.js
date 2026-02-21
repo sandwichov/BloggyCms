@@ -204,3 +204,25 @@ function createGlobalLoader() {
     document.body.appendChild(loader);
     return loader;
 }
+
+document.getElementById('faviconInput')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const validTypes = ['image/x-icon', 'image/png', 'image/svg+xml', 'image/vnd.microsoft.icon'];
+        const validExtensions = ['.ico', '.png', '.svg'];
+        
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        
+        if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+            alert('Пожалуйста, выберите файл в формате ICO, PNG или SVG');
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('faviconPreview').src = event.target.result;
+            document.getElementById('faviconFormat').textContent = fileExtension.substring(1).toUpperCase();
+        };
+        reader.readAsDataURL(file);
+    }
+});

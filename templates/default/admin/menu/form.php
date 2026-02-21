@@ -6,38 +6,39 @@
 <div class="container-fluid p-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">
-            <i class="bi bi-<?= isset($menu['id']) ? 'pencil' : 'plus-circle' ?> me-2"></i>
-            <?= isset($menu['id']) ? 'Редактирование меню' : 'Создание меню' ?>
+            <?php echo bloggy_icon('bs', isset($menu['id']) ? 'pencil' : 'plus-circle', '24', '#000', 'me-2'); ?>
+            <?php echo isset($menu['id']) ? 'Редактирование меню' : 'Создание меню'; ?>
         </h4>
-        <a href="<?= ADMIN_URL ?>/menu" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i>Назад к списку
+        <a href="<?php echo ADMIN_URL; ?>/menu" class="btn btn-outline-secondary">
+            <?php echo bloggy_icon('bs', 'arrow-left', '16', '#000', 'me-2'); ?>
+            Назад к списку
         </a>
     </div>
 
     <div class="alert alert-info mb-4">
         <div class="d-flex align-items-center">
-            <i class="bi bi-info-circle me-2"></i>
+            <?php echo bloggy_icon('bs', 'info-circle', '16', '#000', 'me-2'); ?>
             <div>
-                <strong>Текущая тема:</strong> <?= html($currentTheme) ?>
-                <div class="small">Шаблоны меню загружаются из: <code>templates/<?= html($currentTheme) ?>/front/assets/menu/</code></div>
+                <strong>Текущая тема:</strong> <?php echo html($currentTheme); ?>
+                <div class="small">Шаблоны меню загружаются из: <code>templates/<?php echo html($currentTheme); ?>/front/assets/menu/</code></div>
             </div>
         </div>
     </div>
 
-    <?php if (empty($availableTemplates)): ?>
+    <?php if (empty($availableTemplates)) { ?>
     <div class="alert alert-warning">
         <div class="d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle me-2"></i>
+            <?php echo bloggy_icon('bs', 'exclamation-triangle', '16', '#000', 'me-2'); ?>
             <div>
                 <strong>Шаблоны меню не найдены!</strong>
                 <div class="small">
-                    Создайте PHP файлы в директории: <code>templates/<?= html($currentTheme) ?>/front/assets/menu/</code>
+                    Создайте PHP файлы в директории: <code>templates/<?php echo html($currentTheme); ?>/front/assets/menu/</code>
                     <br>Например: <code>main.php</code>, <code>footer.php</code>
                 </div>
             </div>
         </div>
     </div>
-    <?php endif; ?>
+    <?php } ?>
 
     <form method="POST" id="menu-form">
         <div class="row">
@@ -47,13 +48,16 @@
                         <h5 class="card-title mb-0">Структура меню</h5>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-outline-primary btn-sm" id="add-menu-item" data-bs-toggle="modal" data-bs-target="#menuItemModal">
-                                <i class="bi bi-plus-circle me-1"></i>Добавить пункт
+                                <?php echo bloggy_icon('bs', 'plus-circle', '16', '#000', 'me-1'); ?>
+                                Добавить пункт
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-sm" id="expand-all">
-                                <i class="bi bi-arrows-expand me-1"></i>Развернуть все
+                                <?php echo bloggy_icon('bs', 'arrows-expand', '16', '#000', 'me-1'); ?>
+                                Развернуть все
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-sm" id="collapse-all">
-                                <i class="bi bi-arrows-collapse me-1"></i>Свернуть все
+                                <?php echo bloggy_icon('bs', 'arrows-collapse', '16', '#000', 'me-1'); ?>
+                                Свернуть все
                             </button>
                         </div>
                     </div>
@@ -62,91 +66,91 @@
                             <div class="mb-3">
                                 <div class="alert alert-light border">
                                     <div class="d-flex align-items-center">
-                                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                                        <?php echo bloggy_icon('bs', 'lightbulb', '16', '#ffc107', 'me-2'); ?>
                                         <small>Нажмите на пункт меню для редактирования. Перетаскивайте для изменения порядка.</small>
                                     </div>
                                 </div>
                             </div>
                             
                             <div id="menu-items-container" class="sortable-menu menu-tree">
-                                <?php if (!empty($menuStructure)): ?>
+                                <?php if (!empty($menuStructure)) { ?>
                                     <?php 
                                     function renderMenuItem($item, $index, $level = 0) {
                                         $title = html($item['title'] ?? '');
                                         $url = html($item['url'] ?? '');
                                         $class = html($item['class'] ?? '');
                                         $target = $item['target'] ?? '_self';
-                                        $children = $item['children'] ?? [];
+                                        $children = $item['children'] ?? array();
                                         $hasChildren = !empty($children);
                                         $levelClass = 'level-' . min($level, 4);
-                                        $itemData = html(json_encode([
+                                        $itemData = html(json_encode(array(
                                             'title' => $item['title'] ?? '',
                                             'url' => $item['url'] ?? '',
                                             'class' => $item['class'] ?? '',
                                             'target' => $item['target'] ?? '_self'
-                                        ]));
+                                        )));
                                         ?>
-                                        <div class="menu-item-card card mb-2 <?= $levelClass ?>" 
-                                             data-index="<?= $index ?>" 
-                                             data-level="<?= $level ?>"
-                                             data-item="<?= $itemData ?>">
+                                        <div class="menu-item-card card mb-2 <?php echo $levelClass; ?>" 
+                                             data-index="<?php echo $index; ?>" 
+                                             data-level="<?php echo $level; ?>"
+                                             data-item="<?php echo $itemData; ?>">
                                             <div class="card-body p-3">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div class="d-flex align-items-center flex-grow-1">
                                                         <div class="menu-level-indicator me-3">
-                                                            <?php for ($i = 0; $i < $level; $i++): ?>
+                                                            <?php for ($i = 0; $i < $level; $i++) { ?>
                                                                 <span class="level-line"></span>
-                                                            <?php endfor; ?>
+                                                            <?php } ?>
                                                             <span class="level-dot"></span>
                                                         </div>
                                                         <div class="flex-grow-1">
                                                             <div class="d-flex align-items-center">
-                                                                <?php if ($hasChildren): ?>
-                                                                    <i class="bi bi-folder-fill text-warning me-2"></i>
-                                                                <?php else: ?>
-                                                                    <i class="bi bi-link-45deg text-primary me-2"></i>
-                                                                <?php endif; ?>
+                                                                <?php if ($hasChildren) { ?>
+                                                                    <?php echo bloggy_icon('bs', 'folder-fill', '16', '#ffc107', 'me-2'); ?>
+                                                                <?php } else { ?>
+                                                                    <?php echo bloggy_icon('bs', 'link-45deg', '16', '#0d6efd', 'me-2'); ?>
+                                                                <?php } ?>
                                                                 <div>
-                                                                    <h6 class="mb-1"><?= !empty($title) ? $title : 'Без названия' ?></h6>
-                                                                    <small class="text-muted"><?= $url ?></small>
+                                                                    <h6 class="mb-1"><?php echo !empty($title) ? $title : 'Без названия'; ?></h6>
+                                                                    <small class="text-muted"><?php echo $url; ?></small>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="btn-group btn-group-sm">
                                                         <button type="button" class="btn btn-outline-secondary menu-item-handle" title="Перетащить">
-                                                            <i class="bi bi-arrows-move"></i>
+                                                            <?php echo bloggy_icon('bs', 'arrows-move', '16', '#000'); ?>
                                                         </button>
                                                         <button type="button" class="btn btn-outline-primary edit-menu-item" 
                                                                 title="Редактировать"
                                                                 data-bs-toggle="modal" 
                                                                 data-bs-target="#menuItemModal">
-                                                            <i class="bi bi-pencil"></i>
+                                                            <?php echo bloggy_icon('bs', 'pencil', '16', '#000'); ?>
                                                         </button>
                                                         <button type="button" class="btn btn-outline-success add-child-item" 
                                                                 title="Добавить подпункт"
                                                                 data-bs-toggle="modal" 
                                                                 data-bs-target="#menuItemModal"
-                                                                data-parent-index="<?= $index ?>">
-                                                            <i class="bi bi-patch-plus"></i>
+                                                                data-parent-index="<?php echo $index; ?>">
+                                                            <?php echo bloggy_icon('bs', 'patch-plus', '16', '#000'); ?>
                                                         </button>
                                                         <button type="button" class="btn btn-outline-danger remove-menu-item" title="Удалить">
-                                                            <i class="bi bi-trash"></i>
+                                                            <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                         </button>
                                                     </div>
                                                 </div>
                                                 
-                                                <?php if ($hasChildren): ?>
+                                                <?php if ($hasChildren) { ?>
                                                     <div class="menu-children-container mt-3">
                                                         <div class="border-top pt-3">
                                                             <div class="menu-children sortable-menu">
-                                                                <?php foreach ($children as $childIndex => $child): ?>
+                                                                <?php foreach ($children as $childIndex => $child) { ?>
                                                                     <?php renderMenuItem($child, $index . '_' . $childIndex, $level + 1); ?>
-                                                                <?php endforeach; ?>
+                                                                <?php } ?>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                <?php endif; ?>
+                                                <?php } ?>
                                             </div>
                                         </div>
                                         <?php
@@ -156,17 +160,18 @@
                                         renderMenuItem($item, $index, 0);
                                     }
                                     ?>
-                                <?php endif; ?>
+                                <?php } ?>
                             </div>
                             
-                            <div id="menu-empty" class="text-center text-muted p-5 <?= !empty($menuStructure) ? 'd-none' : '' ?>">
+                            <div id="menu-empty" class="text-center text-muted p-5 <?php echo !empty($menuStructure) ? 'd-none' : ''; ?>">
                                 <div class="mb-3">
-                                    <i class="bi bi-list-ul display-4 opacity-50"></i>
+                                    <?php echo bloggy_icon('bs', 'list-ul', '48', '#6C6C6C'); ?>
                                 </div>
                                 <h5 class="text-muted">Меню пустое</h5>
                                 <p class="text-muted mb-3">Добавьте первый пункт меню чтобы начать работу</p>
                                 <button type="button" class="btn btn-primary" id="add-first-item" data-bs-toggle="modal" data-bs-target="#menuItemModal">
-                                    <i class="bi bi-plus-circle me-1"></i>Добавить первый пункт
+                                    <?php echo bloggy_icon('bs', 'plus-circle', '16', '#fff', 'me-1'); ?>
+                                    Добавить первый пункт
                                 </button>
                             </div>
                         </div>
@@ -178,55 +183,60 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-0">
                         <h5 class="card-title mb-0">
-                            <i class="bi bi-gear me-2"></i>Настройки меню
+                            <?php echo bloggy_icon('bs', 'gear', '20', '#000', 'me-2'); ?>
+                            Настройки меню
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">
-                                <i class="bi bi-tag me-1"></i>Название меню
+                                <?php echo bloggy_icon('bs', 'tag', '16', '#000', 'me-1'); ?>
+                                Название меню
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    name="name" 
-                                   value="<?= html($menu['name'] ?? '') ?>" 
+                                   value="<?php echo html($menu['name'] ?? ''); ?>" 
                                    required
                                    placeholder="Например: Главное меню">
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">
-                                <i class="bi bi-layout-wtf me-1"></i>Шаблон меню
+                                <?php echo bloggy_icon('bs', 'layout-wtf', '16', '#000', 'me-1'); ?>
+                                Шаблон меню
                                 <span class="text-danger">*</span>
                             </label>
-                            <select class="form-select" name="template" required <?= empty($availableTemplates) ? 'disabled' : '' ?>>
+                            <select class="form-select" name="template" required <?php echo empty($availableTemplates) ? 'disabled' : ''; ?>>
                                 <option value="">Выберите шаблон</option>
-                                <?php foreach ($availableTemplates as $templateKey => $templateName): ?>
-                                    <option value="<?= $templateKey ?>" 
-                                        <?= ($menu['template'] ?? '') === $templateKey ? 'selected' : '' ?>>
-                                        <?= html($templateName) ?>
+                                <?php foreach ($availableTemplates as $templateKey => $templateName) { ?>
+                                    <option value="<?php echo $templateKey; ?>" 
+                                        <?php echo ($menu['template'] ?? '') === $templateKey ? 'selected' : ''; ?>>
+                                        <?php echo html($templateName); ?>
                                     </option>
-                                <?php endforeach; ?>
+                                <?php } ?>
                             </select>
                             <div class="form-text">
-                                <i class="bi bi-folder me-1"></i>Путь: <code>templates/<?= html($currentTheme) ?>/front/assets/menu/</code>
+                                <?php echo bloggy_icon('bs', 'folder', '16', '#000', 'me-1'); ?>
+                                Путь: <code>templates/<?php echo html($currentTheme); ?>/front/assets/menu/</code>
                             </div>
-                            <?php if (empty($availableTemplates)): ?>
+                            <?php if (empty($availableTemplates)) { ?>
                             <div class="alert alert-warning mt-2 p-2 small">
-                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                <?php echo bloggy_icon('bs', 'exclamation-triangle', '16', '#000', 'me-1'); ?>
                                 Нет доступных шаблонов. Создайте файлы в указанной директории.
                             </div>
-                            <?php endif; ?>
+                            <?php } ?>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">
-                                <i class="bi bi-power me-1"></i>Статус
+                                <?php echo bloggy_icon('bs', 'power', '16', '#000', 'me-1'); ?>
+                                Статус
                             </label>
                             <select class="form-select" name="status">
-                                <option value="active" <?= ($menu['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>Активно</option>
-                                <option value="inactive" <?= ($menu['status'] ?? '') === 'inactive' ? 'selected' : '' ?>>Неактивно</option>
+                                <option value="active" <?php echo ($menu['status'] ?? 'active') === 'active' ? 'selected' : ''; ?>>Активно</option>
+                                <option value="inactive" <?php echo ($menu['status'] ?? '') === 'inactive' ? 'selected' : ''; ?>>Неактивно</option>
                             </select>
                         </div>
                     </div>
@@ -235,17 +245,18 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary" <?= empty($availableTemplates) ? 'disabled' : '' ?>>
-                                <i class="bi bi-check-lg me-2"></i>
-                                <?= isset($menu['id']) ? 'Обновить меню' : 'Создать меню' ?>
+                            <button type="submit" class="btn btn-primary" <?php echo empty($availableTemplates) ? 'disabled' : ''; ?>>
+                                <?php echo bloggy_icon('bs', 'check-lg', '20', '#fff', 'me-2'); ?>
+                                <?php echo isset($menu['id']) ? 'Обновить меню' : 'Создать меню'; ?>
                             </button>
                             
-                            <?php if (isset($menu['id'])): ?>
-                            <a href="<?= ADMIN_URL ?>/menu/preview/<?= $menu['id'] ?>" 
+                            <?php if (isset($menu['id'])) { ?>
+                            <a href="<?php echo ADMIN_URL; ?>/menu/preview/<?php echo $menu['id']; ?>" 
                                class="btn btn-outline-secondary">
-                                <i class="bi bi-eye me-2"></i>Предпросмотр
+                                <?php echo bloggy_icon('bs', 'eye', '16', '#000', 'me-2'); ?>
+                                Предпросмотр
                             </a>
-                            <?php endif; ?>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -253,7 +264,8 @@
                 <div class="card border-0 shadow-sm mt-3">
                     <div class="card-header bg-white border-0">
                         <h6 class="card-title mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Статистика
+                            <?php echo bloggy_icon('bs', 'graph-up', '16', '#000', 'me-2'); ?>
+                            Статистика
                         </h6>
                     </div>
                     <div class="card-body">
@@ -274,7 +286,7 @@
             </div>
         </div>
         
-        <input type="hidden" name="menu_structure" id="menu-structure" value='<?= json_encode($menuStructure ?? [], JSON_UNESCAPED_UNICODE) ?>'>
+        <input type="hidden" name="menu_structure" id="menu-structure" value='<?php echo json_encode($menuStructure ?? array(), JSON_UNESCAPED_UNICODE); ?>'>
     </form>
 </div>
 
@@ -283,7 +295,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="menuItemModalLabel">
-                    <i class="bi bi-plus-circle me-2"></i>Добавить пункт меню
+                    <?php echo bloggy_icon('bs', 'plus-circle', '20', '#000', 'me-2'); ?>
+                    Добавить пункт меню
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -295,7 +308,8 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">
-                                <i class="bi bi-fonts me-1"></i>Название пункта
+                                <?php echo bloggy_icon('bs', 'fonts', '16', '#000', 'me-1'); ?>
+                                Название пункта
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" 
@@ -309,7 +323,8 @@
                         
                         <div class="col-md-12">
                             <label class="form-label">
-                                <i class="bi bi-link me-1"></i>URL адрес
+                                <?php echo bloggy_icon('bs', 'link', '16', '#000', 'me-1'); ?>
+                                URL адрес
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
@@ -326,11 +341,13 @@
                         <div class="mb-2">
     <div class="d-flex justify-content-between align-items-center mb-1">
         <label class="form-label mb-0">
-            <i class="bi bi-code-slash me-1"></i>Доступные шорткоды:
+            <?php echo bloggy_icon('bs', 'code-slash', '16', '#000', 'me-1'); ?>
+            Доступные шорткоды:
         </label>
         <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" 
                 data-bs-toggle="collapse" data-bs-target="#shortcodeHelp">
-            <i class="bi bi-info-circle"></i> Подробнее
+            <?php echo bloggy_icon('bs', 'info-circle', '16', '#000', 'me-1'); ?>
+            Подробнее
         </button>
     </div>
     
@@ -401,13 +418,15 @@
     </div>
     
     <div class="shortcode-preview small text-muted mt-2" id="shortcode-preview" style="display: none;">
-        <i class="bi bi-eye me-1"></i>Превью: <span id="preview-text"></span>
+        <?php echo bloggy_icon('bs', 'eye', '16', '#000', 'me-1'); ?>
+        Превью: <span id="preview-text"></span>
     </div>
 </div>
                         
                         <div class="col-md-6">
                             <label class="form-label">
-                                <i class="bi bi-box-arrow-up-right me-1"></i>Открывать в
+                                <?php echo bloggy_icon('bs', 'box-arrow-up-right', '16', '#000', 'me-1'); ?>
+                                Открывать в
                             </label>
                             <select class="form-select" id="item-target">
                                 <option value="_self">Текущем окне</option>
@@ -417,7 +436,8 @@
                         
                         <div class="col-md-6">
                             <label class="form-label">
-                                <i class="bi bi-code-slash me-1"></i>CSS классы
+                                <?php echo bloggy_icon('bs', 'code-slash', '16', '#000', 'me-1'); ?>
+                                CSS классы
                             </label>
                             <input type="text" 
                                    class="form-control" 
@@ -429,13 +449,15 @@
 
                         <div class="border-top pt-3 mt-3">
                             <h6 class="text-muted mb-3">
-                                <i class="bi bi-image me-1"></i>Настройки иконки
+                                <?php echo bloggy_icon('bs', 'image', '16', '#000', 'me-1'); ?>
+                                Настройки иконки
                             </h6>
                             
                             <div class="row">
                                 <div class="col-md-12">
                                     <label class="form-label">
-                                        <i class="bi bi-palette me-1"></i>Иконка
+                                        <?php echo bloggy_icon('bs', 'palette', '16', '#000', 'me-1'); ?>
+                                        Иконка
                                     </label>
                                     <div class="input-group mb-2">
                                         <input type="text" 
@@ -447,12 +469,13 @@
                                                 class="btn btn-outline-primary" 
                                                 id="select-icon-btn"
                                                 onclick="window.menuIconManager.openIconSelector()">
-                                            <i class="bi bi-images"></i> Выбрать иконку
+                                            <?php echo bloggy_icon('bs', 'images', '16', '#000', 'me-1'); ?>
+                                            Выбрать иконку
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-outline-danger" 
                                                 id="clear-icon-btn">
-                                            <i class="bi bi-x-circle"></i>
+                                            <?php echo bloggy_icon('bs', 'x-circle', '16', '#000'); ?>
                                         </button>
                                     </div>
                                     
@@ -466,7 +489,8 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="bi bi-rulers me-1"></i>Размер (px)
+                                        <?php echo bloggy_icon('bs', 'rulers', '16', '#000', 'me-1'); ?>
+                                        Размер (px)
                                     </label>
                                     <input type="number" 
                                         class="form-control" 
@@ -478,7 +502,8 @@
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        <i class="bi bi-palette me-1"></i>Цвет
+                                        <?php echo bloggy_icon('bs', 'palette', '16', '#000', 'me-1'); ?>
+                                        Цвет
                                     </label>
                                     <input type="color" 
                                         class="form-control form-control-color" 
@@ -495,7 +520,8 @@
                                             type="checkbox" 
                                             id="item-icon-only">
                                         <label class="form-check-label" for="item-icon-only">
-                                            <i class="bi bi-fonts me-1"></i>Отображать только иконку (без текста)
+                                            <?php echo bloggy_icon('bs', 'fonts', '16', '#000', 'me-1'); ?>
+                                            Отображать только иконку (без текста)
                                         </label>
                                         <div class="form-text small">
                                             Если включено, в меню будет отображаться только иконка
@@ -507,46 +533,49 @@
 
                         <div class="border-top pt-3 mt-3">
                         <h6 class="text-muted mb-3">
-                            <i class="bi bi-shield-lock me-1"></i>Настройки видимости
+                            <?php echo bloggy_icon('bs', 'shield-lock', '16', '#000', 'me-1'); ?>
+                            Настройки видимости
                         </h6>
     
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label small">
-                                    <i class="bi bi-eye me-1"></i>Показывать группам
+                                    <?php echo bloggy_icon('bs', 'eye', '16', '#000', 'me-1'); ?>
+                                    Показывать группам
                                 </label>
                                 <select class="form-select form-select-sm" id="item-show-to" multiple size="4">
                                     <option value="">Все группы (если не выбрано)</option>
                                     <?php 
                                     $groups = $this->getUserGroups();
-                                    foreach ($groups as $group): 
+                                    foreach ($groups as $group) { 
                                     ?>
-                                        <option value="<?= $group['id'] ?>">
-                                            <?= html($group['name']) ?>
+                                        <option value="<?php echo $group['id']; ?>">
+                                            <?php echo html($group['name']); ?>
                                         </option>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </select>
                                 <div class="form-text small">Оставьте пустым чтобы показывать всем</div>
                             </div>
                             
                             <div class="col-md-6">
                                 <label class="form-label small">
-                                    <i class="bi bi-eye-slash me-1"></i>Не показывать группам
+                                    <?php echo bloggy_icon('bs', 'eye-slash', '16', '#000', 'me-1'); ?>
+                                    Не показывать группам
                                 </label>
                                 <select class="form-select form-select-sm" id="item-hide-from" multiple size="4">
                                     <option value="">Никому не скрывать</option>
-                                    <?php foreach ($groups as $group): ?>
-                                        <option value="<?= $group['id'] ?>">
-                                            <?= html($group['name']) ?>
+                                    <?php foreach ($groups as $group) { ?>
+                                        <option value="<?php echo $group['id']; ?>">
+                                            <?php echo html($group['name']); ?>
                                         </option>
-                                    <?php endforeach; ?>
+                                    <?php } ?>
                                 </select>
                                 <div class="form-text small">Выберите группы которым скрыть этот пункт</div>
                             </div>
                         </div>
     
                         <div class="alert alert-info mt-2 p-2 small">
-                            <i class="bi bi-info-circle me-1"></i>
+                            <?php echo bloggy_icon('bs', 'info-circle', '16', '#000', 'me-1'); ?>
                             <strong>Приоритет:</strong> Сначала проверяется "Показывать группам", затем "Не показывать группам"
                         </div>
                     </div>
@@ -556,10 +585,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i>Отмена
+                    <?php echo bloggy_icon('bs', 'x-circle', '16', '#000', 'me-1'); ?>
+                    Отмена
                 </button>
                 <button type="button" class="btn btn-primary" id="save-menu-item">
-                    <i class="bi bi-check-lg me-1"></i>Сохранить пункт
+                    <?php echo bloggy_icon('bs', 'check-lg', '16', '#fff', 'me-1'); ?>
+                    Сохранить пункт
                 </button>
             </div>
         </div>
@@ -571,7 +602,8 @@
         <div class="custom-modal-content">
             <div class="custom-modal-header">
                 <h5 class="custom-modal-title">
-                    <i class="bi bi-images me-2"></i>Выбор иконки
+                    <?php echo bloggy_icon('bs', 'images', '20', '#000', 'me-2'); ?>
+                    Выбор иконки
                 </h5>
                 <button type="button" class="custom-modal-close" onclick="window.menuIconManager.closeIconSelector()">
                     <span>&times;</span>
@@ -581,7 +613,7 @@
                 <div class="mb-3">
                     <div class="input-group">
                         <span class="input-group-text border-0 bg-light">
-                            <i class="bi bi-search"></i>
+                            <?php echo bloggy_icon('bs', 'search', '16', '#000'); ?>
                         </span>
                         <input type="text" 
                             id="iconSearchModal" 
@@ -603,10 +635,12 @@
             </div>
             <div class="custom-modal-footer">
                 <button type="button" class="btn btn-outline-secondary" onclick="window.menuIconManager.closeIconSelector()">
-                    <i class="bi bi-x-circle me-1"></i>Отмена
+                    <?php echo bloggy_icon('bs', 'x-circle', '16', '#000', 'me-1'); ?>
+                    Отмена
                 </button>
                 <button type="button" class="btn btn-primary" onclick="window.menuIconManager.confirmIconSelection()">
-                    <i class="bi bi-check-lg me-1"></i>Выбрать
+                    <?php echo bloggy_icon('bs', 'check-lg', '16', '#fff', 'me-1'); ?>
+                    Выбрать
                 </button>
             </div>
         </div>

@@ -5,7 +5,7 @@
             Управление ачивками
         </h4>
         <div class="d-flex gap-2">
-            <a href="<?= ADMIN_URL ?>/user-achievements/create" class="btn btn-primary">
+            <a href="<?php echo ADMIN_URL; ?>/user-achievements/create" class="btn btn-primary">
                 <?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>
                 Добавить ачивку
             </a>
@@ -19,18 +19,18 @@
                     <label class="form-label">Тип ачивки</label>
                     <select name="type" class="form-select">
                         <option value="">Все типы</option>
-                        <option value="auto" <?= ($_GET['type'] ?? '') == 'auto' ? 'selected' : '' ?>>Автоматические</option>
-                        <option value="manual" <?= ($_GET['type'] ?? '') == 'manual' ? 'selected' : '' ?>>Ручные</option>
+                        <option value="auto" <?php echo ($_GET['type'] ?? '') == 'auto' ? 'selected' : ''; ?>>Автоматические</option>
+                        <option value="manual" <?php echo ($_GET['type'] ?? '') == 'manual' ? 'selected' : ''; ?>>Ручные</option>
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Поиск</label>
                     <input type="text" name="search" class="form-control" placeholder="Название ачивки..." 
-                        value="<?php echo html($_GET['search'] ?? '') ?>">
+                        value="<?php echo html($_GET['search'] ?? ''); ?>">
                 </div>
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-primary w-100">
-                        <?php echo bloggy_icon('bs', 'funnel', '18'); ?>
+                        <?php echo bloggy_icon('bs', 'funnel', '18', '#fff', 'me-2'); ?>
                         Применить фильтр
                     </button>
                 </div>
@@ -40,14 +40,14 @@
     
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <?php if(empty($achievements)) { ?>
+            <?php if (empty($achievements)) { ?>
                 <div class="text-center py-5">
                     <div class="mb-3">
-                        <?php echo bloggy_icon('bs', 'trophy', '32', '#838383'); ?>
+                        <?php echo bloggy_icon('bs', 'trophy', '48', '#838383'); ?>
                     </div>
                     <h5 class="text-muted">Ачивки не найдены</h5>
                     <p class="text-muted">Создайте первую ачивку для пользователей</p>
-                    <a href="<?= ADMIN_URL ?>/user-achievements/create" class="btn btn-primary">
+                    <a href="<?php echo ADMIN_URL; ?>/user-achievements/create" class="btn btn-primary">
                         <?php echo bloggy_icon('bs', 'plus-lg', '20', '#fff', 'me-2'); ?>
                         Создать ачивку
                     </a>
@@ -66,36 +66,39 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($achievements as $achievement) { ?>
+                            <?php foreach ($achievements as $achievement) { ?>
                                 <tr>
                                     <td>
-                                        <?php if($achievement['image']): ?>
-                                            <img src="<?= BASE_URL ?>/uploads/achievements/<?= $achievement['image'] ?>" 
+                                        <?php if ($achievement['image']) { ?>
+                                            <img src="<?php echo BASE_URL; ?>/uploads/achievements/<?php echo $achievement['image']; ?>" 
                                                 class="rounded" 
                                                 style="width: 40px; height: 40px; object-fit: cover;"
-                                                alt="<?php echo html($achievement['name']) ?>">
-                                        <?php else: ?>
+                                                alt="<?php echo html($achievement['name']); ?>">
+                                        <?php } else { ?>
                                             <div class="d-flex align-items-center justify-content-center rounded" 
-                                                style="width: 40px; height: 40px; background: <?= $achievement['icon_color'] ?>;">
-                                                <i class="bi bi-<?= $achievement['icon'] ?> text-white"></i>
+                                                style="width: 40px; height: 40px; background: <?php echo $achievement['icon_color']; ?>;">
+                                                <?php 
+                                                $iconName = str_replace('bi-', '', $achievement['icon']);
+                                                echo bloggy_icon('bs', $iconName, '20', '#fff'); 
+                                                ?>
                                             </div>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </td>
                                     <td>
                                         <div>
-                                            <strong><?php echo html($achievement['name']) ?></strong>
-                                            <?php if($achievement['type'] == 'manual'): ?>
+                                            <strong><?php echo html($achievement['name']); ?></strong>
+                                            <?php if ($achievement['type'] == 'manual') { ?>
                                                 <span class="badge bg-warning ms-2">Ручная</span>
-                                            <?php endif; ?>
+                                            <?php } ?>
                                         </div>
-                                        <?php if($achievement['description']): ?>
-                                            <small class="text-muted"><?php echo html($achievement['description']) ?></small>
-                                        <?php endif; ?>
+                                        <?php if ($achievement['description']) { ?>
+                                            <small class="text-muted"><?php echo html($achievement['description']); ?></small>
+                                        <?php } ?>
                                     </td>
                                     <td>
-                                        <?php if(!empty($achievement['conditions'])) { ?>
+                                        <?php if (!empty($achievement['conditions'])) { ?>
                                             <div class="d-flex flex-wrap gap-1">
-                                                <?php foreach($achievement['conditions'] as $condition): ?>
+                                                <?php foreach ($achievement['conditions'] as $condition) { ?>
                                                     <?php 
                                                     $conditionText = '';
                                                     switch($condition['condition_type']) {
@@ -114,11 +117,11 @@
                                                     }
                                                     ?>
                                                     <span class="badge bg-info">
-                                                        <?php echo html($conditionText) ?> 
-                                                        <?php echo html($condition['operator']) ?> 
-                                                        <?php echo html($condition['value']) ?>
+                                                        <?php echo html($conditionText); ?> 
+                                                        <?php echo html($condition['operator']); ?> 
+                                                        <?php echo html($condition['value']); ?>
                                                     </span>
-                                                <?php endforeach; ?>
+                                                <?php } ?>
                                             </div>
                                         <?php } else { ?>
                                             <span class="text-muted">Без условий</span>
@@ -126,33 +129,33 @@
                                     </td>
                                     <td>
                                         <span class="badge bg-secondary">
-                                            <?= $achievement['unlocked_count'] ?? 0 ?> пользователей
+                                            <?php echo $achievement['unlocked_count'] ?? 0; ?> пользователей
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-<?= $achievement['is_active'] ? 'success' : 'secondary' ?>">
-                                            <?= $achievement['is_active'] ? 'Активна' : 'Неактивна' ?>
+                                        <span class="badge bg-<?php echo $achievement['is_active'] ? 'success' : 'secondary'; ?>">
+                                            <?php echo $achievement['is_active'] ? 'Активна' : 'Неактивна'; ?>
                                         </span>
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-end gap-1">
-                                            <a href="<?= ADMIN_URL ?>/user-achievements/toggle/<?= $achievement['id'] ?>" 
-                                            class="btn btn-sm btn-outline-<?= $achievement['is_active'] ? 'warning' : 'success' ?>"
-                                            title="<?= $achievement['is_active'] ? 'Деактивировать' : 'Активировать' ?>">
-                                                <i class="bi bi-<?= $achievement['is_active'] ? 'pause' : 'play' ?>"></i>
+                                            <a href="<?php echo ADMIN_URL; ?>/user-achievements/toggle/<?php echo $achievement['id']; ?>" 
+                                               class="btn btn-sm btn-outline-<?php echo $achievement['is_active'] ? 'warning' : 'success'; ?>"
+                                               title="<?php echo $achievement['is_active'] ? 'Деактивировать' : 'Активировать'; ?>">
+                                                <?php echo bloggy_icon('bs', $achievement['is_active'] ? 'pause' : 'play', '16', '#000'); ?>
                                             </a>
                                             
-                                            <a href="<?= ADMIN_URL ?>/user-achievements/edit/<?= $achievement['id'] ?>" 
-                                            class="btn btn-sm btn-outline-primary"
-                                            title="Редактировать">
-                                                <i class="bi bi-pencil"></i>
+                                            <a href="<?php echo ADMIN_URL; ?>/user-achievements/edit/<?php echo $achievement['id']; ?>" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Редактировать">
+                                                <?php echo bloggy_icon('bs', 'pencil', '16', '#000'); ?>
                                             </a>
                                             
-                                            <a href="<?= ADMIN_URL ?>/user-achievements/delete/<?= $achievement['id'] ?>" 
-                                            class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Вы уверены, что хотите удалить эту ачивку?')"
-                                            title="Удалить">
-                                                <i class="bi bi-trash"></i>
+                                            <a href="<?php echo ADMIN_URL; ?>/user-achievements/delete/<?php echo $achievement['id']; ?>" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Вы уверены, что хотите удалить эту ачивку?')"
+                                               title="Удалить">
+                                                <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                             </a>
                                         </div>
                                     </td>
