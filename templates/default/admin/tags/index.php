@@ -28,6 +28,7 @@
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
+                                <th>Изображение</th>
                                 <th>Тег</th>
                                 <th>URL</th>
                                 <th>Постов с тегом</th>
@@ -37,6 +38,19 @@
                         <tbody>
                             <?php foreach ($tags as $tag) { ?>
                                 <tr>
+                                    <td style="width: 60px;">
+                                        <?php if (!empty($tag['image'])) { ?>
+                                            <img src="/uploads/tags/<?php echo html($tag['image']); ?>" 
+                                                 alt="<?php echo html($tag['name']); ?>" 
+                                                 class="rounded"
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                        <?php } else { ?>
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px;">
+                                                <?php echo bloggy_icon('bs', 'tag', '20', '#999'); ?>
+                                            </div>
+                                        <?php } ?>
+                                    </td>
                                     <td>
                                         <strong><?php echo SettingsHelper::get('controller_tags', 'tag_prefix', '#'); ?><?php echo html($tag['name']); ?></strong>
                                     </td>

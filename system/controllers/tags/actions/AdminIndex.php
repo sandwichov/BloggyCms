@@ -21,10 +21,7 @@ class AdminIndex extends TagAction {
      */
     public function execute() {
         try {
-            // Получение списка всех тегов из базы данных
             $tags = $this->tagModel->getAll();
-
-            // Массив подсказок для администратора
             $hints = [
                 "К каждому тегу вы можете добавить свое изображение",
                 "Теги имеют дополнительные настройки - для этого перейдите в раздел Настройки и выберите - Компоненты -> теги",
@@ -33,18 +30,22 @@ class AdminIndex extends TagAction {
                 "Вы можете задать дефолтное изображение для тегов, для которых Вы не загрузили собственное - в настройках",
             ];
             
-            // Выбор случайной подсказки
             $randomHint = $hints[array_rand($hints)];
 
-            // Отображение страницы со списком тегов
+            $settings = [
+                'default_image' => \SettingsHelper::get('controller_tags', 'default_image'),
+                'tag_prefix' => \SettingsHelper::get('controller_tags', 'tag_prefix', '#'),
+                'show_info' => \SettingsHelper::get('controller_tags', 'show_info')
+            ];
+
             $this->render('admin/tags/index', [
-                'tags' => $tags,               // Массив всех тегов
-                'randomHint' => $randomHint,   // Случайная подсказка
-                'pageTitle' => 'Управление тегами' // Заголовок страницы
+                'tags' => $tags,
+                'randomHint' => $randomHint,
+                'pageTitle' => 'Управление тегами',
+                'settings' => $settings
             ]);
             
         } catch (\Exception $e) {
-            // Обработка ошибок при загрузке списка
             \Notification::error('Ошибка при загрузке списка тегов');
             $this->redirect(ADMIN_URL);
         }

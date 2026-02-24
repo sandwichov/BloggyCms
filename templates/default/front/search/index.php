@@ -325,7 +325,7 @@
                             break;
                             
                         case 'user':
-                            $url = BASE_URL . '/user/' . ($item['slug'] ?? '');
+                            $url = BASE_URL . '/profile/' . ($item['slug'] ?? '');
                             $typeLabel = 'Пользователь';
                             $typeClass = 'secondary';
                             $metaInfo = '<span class="tg-search-result-date">' . 

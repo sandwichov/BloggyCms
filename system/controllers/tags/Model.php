@@ -49,7 +49,7 @@ class TagModel {
         $tags = $this->db->fetchAll($sql);
         
         $countSql = "SELECT COUNT(DISTINCT t.id) as total 
-                     FROM tags t";
+                    FROM tags t";
         $totalResult = $this->db->fetch($countSql);
         $total = $totalResult['total'];
         
