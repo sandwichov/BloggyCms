@@ -32,10 +32,10 @@ $tagPrefix = SettingsHelper::get('controller_tags', 'tag_prefix', '#');
             <div class="tg-tag-header-left">
                 <div class="tg-tag-icon-large">
                     <?php if (!empty($tag['image'])) { ?>
-                        <img src="<?php echo BASE_URL . '/uploads/' . html($tag['image']); ?>" 
+                        <img src="<?php echo BASE_URL . '/uploads/tags/' . html($tag['image']); ?>" 
                              alt="<?php echo html($tag['name']); ?>">
                     <?php } elseif (!empty($defaultTagImage)) { ?>
-                        <img src="<?php echo BASE_URL . '/uploads/' . html($defaultTagImage); ?>" 
+                        <img src="<?php echo BASE_URL . '/uploads/settings/tags/' . html($defaultTagImage); ?>" 
                              alt="<?php echo html($tag['name']); ?>">
                     <?php } else { ?>
                         <?php echo bloggy_icon('bs', 'tag-fill', '28', 'var(--tg-primary)'); ?>
