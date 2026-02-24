@@ -22,8 +22,6 @@ body {
     color: var(--tg-text);
     line-height: 1.5;
     font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -2516,12 +2514,6 @@ a:hover {
     text-decoration: underline;
 }
 
-.tg-post-date {
-    color: var(--tg-text-secondary);
-    display: flex;
-    align-items: center;
-}
-
 .tg-post-title {
     font-size: 20px;
     font-weight: 600;
@@ -2801,7 +2793,7 @@ a:hover {
 
 .tg-post-content h2 {
     font-size: 24px;
-    margin: 2em 0 1em;
+    margin: 1em 0 1em;
 }
 
 .tg-post-content h3 {
@@ -3426,12 +3418,14 @@ a:hover {
 }
 
 .tg-post-date {
-    flex-shrink: 0;
-    width: 45px;
-    text-align: center;
-    background: var(--tg-bg);
-    border-radius: var(--tg-radius-sm);
-    padding: 4px 0;
+  flex-shrink: 0;
+  width: auto;
+  text-align: center;
+  background: var(--tg-bg);
+  border-radius: var(--tg-radius-sm);
+  padding: 0 7px;
+  position: relative;
+  bottom: 4px;
 }
 
 .tg-post-day {
@@ -5266,4 +5260,25 @@ a:hover {
 
 .tg-mt-3 {
     margin-top: 16px;
+}
+
+.tg-card-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--tg-border);
+}
+
+.tg-tag-card {
+    transition: var(--tg-transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tg-tag-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--tg-shadow-hover);
+}
+
+.tg-card-text {
+    color: var(--tg-text-secondary);
 }
