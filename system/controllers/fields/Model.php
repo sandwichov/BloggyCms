@@ -347,38 +347,38 @@ class FieldModel {
      * @return bool Результат выполнения запроса
      */
     public function saveFieldValue($fieldId, $entityType, $entityId, $value, $fieldType = null, $config = []) {
-        // Обработка значения через FieldManager если указан тип поля
-        if ($fieldType) {
-            if (is_string($config)) {
-                $config = json_decode($config, true) ?? [];
-            }
-            
-            $fieldManager = new FieldManager($this->db);
-            $fieldInstance = $fieldManager->getFieldInstance($fieldType, $config);
-            if ($fieldInstance && !$fieldInstance->requiresFileUpload()) {
-                $value = $fieldInstance->processValue($value);
-            }
-        }
 
-        // Проверка существования значения
         $existing = $this->db->fetch(
             "SELECT id FROM field_values WHERE field_id = ? AND entity_type = ? AND entity_id = ?",
             [$fieldId, $entityType, $entityId]
         );
         
-        // Обновление существующего значения или создание нового
+        if ($value === null) {
+
+            if ($existing) {
+                $result = $this->db->query(
+                    "DELETE FROM field_values WHERE field_id = ? AND entity_type = ? AND entity_id = ?",
+                    [$fieldId, $entityType, $entityId]
+                );
+                return $result;
+            }
+            return true;
+        }
+        
         if ($existing) {
-            return $this->db->query(
+            $result = $this->db->query(
                 "UPDATE field_values SET value = ?, updated_at = CURRENT_TIMESTAMP 
                 WHERE field_id = ? AND entity_type = ? AND entity_id = ?",
                 [$value, $fieldId, $entityType, $entityId]
             );
+            return $result;
         } else {
-            return $this->db->query(
+            $result = $this->db->query(
                 "INSERT INTO field_values (field_id, entity_type, entity_id, value) 
                 VALUES (?, ?, ?, ?)",
                 [$fieldId, $entityType, $entityId, $value]
             );
+            return $result;
         }
     }
 

@@ -14,6 +14,22 @@ namespace users\actions;
 class AdminEdit extends UserAction {
     
     /**
+     * @var \FieldManager Менеджер полей для обработки пользовательских полей
+     */
+    private $fieldManager;
+    
+    /**
+     * Конструктор
+     * 
+     * @param \Database $db
+     * @param array $params
+     */
+    public function __construct($db, $params = []) {
+        parent::__construct($db, $params);
+        $this->fieldManager = new \FieldManager($db);
+    }
+    
+    /**
      * Метод выполнения редактирования пользователя
      * Проверяет ID, загружает данные пользователя, обрабатывает POST-запрос
      * или отображает форму с текущими данными
@@ -21,10 +37,8 @@ class AdminEdit extends UserAction {
      * @return void
      */
     public function execute() {
-        // Получение ID пользователя из параметров
         $id = $this->params['id'] ?? null;
         
-        // Проверка наличия ID
         if (!$id) {
             \Notification::error('ID пользователя не указан');
             $this->redirect(ADMIN_URL . '/users');
@@ -32,20 +46,16 @@ class AdminEdit extends UserAction {
         }
         
         try {
-            // Загрузка данных пользователя
             $user = $this->loadUser($id);
             
-            // Обработка POST-запроса (сохранение изменений)
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $this->handlePostRequest($id, $user);
                 return;
             }
 
-            // Отображение формы редактирования
             $this->renderEditForm($user);
 
         } catch (\Exception $e) {
-            // Обработка ошибок
             $this->handleError($e, $id);
         }
     }
@@ -74,33 +84,15 @@ class AdminEdit extends UserAction {
      * @throws \Exception При ошибках валидации
      */
     private function handlePostRequest($id, $user) {
-        // Валидация обязательных полей
         $this->validateRequiredFields();
-        
-        // Проверка уникальности (исключая текущего пользователя)
         $this->checkUniqueness($id);
-        
-        // Подготовка основных данных
         $userData = $this->prepareUserData($user);
-        
-        // Обработка пароля (если указан)
         $userData = $this->handlePasswordChange($userData);
-        
-        // Обработка аватара (загрузка/удаление)
         $userData = $this->handleAvatarUpdate($userData, $user);
-        
-        // Сохранение пользовательских полей
-        $this->saveCustomFields($id);
-        
-        // Обновление групп
+        $this->saveCustomFields($id, $user);
         $this->updateUserGroups($id);
-        
-        // Обновление ручных достижений
         $this->updateUserAchievements($id);
-        
-        // Обновление основных данных пользователя
         $this->userModel->update($id, $userData);
-
         \Notification::success('Пользователь успешно обновлен');
         $this->redirect(ADMIN_URL . '/users');
     }
@@ -181,7 +173,6 @@ class AdminEdit extends UserAction {
      * @return array Обновленные данные
      */
     private function handleAvatarUpdate($userData, $user) {
-        // Загрузка нового аватара
         if (!empty($_FILES['avatar']['tmp_name'])) {
             $uploadDir = UPLOADS_PATH . '/avatars/';
             if (!is_dir($uploadDir)) {
@@ -197,7 +188,6 @@ class AdminEdit extends UserAction {
             }
         }
         
-        // Удаление текущего аватара
         if (isset($_POST['remove_avatar']) && $_POST['remove_avatar']) {
             $this->deleteOldAvatar($user);
             $userData['avatar'] = 'default.jpg';
@@ -221,29 +211,73 @@ class AdminEdit extends UserAction {
     }
     
     /**
-     * Сохраняет пользовательские поля
+     * Сохраняет пользовательские поля с поддержкой файлов
      * 
      * @param int $userId ID пользователя
+     * @param array $user Данные пользователя
      */
-    private function saveCustomFields($userId) {
+    private function saveCustomFields($userId, $user) {
         $customFields = $this->fieldModel->getActiveByEntityType('user');
+        $currentValues = $this->getCurrentFieldValues($userId);
         
         foreach ($customFields as $field) {
-            $fieldKey = 'field_' . $field['system_name'];
             
-            if (isset($_POST[$fieldKey])) {
-                $value = $_POST[$fieldKey];
-                
-                $this->fieldModel->saveFieldValue(
-                    $field['id'],
-                    'user',
-                    $userId,
-                    $value,
-                    $field['type'],
-                    $field['config']
+            try {
+                $value = $this->fieldManager->processFieldValue(
+                    $field, 
+                    $_POST, 
+                    $_FILES,
+                    $currentValues
                 );
+
+                if ($value !== null) {
+                    $this->fieldModel->saveFieldValue(
+                        $field['id'],
+                        'user',
+                        $userId,
+                        $value,
+                        $field['type'],
+                        $field['config']
+                    );
+                } else {
+                    $this->fieldModel->saveFieldValue(
+                        $field['id'],
+                        'user',
+                        $userId,
+                        $value,
+                        $field['type'],
+                        $field['config']
+                    );
+                }
+                
+            } catch (\Exception $e) {
+                \Notification::error("Ошибка при сохранении поля {$field['name']}: " . $e->getMessage());
             }
         }
+    
+    }
+    
+    /**
+     * Получает текущие значения всех полей для пользователя
+     * 
+     * @param int $userId ID пользователя
+     * @return array Массив значений, где ключ - system_name поля
+     */
+    private function getCurrentFieldValues($userId) {
+        $values = [];
+        
+        $results = $this->db->fetchAll("
+            SELECT f.system_name, fv.value 
+            FROM field_values fv
+            JOIN fields f ON fv.field_id = f.id
+            WHERE fv.entity_type = 'user' AND fv.entity_id = ?
+        ", [$userId]);
+        
+        foreach ($results as $row) {
+            $values[$row['system_name']] = $row['value'];
+        }
+        
+        return $values;
     }
     
     /**
@@ -269,11 +303,9 @@ class AdminEdit extends UserAction {
             return;
         }
         
-        // Получение текущих ачивок пользователя
         $currentAchievements = $this->userModel->getUserUnlockedAchievements($userId);
         $currentAchievementIds = array_column($currentAchievements, 'id');
         
-        // Разблокировка новых ачивок
         foreach ($_POST['achievements'] as $achievementId) {
             if (!in_array($achievementId, $currentAchievementIds)) {
                 $achievement = $this->userModel->getAchievementById($achievementId);
@@ -283,7 +315,6 @@ class AdminEdit extends UserAction {
             }
         }
         
-        // Блокировка удаленных ачивок (только ручные)
         foreach ($currentAchievements as $achievement) {
             if ($achievement['type'] == 'manual' && !in_array($achievement['id'], $_POST['achievements'])) {
                 $this->userModel->removeAchievementFromUser($userId, $achievement['id']);
@@ -298,10 +329,12 @@ class AdminEdit extends UserAction {
      */
     private function renderEditForm($user) {
         $customFields = $this->fieldModel->getActiveByEntityType('user');
+        $fieldValues = $this->getCurrentFieldValues($user['id']);
         
         $this->render('admin/users/edit', [
             'user' => $user,
             'customFields' => $customFields,
+            'fieldValues' => $fieldValues,
             'pageTitle' => 'Редактирование пользователя'
         ]);
     }

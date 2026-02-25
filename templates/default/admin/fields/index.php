@@ -66,12 +66,74 @@
                 </div>
                 <div class="card-body">
                     <?php if(empty($fields)) { ?>
-                        <div class="text-center py-5">
+                        <div class="text-center py-4">
                             <div class="mb-3">
                                 <?php echo bloggy_icon('bs', 'input-cursor-text', '48', '#6C6C6C'); ?>
                             </div>
-                            <h5 class="text-muted">Поля не созданы</h5>
-                            <p class="text-muted">Создайте первое поле для вашего сайта</p>
+                            <h5 class="text-muted mb-4">Поля не созданы</h5>
+                            <p class="text-muted mb-4">Выберите тип сущности для создания первого поля</p>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card h-100 border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <?php echo bloggy_icon('bs', 'file-text', '32', '#0d6efd'); ?>
+                                        </div>
+                                        <h6 class="card-title">Записи</h6>
+                                        <a href="<?php echo ADMIN_URL; ?>/fields/create/post" class="btn btn-primary btn-sm">
+                                            <?php echo bloggy_icon('bs', 'plus-lg', '16', '#ffffff', 'me-1'); ?>
+                                            Создать поле
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card h-100 border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <?php echo bloggy_icon('bs', 'file-earmark', '32', '#198754'); ?>
+                                        </div>
+                                        <h6 class="card-title">Страницы</h6>
+                                        <a href="<?php echo ADMIN_URL; ?>/fields/create/page" class="btn btn-success btn-sm">
+                                            <?php echo bloggy_icon('bs', 'plus-lg', '16', '#ffffff', 'me-1'); ?>
+                                            Создать поле
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card h-100 border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <?php echo bloggy_icon('bs', 'folder', '32', '#dc3545'); ?>
+                                        </div>
+                                        <h6 class="card-title">Категории</h6>
+                                        <a href="<?php echo ADMIN_URL; ?>/fields/create/category" class="btn btn-danger btn-sm">
+                                            <?php echo bloggy_icon('bs', 'plus-lg', '16', '#ffffff', 'me-1'); ?>
+                                            Создать поле
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card h-100 border-0 shadow-sm text-center">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <?php echo bloggy_icon('bs', 'person', '32', '#ffc107'); ?>
+                                        </div>
+                                        <h6 class="card-title">Пользователи</h6>
+                                        <a href="<?php echo ADMIN_URL; ?>/fields/create/user" class="btn btn-warning btn-sm">
+                                            <?php echo bloggy_icon('bs', 'plus-lg', '16', '#ffffff', 'me-1'); ?>
+                                            Создать поле
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     <?php } else { ?>
                         <div class="table-responsive">

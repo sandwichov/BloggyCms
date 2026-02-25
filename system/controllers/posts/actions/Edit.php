@@ -385,18 +385,17 @@ class Edit extends PostAction {
     private function saveCustomField($field, $postId, $currentValues, $fieldModel, $fieldManager) {
         try {
             $value = $fieldManager->processFieldValue($field, $_POST, $_FILES, $currentValues);
+            $config = is_array($field['config']) ? $field['config'] : json_decode($field['config'] ?? '{}', true);
             
-            if ($value !== null) {
-                $config = is_array($field['config']) ? $field['config'] : json_decode($field['config'] ?? '{}', true);
-                $fieldModel->saveFieldValue(
-                    $field['id'], 
-                    'post', 
-                    $postId, 
-                    $value,
-                    $field['type'],
-                    $config
-                );
-            }
+            $fieldModel->saveFieldValue(
+                $field['id'], 
+                'post', 
+                $postId, 
+                $value,
+                $field['type'],
+                $config
+            );
+            
         } catch (\Exception $e) {
             \Notification::error("Ошибка обработки поля {$field['name']}: " . $e->getMessage());
         }

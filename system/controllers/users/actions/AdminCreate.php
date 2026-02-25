@@ -162,21 +162,30 @@ class AdminCreate extends UserAction {
      */
     private function saveCustomFields($userId) {
         $customFields = $this->fieldModel->getActiveByEntityType('user');
+        $currentValues = [];
+        $fieldManager = new \FieldManager($this->db);
         
         foreach ($customFields as $field) {
-            $fieldKey = 'field_' . $field['system_name'];
-            
-            if (isset($_POST[$fieldKey])) {
-                $value = $_POST[$fieldKey];
-                
-                $this->fieldModel->saveFieldValue(
-                    $field['id'],
-                    'user',
-                    $userId,
-                    $value,
-                    $field['type'],
-                    $field['config']
+            try {
+                $value = $fieldManager->processFieldValue(
+                    $field, 
+                    $_POST, 
+                    $_FILES,
+                    $currentValues
                 );
+                
+                if ($value !== null) {
+                    $this->fieldModel->saveFieldValue(
+                        $field['id'],
+                        'user',
+                        $userId,
+                        $value,
+                        $field['type'],
+                        $field['config']
+                    );
+                }
+            } catch (\Exception $e) {
+                \Notification::error("Ошибка при сохранении поля {$field['name']}: " . $e->getMessage());
             }
         }
     }

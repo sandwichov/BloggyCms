@@ -45,7 +45,6 @@ class ImageField extends BaseField {
         
         $html = "<div class='image-field' data-max-size='{$maxSize}' data-allowed-types='{$allowedTypes}'>";
         
-        // Отображение текущего изображения
         if (!empty($value)) {
             $html .= "
                 <div class='mb-2'>
@@ -63,7 +62,6 @@ class ImageField extends BaseField {
             ";
         }
         
-        // Поле для загрузки нового файла
         $html .= "
             <input type='file' 
                    name='field_{$this->systemName}' 
@@ -75,7 +73,6 @@ class ImageField extends BaseField {
             </div>
         ";
         
-        // Скрытое поле с текущим значением
         $html .= "<input type='hidden' name='field_{$this->systemName}_current' value='" . htmlspecialchars($value) . "'>";
         
         $html .= "</div>";
@@ -178,10 +175,7 @@ class ImageField extends BaseField {
         $maxSize = $this->config['max_size'] ?? 2048;
         
         try {
-            // Загрузка нового файла через FileUpload хелпер
             $fileName = FileUpload::upload($fileData, $uploadDir, $allowedTypes, $maxSize);
-            
-            // Удаление старого файла если он существует
             if (!empty($currentValue)) {
                 $oldFilePath = $uploadDir . '/' . $currentValue;
                 FileUpload::delete($oldFilePath);

@@ -192,6 +192,9 @@ class FieldManager {
      * @throws Exception При некорректных данных поля
      */
     public function processFieldValue($field, $postData, $filesData, $currentValues = []) {
+    
+        $deleteKey = 'field_' . $field['system_name'] . '_delete';
+
         if (!is_array($field) || !isset($field['type']) || !isset($field['system_name'])) {
             throw new Exception('Некорректные данные поля');
         }
@@ -211,18 +214,23 @@ class FieldManager {
         
         if ($fieldInstance->requiresFileUpload()) {
             $fileKey = 'field_' . $systemName;
-            
             $deleteKey = $fileKey . '_delete';
-            if (isset($postData[$deleteKey]) && $postData[$deleteKey]) {
-                if (method_exists($fieldInstance, 'handleDelete')) {
-                    return $fieldInstance->handleDelete($currentValue);
+            
+            if (isset($postData[$deleteKey])) {
+                
+                if ($postData[$deleteKey] == '1' || $postData[$deleteKey] === 'on') {
+                    if (method_exists($fieldInstance, 'handleDelete')) {
+                        $fieldInstance->handleDelete($currentValue);
+                        return null;
+                    }
+                    return null;
                 }
-                return null;
             }
             
             if (isset($filesData[$fileKey]) && !empty($filesData[$fileKey]['tmp_name'])) {
                 try {
-                    return $fieldInstance->processFileUpload($filesData[$fileKey], $currentValue);
+                    $result = $fieldInstance->processFileUpload($filesData[$fileKey], $currentValue);
+                    return $result;
                 } catch (Exception $e) {
                     throw $e;
                 }

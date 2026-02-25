@@ -261,14 +261,9 @@ class AdminEdit extends PageAction {
     private function updateCustomFields() {
         $fieldModel = new \FieldModel($this->db);
         $fieldManager = new \FieldManager($this->db);
-        
-        // Получение активных полей для страниц
         $customFields = $fieldModel->getActiveByEntityType('page');
-        
-        // Получение текущих значений полей
         $currentValues = $this->getCurrentFieldValues($fieldModel, $customFields);
         
-        // Обработка каждого поля
         foreach ($customFields as $field) {
             $this->processCustomField($field, $fieldModel, $fieldManager, $currentValues);
         }
@@ -299,27 +294,22 @@ class AdminEdit extends PageAction {
      */
     private function processCustomField($field, $fieldModel, $fieldManager, $currentValues) {
         try {
-            // Обработка значения поля с учетом текущих значений
             $value = $fieldManager->processFieldValue($field, $_POST, $_FILES, $currentValues);
             
-            if ($value !== null) {
-                // Декодирование конфигурации поля
-                $config = is_array($field['config']) 
-                    ? $field['config'] 
-                    : json_decode($field['config'] ?? '{}', true);
-                
-                // Сохранение значения поля
-                $fieldModel->saveFieldValue(
-                    $field['id'], 
-                    'page', 
-                    $this->id, 
-                    $value,
-                    $field['type'],
-                    $config
-                );
-            }
+            $config = is_array($field['config']) 
+                ? $field['config'] 
+                : json_decode($field['config'] ?? '{}', true);
+            
+            $fieldModel->saveFieldValue(
+                $field['id'], 
+                'page', 
+                $this->id, 
+                $value,
+                $field['type'],
+                $config
+            );
+            
         } catch (\Exception $e) {
-            // Уведомление об ошибке для конкретного поля
             \Notification::error("Ошибка обработки поля {$field['name']}: " . $e->getMessage());
         }
     }
