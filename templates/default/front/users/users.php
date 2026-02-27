@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница списка пользователей
+ * Template Name: Страница списка пользователей
  */
 
 $totalPosts = 0;
@@ -51,7 +51,7 @@ if (!empty($users)) {
             </div>
         </div>
 
-        <div class="tg-users-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div class="tg-users-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
             <?php if (!empty($users)) { ?>
                 <?php foreach ($users as $user) { ?>
                     <div class="tg-card tg-user-card" style="display: flex; flex-direction: column; height: 100%; transition: var(--tg-transition);">

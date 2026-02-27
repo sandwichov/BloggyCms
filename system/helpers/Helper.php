@@ -55,8 +55,12 @@ function render_html_block(string $slug): void {
     static $loaded_blocks = [];
 
     $db = Database::getInstance();
+    
     $block = $db->fetch("
-        SELECT hb.*, hbt.system_name as block_type, hb.template as block_template
+        SELECT 
+            hb.*, 
+            COALESCE(hbt.system_name, 'DefaultBlock') as block_type,
+            hb.template as block_template
         FROM html_blocks hb 
         LEFT JOIN html_block_types hbt ON hb.type_id = hbt.id 
         WHERE hb.slug = ?
@@ -67,16 +71,20 @@ function render_html_block(string $slug): void {
             // Загрузка CSS файлов
             if (!empty($block['css_files'])) {
                 $cssFiles = json_decode($block['css_files'], true);
-                foreach ($cssFiles as $cssFile) {
-                    add_frontend_css($cssFile);
+                if (is_array($cssFiles)) {
+                    foreach ($cssFiles as $cssFile) {
+                        add_frontend_css($cssFile);
+                    }
                 }
             }
             
             // Загрузка JS файлов
             if (!empty($block['js_files'])) {
                 $jsFiles = json_decode($block['js_files'], true);
-                foreach ($jsFiles as $jsFile) {
-                    add_frontend_js($jsFile);
+                if (is_array($jsFiles)) {
+                    foreach ($jsFiles as $jsFile) {
+                        add_frontend_js($jsFile);
+                    }
                 }
             }
             
@@ -101,26 +109,41 @@ function render_html_block(string $slug): void {
         
         $content = '';
         
+        // Декодируем настройки
+        $settings = [];
+        if (!empty($block['settings'])) {
+            $settings = json_decode($block['settings'], true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('JSON decode error for block ' . $slug . ': ' . json_last_error_msg());
+            }
+        }
+        
+        // Определяем тип блока
+        $blockType = $block['block_type'] ?? 'DefaultBlock';
+        
         // Рендеринг содержимого блока
-        if (!empty($block['block_type']) && $block['block_type'] !== 'DefaultBlock') {
-            $blockTypeManager = new HtmlBlockTypeManager($db);
+        if ($blockType === 'DefaultBlock') {
+            $content = $settings['html'] ?? '';
             
-            $settings = [];
-            if (!empty($block['settings'])) {
-                $settings = json_decode($block['settings'], true);
+            if (function_exists('process_shortcodes')) {
+                $content = process_shortcodes($content);
             }
             
-            $templateToUse = $template ?? ($block['block_template'] ?? 'default');
-            $settings['template'] = $templateToUse;
+            if (empty(trim($content))) {
+                $content = '<div class="alert alert-info">Блок "' . htmlspecialchars($block['name'] ?? '') . '" не имеет содержимого.</div>';
+            }
+        } elseif (!empty($blockType)) {
+            $blockTypeManager = new HtmlBlockTypeManager($db);
+            $templateToUse = $block['block_template'] ?? 'default';
             
-            $content = $blockTypeManager->renderBlockFront($block['block_type'], $settings);
+            $content = $blockTypeManager->renderBlockFront($blockType, $settings, $templateToUse);
         } else {
-            $content = '<div class="alert alert-info">Блок типа "DefaultBlock" не имеет содержимого.</div>';
+            $content = '<div class="alert alert-warning">Блок "' . htmlspecialchars($block['name'] ?? '') . '" имеет неопределенный тип.</div>';
         }
         
         echo $content;
     } else {
-        echo 'Блок не найден';
+        echo '<!-- HTML блок с slug "' . htmlspecialchars($slug) . '" не найден -->';
     }
 }
 

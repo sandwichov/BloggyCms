@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница всех тегов
+ * Template Name: Страница всех тегов
  */
 
 $minPostsToShow = SettingsHelper::get('controller_tags', 'min_posts_to_show', 1);

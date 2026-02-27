@@ -32,8 +32,6 @@ if ($maintenanceMode && !$isAdmin) {
 }
 ?>
 
-<?php preload_html_block_assets(['header', 'footer']); ?>
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница тега
+ * Template Name: Страница тега
  */
 
 $fieldModel = new FieldModel($db);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Архив блога
+ * Template Name: Архив блога
  */
 
 $monthNames = [

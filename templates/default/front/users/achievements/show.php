@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница просмотра достижения
+ * Template Name: Страница просмотра достижения
  */
 
 $currentUserId = $_SESSION['user_id'] ?? null;

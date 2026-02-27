@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница поста
+ * Template Name: Страница поста
  */
 
 $isPasswordProtected = $post['password_protected'] == 1; 

@@ -22,19 +22,17 @@
                 
                 <nav class="px-4 pt-4">
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button class="nav-link active" id="nav-basic-tab" data-bs-toggle="tab" data-bs-target="#nav-basic" type="button" role="tab">
+                        <button class="nav-link active" id="nav-basic-tab" data-bs-toggle="tab" data-bs-target="#nav-basic" type="button" role="tab" aria-controls="nav-basic" aria-selected="true">
                             <?php echo bloggy_icon('bs', 'info-circle', '16', '#000', 'me-2'); ?>
                             Основное
                         </button>
                         
-                        <?php if ($selectedType !== 'DefaultBlock') { ?>
-                        <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab">
+                        <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-settings" aria-selected="false">
                             <?php echo bloggy_icon('bs', 'gear', '16', '#000', 'me-2'); ?>
                             Настройки
                         </button>
-                        <?php } ?>
                         
-                        <button class="nav-link" id="nav-assets-tab" data-bs-toggle="tab" data-bs-target="#nav-assets" type="button" role="tab">
+                        <button class="nav-link" id="nav-assets-tab" data-bs-toggle="tab" data-bs-target="#nav-assets" type="button" role="tab" aria-controls="nav-assets" aria-selected="false">
                             <?php echo bloggy_icon('bs', 'palette', '16', '#000', 'me-2'); ?>
                             Стили и скрипты
                         </button>
@@ -42,18 +40,17 @@
                 </nav>
 
                 <div class="tab-content p-4" id="nav-tabContent">
-                    
-                    <div class="tab-pane fade show active" id="nav-basic" role="tabpanel">
+                    <div class="tab-pane fade show active" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold">Название блока</label>
                                     <input type="text" 
-                                           name="name" 
-                                           class="form-control form-control-lg" 
-                                           value="<?php echo html($block['name'] ?? ''); ?>" 
-                                           placeholder="Введите название блока"
-                                           required>
+                                        name="name" 
+                                        class="form-control form-control-lg" 
+                                        value="<?php echo html($block['name'] ?? ''); ?>" 
+                                        placeholder="Введите название блока"
+                                        required>
                                     <div class="form-text">Отображаемое название блока в админке</div>
                                 </div>
                             </div>
@@ -64,11 +61,11 @@
                                         <span class="text-danger ms-1">*</span>
                                     </label>
                                     <input type="text" 
-                                           name="slug" 
-                                           class="form-control" 
-                                           value="<?php echo html($block['slug'] ?? ''); ?>" 
-                                           placeholder="например: header_menu"
-                                           required>
+                                        name="slug" 
+                                        class="form-control" 
+                                        value="<?php echo html($block['slug'] ?? ''); ?>" 
+                                        placeholder="например: header_menu"
+                                        required>
                                     <div class="form-text">Уникальный идентификатор для использования в коде</div>
                                 </div>
                             </div>
@@ -77,18 +74,10 @@
                                 <div class="col-md-4">
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold">Шаблон отображения</label>
-                                        <?php
-                                        $blockType = $blockTypes[$selectedType] ?? null;
-                                        $availableTemplates = $blockType && $blockType['class'] ? 
-                                            $blockType['class']->getAvailableTemplates() : 
-                                            array('default' => 'Стандартный шаблон');
-                                        
-                                        $selectedTemplate = $block['template'] ?? 'default';
-                                        ?>
                                         <select name="template" class="form-select" id="block-template-select">
                                             <?php foreach ($availableTemplates as $templateKey => $templateName) { ?>
                                                 <option value="<?php echo html($templateKey); ?>" 
-                                                        <?php echo $selectedTemplate === $templateKey ? 'selected' : ''; ?>>
+                                                        <?php echo ($selectedTemplate == $templateKey) ? 'selected' : ''; ?>>
                                                     <?php echo html($templateName); ?>
                                                 </option>
                                             <?php } ?>
@@ -116,24 +105,43 @@
                         <?php } ?>
                     </div>
 
-                    <?php if ($selectedType !== 'DefaultBlock') { ?>
-                    <div class="tab-pane fade" id="nav-settings" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
                         <div class="mb-4">
                             <h6 class="fw-semibold mb-3">Настройки блока</h6>
                             <div id="block-settings-container">
                                 <?php 
-                                $blockType = $blockTypes[$selectedType] ?? null;
-                                if ($blockType && $blockType['class']) {
-                                    echo $blockType['class']->getSettingsForm($settings ?? array());
+                                if ($selectedType !== 'DefaultBlock') {
+                                    $blockType = $blockTypes[$selectedType] ?? null;
+                                    if ($blockType && $blockType['class']) {
+                                        echo $blockType['class']->getSettingsForm($settings ?? []);
+                                    }
+                                } else {
+                                    $html = $settings['html'] ?? '';
+                                    ?>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold d-flex align-items-center">
+                                            <?php echo bloggy_icon('bs', 'code', '16', '#0d6efd', 'me-2'); ?>
+                                            HTML-код блока
+                                        </label>
+                                        <div class="mb-2">
+                                            <small class="text-muted">
+                                                Введите произвольный HTML-код. Поддерживаются все системные шорткоды.
+                                                Например: <code>[posts limit="5" category="news"]</code>, <code>[menu name="main"]</code>
+                                            </small>
+                                        </div>
+                                        <div class="border rounded overflow-hidden">
+                                            <div id="default-block-html-editor" style="height: 400px; width: 100%;"></div>
+                                        </div>
+                                        <textarea name="settings[html]" id="default-block-html" style="display: none;"><?php echo htmlspecialchars($html); ?></textarea>
+                                    </div>
+                                    <?php
                                 }
                                 ?>
                             </div>
                         </div>
-                        
                     </div>
-                    <?php } ?>
 
-                    <div class="tab-pane fade" id="nav-assets" role="tabpanel">
+                    <div class="tab-pane fade" id="nav-assets" role="tabpanel" aria-labelledby="nav-assets-tab">
                         
                         <div class="mb-4">
                             <label class="form-label fw-semibold d-flex align-items-center">
@@ -178,10 +186,10 @@
                                     <?php foreach ($systemCss as $systemCssFile) { ?>
                                         <div class="input-group mb-2">
                                             <input type="text" 
-                                                   class="form-control system-asset" 
-                                                   value="<?php echo html($systemCssFile); ?>" 
-                                                   readonly
-                                                   placeholder="Системный CSS файл">
+                                                class="form-control system-asset" 
+                                                value="<?php echo html($systemCssFile); ?>" 
+                                                readonly
+                                                placeholder="Системный CSS файл">
                                             <span class="input-group-text text-muted bg-light">
                                                 <?php echo bloggy_icon('bs', 'lock-fill', '16', '#6c757d', null, array('data-bs-toggle' => 'tooltip', 'title' => 'Системный файл')); ?>
                                             </span>
@@ -197,10 +205,10 @@
                                         <?php if (!in_array($cssFile, $systemCss)) { ?>
                                             <div class="input-group mb-2 css-file-row">
                                                 <input type="text" 
-                                                       name="css_files[]" 
-                                                       class="form-control" 
-                                                       value="<?php echo html($cssFile); ?>" 
-                                                       placeholder="templates/default/front/assets/css/my-block.css">
+                                                    name="css_files[]" 
+                                                    class="form-control" 
+                                                    value="<?php echo html($cssFile); ?>" 
+                                                    placeholder="templates/default/front/assets/css/my-block.css">
                                                 <button type="button" class="btn btn-outline-danger remove-asset" data-type="css">
                                                     <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
@@ -211,10 +219,10 @@
                                 
                                 <div class="input-group mb-2 css-file-row">
                                     <input type="text" 
-                                           name="css_files[]" 
-                                           class="form-control" 
-                                           value="" 
-                                           placeholder="templates/default/front/assets/css/my-block.css">
+                                        name="css_files[]" 
+                                        class="form-control" 
+                                        value="" 
+                                        placeholder="templates/default/front/assets/css/my-block.css">
                                     <button type="button" class="btn btn-outline-danger remove-asset" data-type="css">
                                         <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                     </button>
@@ -242,10 +250,10 @@
                                     <?php foreach ($systemJs as $systemJsFile) { ?>
                                         <div class="input-group mb-2">
                                             <input type="text" 
-                                                   class="form-control system-asset" 
-                                                   value="<?php echo html($systemJsFile); ?>" 
-                                                   readonly
-                                                   placeholder="Системный JS файл">
+                                                class="form-control system-asset" 
+                                                value="<?php echo html($systemJsFile); ?>" 
+                                                readonly
+                                                placeholder="Системный JS файл">
                                             <span class="input-group-text text-muted bg-light">
                                                 <?php echo bloggy_icon('bs', 'lock-fill', '16', '#6c757d', null, array('data-bs-toggle' => 'tooltip', 'title' => 'Системный файл')); ?>
                                             </span>
@@ -261,10 +269,10 @@
                                         <?php if (!in_array($jsFile, $systemJs)) { ?>
                                             <div class="input-group mb-2 js-file-row">
                                                 <input type="text" 
-                                                       name="js_files[]" 
-                                                       class="form-control" 
-                                                       value="<?php echo html($jsFile); ?>" 
-                                                       placeholder="templates/default/front/assets/js/my-block.js">
+                                                    name="js_files[]" 
+                                                    class="form-control" 
+                                                    value="<?php echo html($jsFile); ?>" 
+                                                    placeholder="templates/default/front/assets/js/my-block.js">
                                                 <button type="button" class="btn btn-outline-danger remove-asset" data-type="js">
                                                     <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                                 </button>
@@ -275,10 +283,10 @@
                                 
                                 <div class="input-group mb-2 js-file-row">
                                     <input type="text" 
-                                           name="js_files[]" 
-                                           class="form-control" 
-                                           value="" 
-                                           placeholder="templates/default/front/assets/js/my-block.js">
+                                        name="js_files[]" 
+                                        class="form-control" 
+                                        value="" 
+                                        placeholder="templates/default/front/assets/js/my-block.js">
                                     <button type="button" class="btn btn-outline-danger remove-asset" data-type="js">
                                         <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
                                     </button>
@@ -333,162 +341,176 @@
 
 <?php ob_start(); ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const inlineCssEditor = ace.edit("inline-css-editor", {
-            theme: "ace/theme/monokai",
-            mode: "ace/mode/css",
-            showPrintMargin: false,
-            fontSize: "14px",
-            tabSize: 4,
-            useSoftTabs: true,
-            wrap: true,
-            minLines: 8,
-            maxLines: 20
-        });
-
-        const inlineJsEditor = ace.edit("inline-js-editor", {
-            theme: "ace/theme/monokai",
-            mode: "ace/mode/javascript",
-            showPrintMargin: false,
-            fontSize: "14px",
-            tabSize: 4,
-            useSoftTabs: true,
-            wrap: true,
-            minLines: 8,
-            maxLines: 20
-        });
-
-        const initialInlineCss = document.getElementById('inline_css').value;
-        inlineCssEditor.setValue(initialInlineCss, -1);
+document.addEventListener('DOMContentLoaded', function() {
+    function initEditors() {
+        if (typeof ace === 'undefined') {
+            console.error('Ace editor not loaded!');
+            return;
+        }
         
-        const initialInlineJs = document.getElementById('inline_js').value;
-        inlineJsEditor.setValue(initialInlineJs, -1);
+        const cssEditorElement = document.getElementById('inline-css-editor');
+        if (cssEditorElement) {
+            window.inlineCssEditor = ace.edit("inline-css-editor", {
+                theme: "ace/theme/monokai",
+                mode: "ace/mode/css",
+                showPrintMargin: false,
+                fontSize: "14px",
+                tabSize: 4,
+                useSoftTabs: true,
+                wrap: true,
+                minLines: 8,
+                maxLines: 20
+            });
+            
+            const inlineCssField = document.getElementById('inline_css');
+            if (inlineCssField) {
+                window.inlineCssEditor.setValue(inlineCssField.value || '', -1);
+            }
+        }
 
-        [inlineCssEditor, inlineJsEditor].forEach(ed => {
-            ed.session.getUndoManager().reset();
-            ed.setOptions({
+        const jsEditorElement = document.getElementById('inline-js-editor');
+        if (jsEditorElement) {
+            window.inlineJsEditor = ace.edit("inline-js-editor", {
+                theme: "ace/theme/monokai",
+                mode: "ace/mode/javascript",
+                showPrintMargin: false,
+                fontSize: "14px",
+                tabSize: 4,
+                useSoftTabs: true,
+                wrap: true,
+                minLines: 8,
+                maxLines: 20
+            });
+            
+            const inlineJsField = document.getElementById('inline_js');
+            if (inlineJsField) {
+                window.inlineJsEditor.setValue(inlineJsField.value || '', -1);
+            }
+        }
+
+        const htmlEditorElement = document.getElementById('default-block-html-editor');
+        if (htmlEditorElement) {
+            window.defaultBlockHtmlEditor = ace.edit("default-block-html-editor", {
+                theme: "ace/theme/monokai",
+                mode: "ace/mode/html",
+                showPrintMargin: false,
+                fontSize: "14px",
+                tabSize: 4,
+                useSoftTabs: true,
+                wrap: true,
+                minLines: 20,
+                maxLines: 40
+            });
+            
+            window.defaultBlockHtmlEditor.session.setUseWrapMode(true);
+            window.defaultBlockHtmlEditor.setOptions({
                 enableBasicAutocompletion: true,
-                enableLiveAutocompletion: false,
-                enableSnippets: false,
-                behavioursEnabled: true,
-                wrapBehavioursEnabled: true
+                enableLiveAutocompletion: true,
+                enableSnippets: true
             });
-            ed.session.setUseWrapMode(true);
-            ed.session.setTabSize(4);
-            ed.session.setUseSoftTabs(true);
-        });
-
-        document.getElementById('add-css-file').addEventListener('click', function() {
-            addAssetRow('css');
-        });
-
-        document.getElementById('add-js-file').addEventListener('click', function() {
-            addAssetRow('js');
-        });
-
-        function addAssetRow(type) {
-            const container = document.getElementById(`${type}-files-container`);
-            const newRow = document.createElement('div');
-            newRow.className = `input-group mb-2 ${type}-file-row`;
-            newRow.innerHTML = `
-                <input type="text" name="${type}_files[]" class="form-control" value="" placeholder="templates/default/front/assets/${type}/my-block.${type}">
-                <button type="button" class="btn btn-outline-danger remove-asset" data-type="${type}">
-                    <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
-                </button>
-            `;
-            container.appendChild(newRow);
-            attachRemoveHandlers();
+            
+            const htmlTextarea = document.getElementById('default-block-html');
+            if (htmlTextarea) {
+                const htmlValue = htmlTextarea.value;
+                window.defaultBlockHtmlEditor.setValue(htmlValue || '', -1);
+                window.defaultBlockHtmlEditor.session.getUndoManager().reset();
+            } else {
+                console.error('HTML textarea not found!');
+            }
         }
 
-        function attachRemoveHandlers() {
-            document.querySelectorAll('.remove-asset').forEach(button => {
-                button.addEventListener('click', function() {
-                    const type = this.getAttribute('data-type');
-                    const row = this.closest(`.${type}-file-row`);
-                    const container = document.getElementById(`${type}-files-container`);
-                    
-                    if (container.querySelectorAll(`.${type}-file-row`).length > 1) {
-                        row.remove();
-                    } else {
-                        const input = row.querySelector('input');
-                        input.value = '';
-                    }
+        [window.inlineCssEditor, window.inlineJsEditor].forEach(ed => {
+            if (ed) {
+                ed.session.getUndoManager().reset();
+                ed.setOptions({
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: false,
+                    enableSnippets: false,
+                    behavioursEnabled: true,
+                    wrapBehavioursEnabled: true
                 });
-            });
-        }
-
-        attachRemoveHandlers();
-
-        const form = document.getElementById("blockForm");
-        const inlineCssField = document.getElementById("inline_css");
-        const inlineJsField = document.getElementById("inline_js");
-
-        form.addEventListener("submit", function(e) {
-            inlineCssField.value = inlineCssEditor.getValue();
-            inlineJsField.value = inlineJsEditor.getValue();
+                ed.session.setUseWrapMode(true);
+                ed.session.setTabSize(4);
+                ed.session.setUseSoftTabs(true);
+            }
         });
-        document.querySelector('input[name="name"]').focus();
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+    }
+
+    initEditors();
+
+    document.getElementById('add-css-file')?.addEventListener('click', function() {
+        addAssetRow('css');
     });
-</script>
 
-<script>
+    document.getElementById('add-js-file')?.addEventListener('click', function() {
+        addAssetRow('js');
+    });
+
+    function addAssetRow(type) {
+        const container = document.getElementById(`${type}-files-container`);
+        const newRow = document.createElement('div');
+        newRow.className = `input-group mb-2 ${type}-file-row`;
+        newRow.innerHTML = `
+            <input type="text" name="${type}_files[]" class="form-control" value="" placeholder="templates/default/front/assets/${type}/my-block.${type}">
+            <button type="button" class="btn btn-outline-danger remove-asset" data-type="${type}">
+                <?php echo bloggy_icon('bs', 'trash', '16', '#000'); ?>
+            </button>
+        `;
+        container.appendChild(newRow);
+        attachRemoveHandlers();
+    }
+
+    function attachRemoveHandlers() {
+        document.querySelectorAll('.remove-asset').forEach(button => {
+            button.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const row = this.closest(`.${type}-file-row`);
+                const container = document.getElementById(`${type}-files-container`);
+                
+                if (container.querySelectorAll(`.${type}-file-row`).length > 1) {
+                    row.remove();
+                } else {
+                    const input = row.querySelector('input');
+                    input.value = '';
+                }
+            });
+        });
+    }
+
+    attachRemoveHandlers();
+
+    const form = document.getElementById("blockForm");
+    const inlineCssField = document.getElementById("inline_css");
+    const inlineJsField = document.getElementById("inline_js");
+    const defaultBlockHtmlField = document.getElementById("default-block-html");
+
+    if (form) {
+        form.addEventListener("submit", function(e) {
+
+            if (window.inlineCssEditor) {
+                inlineCssField.value = window.inlineCssEditor.getValue();
+            }
+            
+            if (window.inlineJsEditor) {
+                inlineJsField.value = window.inlineJsEditor.getValue();
+            }
+            
+            if (window.defaultBlockHtmlEditor && defaultBlockHtmlField) {
+                const htmlValue = window.defaultBlockHtmlEditor.getValue();
+                defaultBlockHtmlField.value = htmlValue;
+            }
+        });
+    }
+
+    document.querySelector('input[name="name"]')?.focus();
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const templateSelect = document.getElementById('block-template-select');
-    const templatePreview = document.getElementById('template-preview');
-    const previewBtn = document.getElementById('preview-template-btn');
-    
-    if (templateSelect) {
-        templateSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (templatePreview) {
-                templatePreview.textContent = selectedOption.text;
-            }
-        });
-    }
-    
-    if (previewBtn) {
-        previewBtn.addEventListener('click', function() {
-            alert('Недоступно');
-        });
-    }
-    
-    const blockTypeSelect = document.getElementById('block-type-select');
-    if (blockTypeSelect) {
-        blockTypeSelect.addEventListener('change', function() {
-            const blockType = this.value;
-            if (blockType !== 'DefaultBlock') {
-                fetchAvailableTemplates(blockType);
-            }
-        });
-    }
-    
-    function fetchAvailableTemplates(blockType) {
-        fetch(`<?php echo ADMIN_URL; ?>/html-blocks/get-block-templates?block_type=${encodeURIComponent(blockType)}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateTemplateSelect(data.templates);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-    
-    function updateTemplateSelect(templates) {
-        const select = document.getElementById('block-template-select');
-        if (select) {
-            select.innerHTML = '';
-            Object.entries(templates).forEach(([key, value]) => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = value;
-                select.appendChild(option);
-            });
-        }
-    }
 });
 </script>
 <?php admin_bottom_js(ob_get_clean()); ?>

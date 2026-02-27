@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница регистрации
+ * Template Name: Страница регистрации
  */
 
 $registrationDisabled = $registration_disabled ?? false;

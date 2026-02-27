@@ -36,9 +36,11 @@ class AdminEdit extends HtmlBlockAction {
                 return;
             }
 
-            // Проверка активности типа блока
+            // Определение типа блока
             $blockTypeName = $block['block_type'] ?? 'DefaultBlock';
-            if (!$this->blockTypeManager->isBlockTypeActive($blockTypeName)) {
+
+            // Проверка активности типа блока (только для не-DefaultBlock)
+            if ($blockTypeName !== 'DefaultBlock' && !$this->blockTypeManager->isBlockTypeActive($blockTypeName)) {
                 \Notification::error('Невозможно редактировать блок: тип блока отключен. Сначала активируйте тип блока.');
                 $this->redirect(ADMIN_URL . '/html-blocks');
                 return;
@@ -59,13 +61,14 @@ class AdminEdit extends HtmlBlockAction {
                         return;
                     }
 
-                    $blockType = null;
+                    $typeId = null;
                     $settings = [];
                     
                     // Обработка настроек для специфичных типов блоков
                     if ($blockTypeName !== 'DefaultBlock') {
                         $blockType = $this->blockTypeManager->getBlockType($blockTypeName);
                         if ($blockType) {
+                            $typeId = $blockType['id'];
                             $blockInstance = $blockType['class'];
                             $settings = $_POST['settings'] ?? [];
                             
@@ -80,6 +83,11 @@ class AdminEdit extends HtmlBlockAction {
                             // Подготовка настроек к сохранению
                             $settings = $blockInstance->prepareSettings($settings);
                         }
+                    } else {
+                        // Для DefaultBlock - сохраняем HTML из настроек
+                        $settings = [
+                            'html' => $_POST['settings']['html'] ?? ''
+                        ];
                     }
 
                     // Обработка CSS и JavaScript файлов блока
@@ -87,9 +95,9 @@ class AdminEdit extends HtmlBlockAction {
                     $jsFiles = $this->processAssetFiles($_POST['js_files'] ?? []);
                     
                     // Добавление системных ресурсов типа блока (если есть)
-                    if ($blockTypeName !== 'DefaultBlock' && $blockType && $blockType['class']) {
-                        $systemCss = $blockType['class']->getSystemCss();
-                        $systemJs = $blockType['class']->getSystemJs();
+                    if ($blockTypeName !== 'DefaultBlock' && isset($blockInstance)) {
+                        $systemCss = $blockInstance->getSystemCss();
+                        $systemJs = $blockInstance->getSystemJs();
                         
                         $cssFiles = array_merge($systemCss, $cssFiles);
                         $jsFiles = array_merge($systemJs, $jsFiles);
@@ -99,8 +107,8 @@ class AdminEdit extends HtmlBlockAction {
                     $data = [
                         'name' => $_POST['name'],
                         'slug' => $_POST['slug'],
-                        'content' => '', // Контент не хранится в базе (генерируется динамически)
-                        'type_id' => $blockType ? $blockType['id'] : null,
+                        'content' => '',
+                        'type_id' => $typeId,
                         'settings' => $settings,
                         'css_files' => $cssFiles,
                         'js_files' => $jsFiles,
@@ -109,7 +117,7 @@ class AdminEdit extends HtmlBlockAction {
                     ];
                     
                     // Обновление блока в базе данных
-                    $this->htmlBlockModel->update($this->id, $data);
+                    $result = $this->htmlBlockModel->update($this->id, $data);
                     
                     // Уведомление об успешном обновлении
                     \Notification::success('HTML-блок успешно обновлен');

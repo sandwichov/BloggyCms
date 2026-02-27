@@ -1,6 +1,6 @@
 <?php
 /**
- * Профиль пользователя
+ * Template Name: Профиль пользователя
  */
 
 $fieldModel = new FieldModel($this->db);

@@ -74,16 +74,26 @@ class HtmlBlockController extends Controller {
             
             // Рендеринг содержимого блока в зависимости от его типа
             $blockContent = '';
-            if (!empty($block['block_type']) && $block['block_type'] !== 'DefaultBlock') { 
-                $blockContent = $this->blockTypeManager->renderBlockFront(
-                    $block['block_type'], 
-                    $settings
-                );
+            if (!empty($block['block_type'])) {
+                if ($block['block_type'] === 'DefaultBlock') {
+                    // Для DefaultBlock используем HTML из настроек
+                    $blockContent = $settings['html'] ?? '';
+                    // Обработка шорткодов
+                    if (function_exists('process_shortcodes')) {
+                        $blockContent = process_shortcodes($blockContent);
+                    }
+                } else {
+                    $blockContent = $this->blockTypeManager->renderBlockFront(
+                        $block['block_type'], 
+                        $settings,
+                        $block['template'] ?? null
+                    );
+                }
             }
             
             // Отображение информационного сообщения для блоков без содержимого
             if (empty($blockContent)) {
-                $blockContent = '<div class="alert alert-info">Блок типа "' . htmlspecialchars($block['block_type'] ?? 'DefaultBlock') . '" не имеет содержимого.</div>';
+                $blockContent = '<div class="alert alert-info">Блок "' . htmlspecialchars($block['name'] ?? '') . '" не имеет содержимого.</div>';
             }
             
             /**

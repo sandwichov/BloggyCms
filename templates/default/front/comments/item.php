@@ -1,6 +1,6 @@
 <?php
 /**
- * Отдельный комментарий
+ * Template Name: Отдельный комментарий
  */
 
 $isPending = $comment['status'] === 'pending';

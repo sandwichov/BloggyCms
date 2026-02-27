@@ -26,9 +26,15 @@ class AdminGetBlockSettings extends HtmlBlockAction {
         $currentSettings = isset($_GET['current_settings']) ? 
             json_decode($_GET['current_settings'], true) : [];
         
-        // Обработка случая с пустым системным именем или DefaultBlock
-        if (empty($systemName) || $systemName === 'DefaultBlock') {
+        // Обработка случая с пустым системным именем
+        if (empty($systemName)) {
             echo '';
+            return;
+        }
+        
+        // Для DefaultBlock используем специальный метод
+        if ($systemName === 'DefaultBlock') {
+            echo $this->getDefaultBlockSettingsForm($currentSettings);
             return;
         }
         

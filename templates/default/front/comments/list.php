@@ -1,6 +1,6 @@
 <?php
 /**
- * Список комментариев
+ * Template Name: Список комментариев
  */
 
 function countAllNestedComments($comment) {

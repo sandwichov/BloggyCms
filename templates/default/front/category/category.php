@@ -1,6 +1,6 @@
 <?php
 /**
- * Страница категории
+ * Template Name: Страница категории
  */
 
 $fieldModel = new FieldModel($this->db);
