@@ -1069,6 +1069,13 @@ class UserModel {
                 }
                 return 0;
                 
+            case 'posts_count':
+                $result = $this->db->fetch(
+                    "SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND status = 'published'",
+                    [$userId]
+                );
+                return (int)($result['count'] ?? 0);
+                
             case 'comments_count':
                 $result = $this->db->fetch(
                     "SELECT COUNT(*) as count FROM comments WHERE user_id = ? AND status = 'approved'",

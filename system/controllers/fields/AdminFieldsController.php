@@ -34,6 +34,17 @@ class AdminFieldsController extends Controller {
             exit;
         }
     }
+
+    /**
+     * @var array Информация о контроллере для админ-панели
+     */
+    protected $controllerInfo = [
+        'name' => 'Поля',
+        'author' => 'BloggyCMS', 
+        'version' => '1.0.0',
+        'has_settings' => false,
+        'description' => 'Управление дополнительными полями'
+    ];
     
     /**
      * Проверка прав администратора
