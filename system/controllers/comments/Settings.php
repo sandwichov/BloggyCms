@@ -31,19 +31,18 @@ class CommentsSettings {
                         'title' => 'Иконка бейджа',
                         'default' => 'bs:rocket',
                         'icons_page_url' => '/admin/icons',
-                        'required' => false,
                         'show' => 'field:show_admin_badge'
                     ]),
                     \FieldFactory::color('bg_badge', [
                         'title' => 'Фон бейджа',
                         'default' => '#007bff',
-                        'required' => false,
+                        'preset' => 'basic',
                         'show' => 'field:show_admin_badge',
                     ]),
                     \FieldFactory::color('color_badge', [
                         'title' => 'Цвет текста',
                         'default' => '#ffffff',
-                        'required' => false,
+                        'preset' => 'basic',
                         'show' => 'field:show_admin_badge',
                     ]),
                     \FieldFactory::checkbox('show_emodji', [

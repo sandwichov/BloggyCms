@@ -93,6 +93,7 @@ class FieldFactory {
     
     /**
      * Создает поле для выбора цвета
+     * Использует библиотеку Pickr (https://github.com/simonwep/pickr)
      * 
      * @param string $name Имя поля
      * @param array $options Опции поля
