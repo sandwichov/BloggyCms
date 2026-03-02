@@ -15,22 +15,16 @@ class Show extends PostAction {
     
     /**
      * Метод выполнения отображения поста
-     * Получает slug из параметров, проверяет существование поста,
-     * видимость для пользователя, защиту паролем, загружает все связанные данные
-     * и отображает пост
-     * 
      * @return void
      * @throws \Exception Если slug не указан
      */
     public function execute() {
-        // Получение slug поста из параметров
         $slug = $this->params['slug'] ?? null;
         if (!$slug) {
             throw new \Exception('Slug поста не указан');
         }
 
         try {
-            // Загрузка поста по slug
             $post = $this->postModel->getBySlug($slug);
         
             if (!$post) {
@@ -39,32 +33,26 @@ class Show extends PostAction {
                 return;
             }
             
-            // Проверка видимости поста для пользователя
             $userGroups = $this->getUserGroups();
             $isVisible = $this->postModel->checkPostVisibility($post['id'], $userGroups);
             
             if (!$isVisible) {
-                // Показываем 404 страницу вместо редиректа на главную
                 http_response_code(404);
                 $this->render('front/404');
                 return;
             }
             
-            // Проверка защиты паролем
             $isPasswordProtected = $post['password_protected'] == 1;
             
             if ($isPasswordProtected) {
-                // Проверка доступа в сессии
                 $hasAccess = $this->checkPostAccess($post['id']);
                 
                 if (!$hasAccess) {
-                    // Отображение формы ввода пароля
                     $this->renderPasswordForm($post);
                     return;
                 }
             }
             
-            // Если пост доступен - отображаем его
             $this->showPost($post);
             
         } catch (\Exception $e) {
@@ -80,7 +68,6 @@ class Show extends PostAction {
      * @return bool true если доступ есть
      */
     private function checkPostAccess($postId) {
-        // Проверяем сессию на наличие доступа
         return isset($_SESSION['post_access'][$postId]) && $_SESSION['post_access'][$postId] === true;
     }
     
@@ -91,17 +78,29 @@ class Show extends PostAction {
      * @return void
      */
     private function renderPasswordForm($post) {
-        // Подготовка данных для шаблона ввода пароля
+        $this->addBreadcrumb('Главная', BASE_URL);
+        $this->addBreadcrumb('Все записи', BASE_URL . '/posts');
+        
+        if (!empty($post['category_id'])) {
+            $category = $this->categoryModel->getById($post['category_id']);
+            if ($category) {
+                $this->addBreadcrumb(
+                    $category['name'],
+                    BASE_URL . '/category/' . $category['slug']
+                );
+            }
+        }
+        
+        $this->addBreadcrumb($post['title'] . ' (защищено)');
+        $this->setPageTitle($post['title'] . ' (защищено)');
+        
         $categories = $this->categoryModel->getAll();
         $category = $this->categoryModel->getById($post['category_id']);
-        
-        // Форматирование даты
         $createdDate = new \DateTime($post['created_at']);
         $formattedDate = $createdDate->format('d M Y');
         
         $this->render('front/posts/password', [
             'post' => $post,
-            'title' => $post['title'],
             'categories' => $categories,
             'category' => $category,
             'formattedDate' => $formattedDate,
@@ -116,12 +115,24 @@ class Show extends PostAction {
      * @return void
      */
     private function showPost($post) {
-        // Увеличение счетчика просмотров
+        $this->addBreadcrumb('Главная', BASE_URL);
+        $this->addBreadcrumb('Все записи', BASE_URL . '/posts');
+        
+        if (!empty($post['category_id'])) {
+            $category = $this->categoryModel->getById($post['category_id']);
+            if ($category) {
+                $this->addBreadcrumb(
+                    $category['name'],
+                    BASE_URL . '/category/' . $category['slug']
+                );
+            }
+        }
+        
+        $this->addBreadcrumb($post['title']);
+        $this->setPageTitle($post['title']);
         $this->postModel->incrementViews($post['id']);
         
         $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
-        
-        // Проверка лайка и закладки пользователя
         $userLiked = false;
         $userBookmarked = false;
         
@@ -130,35 +141,22 @@ class Show extends PostAction {
             $userBookmarked = $this->postModel->hasBookmark($post['id'], $_SESSION['user_id']);
         }
         
-        // Получение комментариев
         $commentsData = $this->getComments($post['id'], $isAdmin);
         $comments = $commentsData['tree'];
         $totalComments = $commentsData['total'];
-        
-        // Получение тегов и категорий
         $tags = $this->tagModel->getForPost($post['id']);
         $post['tags'] = $tags;
         $category = $this->categoryModel->getById($post['category_id']);
         $categories = $this->categoryModel->getAll();
-        
-        // Получение и обработка блоков поста
         $processedBlocks = $this->getProcessedBlocks($post['id']);
-        
-        // Получение пользовательских полей
         $fieldValues = $this->getCustomFields($post['id']);
-        
-        // Параметры для комментариев
         $scrollToComment = $_GET['scroll_to_comment'] ?? null;
         $pendingComment = $_GET['pending_comment'] ?? null;
-        
-        // Добавление количества комментариев в данные поста
         $post['comments_count'] = $totalComments;
-        
-        // Рендеринг шаблона
+
         $this->render('front/posts/show', [
             'post' => $post,
             'tags' => $tags,
-            'title' => $post['title'],
             'categories' => $categories,
             'category' => $category,
             'comments' => $comments,
@@ -197,7 +195,6 @@ class Show extends PostAction {
         $blocks = $this->postBlockModel->getByPost($postId);
         $processedBlocks = [];
         
-        // Загрузка ассетов для блоков
         $blocksData = [];
         foreach ($blocks as $block) {
             $blocksData[] = [
@@ -209,7 +206,6 @@ class Show extends PostAction {
             $this->postBlockManager->loadFrontendAssetsForBlocks($blocksData);
         }
         
-        // Обработка каждого блока
         foreach ($blocks as $block) {
             $processedBlocks[] = $this->processSingleBlock($block);
         }
@@ -227,7 +223,6 @@ class Show extends PostAction {
         $content = $block['content'];
         $settings = $block['settings'];
         
-        // Декодирование JSON
         if (is_string($content)) {
             $decoded = json_decode($content, true);
             $content = (json_last_error() === JSON_ERROR_NONE) ? $decoded : $content;
@@ -238,11 +233,8 @@ class Show extends PostAction {
             $settings = (json_last_error() === JSON_ERROR_NONE) ? $decodedSettings : [];
         }
         
-        // Объединение настроек с настройками по умолчанию
         $dbSettings = $this->postBlockModel->getBlockSettings($block['type']);
         $mergedSettings = array_merge($dbSettings, $settings);
-        
-        // Обработка контента через менеджер
         $processedContent = $this->postBlockManager->processPostBlockContent(
             $content, 
             $block['type'], 
@@ -284,28 +276,21 @@ class Show extends PostAction {
      */
     private function getUserGroups() {
         $userGroups = [];
-        
-        // Всегда добавляем 'guest'
         $userGroups[] = 'guest';
         
-        // Если пользователь авторизован, добавляем его группы
         if (isset($_SESSION['user_id'])) {
             try {
                 $userModel = new \UserModel($this->db);
                 $userGroupIds = $userModel->getUserGroupIds($_SESSION['user_id']);
                 
                 if (!empty($userGroupIds)) {
-                    // Преобразуем ID групп в строки и добавляем к основному списку
                     $userGroupIds = array_map('strval', $userGroupIds);
                     $userGroups = array_merge($userGroups, $userGroupIds);
                 }
                 
-            } catch (\Exception $e) {
-                // Подавление исключений
-            }
+            } catch (\Exception $e) {}
         }
         
-        // Убираем дубликаты
         $userGroups = array_unique($userGroups);
         
         return $userGroups;

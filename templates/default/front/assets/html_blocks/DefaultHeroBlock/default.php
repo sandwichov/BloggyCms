@@ -3,51 +3,11 @@
  * Hero Block Template
  */
 
-$showTitle = $settings['show_title'] ?? 1;
-$titleText = html($settings['title_text'] ?? 'Заголовок');
-$titleColor = $settings['title_color'] ?? 'var(--tg-text)';
-$showSubtitle = $settings['show_subtitle'] ?? 1;
-$subtitleText = html($settings['subtitle_text'] ?? '');
-$subtitleColor = $settings['subtitle_color'] ?? 'var(--tg-text-secondary)';
-$showDescription = $settings['show_description'] ?? 1;
-$descriptionText = nl2br(html($settings['description_text'] ?? ''));
-$buttons = $settings['buttons'] ?? [];
-$showImage = $settings['show_image'] ?? 1;
-$imageUrl = !empty($settings['image']) ? BlockImageHelper::getImageUrl($settings['image']) : '';
+$imageColSize = $settings['image_column_size'] ?? '6';
+$contentColSize = 12 - (int)$imageColSize;
+$imageColClass = $settings['show_image'] && !empty($settings['image']) ? 'col-md-' . $imageColSize : '';
+$contentColClass = $settings['show_image'] && !empty($settings['image']) ? 'col-md-' . $contentColSize : 'col-12';
 $imagePosition = $settings['image_position'] ?? 'right';
-$imageAlignment = $settings['image_alignment'] ?? 'center';
-$imageRounded = !empty($settings['image_rounded']) ? ' rounded' : '';
-$imageShadow = !empty($settings['image_shadow']) ? ' shadow' : '';
-$bgType = $settings['background_type'] ?? 'color';
-$bgColor = $settings['background_color'] ?? 'var(--tg-surface)';
-$gradientStart = $settings['gradient_start'] ?? 'var(--tg-surface)';
-$gradientEnd = $settings['gradient_end'] ?? 'var(--tg-bg)';
-$gradientDirection = $settings['gradient_direction'] ?? 'to bottom';
-$bgImageUrl = !empty($settings['background_image']) ? BlockImageHelper::getImageUrl($settings['background_image']) : '';
-$bgOverlay = $settings['background_overlay'] ?? 'none';
-
-$bgStyle = '';
-switch ($bgType) {
-    case 'color':
-        $bgStyle = "background-color: $bgColor;";
-        break;
-    case 'gradient':
-        $bgStyle = "background: linear-gradient($gradientDirection, $gradientStart, $gradientEnd);";
-        break;
-    case 'image':
-        if ($bgImageUrl) {
-            $bgStyle = "background-image: url('$bgImageUrl'); background-size: cover; background-position: center;";
-        }
-        break;
-}
-
-$alignClass = 'text-' . html($settings['content_alignment'] ?? 'left');
-$ptClass = 'pt-' . html($settings['padding_top'] ?? 5);
-$pbClass = 'pb-' . html($settings['padding_bottom'] ?? 5);
-$customClass = html($settings['custom_css_class'] ?? '');
-$contentColClass = $showImage && $imageUrl ? 'col-md-6' : 'col-12';
-$imageColClass = $showImage && $imageUrl ? 'col-md-6' : '';
-
 if ($imagePosition === 'left') {
     $imageOrderClass = 'order-md-1';
     $contentOrderClass = 'order-md-2';
@@ -56,14 +16,16 @@ if ($imagePosition === 'left') {
     $contentOrderClass = 'order-md-1';
 }
 
-$alignSelfClass = $imageAlignment === 'top' ? 'align-items-start' : 'align-items-center';
+$alignSelfClass = ($settings['image_alignment'] ?? 'center') === 'top' ? 'align-items-start' : 'align-items-center';
+
 $buttonsHtml = '';
-if (!empty($buttons)) {
+if (!empty($settings['buttons'])) {
     $buttonsHtml .= '<div class="tg-hero-buttons d-flex gap-2 flex-wrap">';
-    foreach ($buttons as $btn) {
-        $btnClass = 'btn ';
-        $btnClass .= ($btn['type'] === 'primary') ? 'btn-primary' : 'btn-outline-secondary';
-        $btnClass .= ($btn['size'] === 'lg') ? ' btn-lg' : '';
+    foreach ($settings['buttons'] as $btn) {
+        $btnClass = 'btn btn-' . html($btn['type']);
+        if (!empty($btn['size']) && $btn['size'] !== 'md') {
+            $btnClass .= ' btn-' . html($btn['size']);
+        }
         
         $iconHtml = '';
         if (!empty($btn['icon'])) {
@@ -84,65 +46,82 @@ if (!empty($buttons)) {
     $buttonsHtml .= '</div>';
 }
 
+$bgStyle = '';
+switch ($settings['background_type'] ?? 'color') {
+    case 'color':
+        $bgStyle = "background-color: " . ($settings['background_color'] ?? 'var(--tg-surface)') . ";";
+        break;
+    case 'gradient':
+        $bgStyle = "background: linear-gradient(" . 
+                   ($settings['gradient_direction'] ?? 'to bottom') . ", " . 
+                   ($settings['gradient_start'] ?? 'var(--tg-surface)') . ", " . 
+                   ($settings['gradient_end'] ?? 'var(--tg-bg)') . ");";
+        break;
+    case 'image':
+        $bgImageUrl = !empty($settings['background_image']) ? BlockImageHelper::getImageUrl($settings['background_image']) : '';
+        if ($bgImageUrl) {
+            $bgStyle = "background-image: url('$bgImageUrl'); background-size: cover; background-position: center;";
+        }
+        break;
+}
+
 $overlayClass = '';
-if ($bgType === 'image' && $bgOverlay !== 'none') {
-    $overlayClass = 'tg-hero-overlay tg-overlay-' . html($bgOverlay);
+if (($settings['background_type'] ?? '') === 'image' && !empty($settings['background_overlay']) && $settings['background_overlay'] !== 'none') {
+    $overlayClass = 'tg-hero-overlay tg-overlay-' . html($settings['background_overlay']);
 }
 ?>
 
-<section class="tg-hero <?php echo $ptClass; ?> <?php echo $pbClass; ?> <?php echo $customClass; ?>" style="<?php echo $bgStyle; ?>">
+<section class="tg-hero pt-<?php echo html($settings['padding_top'] ?? 5); ?> pb-<?php echo html($settings['padding_bottom'] ?? 5); ?> <?php echo html($settings['custom_css_class'] ?? ''); ?>" style="<?php echo $bgStyle; ?>">
     
-    <?php if ($overlayClass) { ?>
+    <?php if ($overlayClass): ?>
     <div class="<?php echo $overlayClass; ?>"></div>
-    <?php } ?>
+    <?php endif; ?>
     
     <div class="container">
         <div class="row <?php echo $alignSelfClass; ?>">
             
-            <?php if ($contentColClass) { ?>
             <div class="<?php echo $contentColClass; ?> <?php echo $contentOrderClass; ?>">
-                <div class="tg-hero-content <?php echo $alignClass; ?>">
+                <div class="tg-hero-content text-<?php echo html($settings['content_alignment'] ?? 'left'); ?>">
 
-                    <?php if ($showTitle && $titleText) { ?>
-                        <h1 class="tg-hero-title display-4 fw-bold mb-3" style="color: <?php echo $titleColor; ?>;">
-                            <?php echo $titleText; ?>
+                    <?php if (!empty($settings['show_title']) && !empty($settings['title_text'])): ?>
+                        <h1 class="tg-hero-title display-4 fw-bold mb-3" style="color: <?php echo html($settings['title_color'] ?? 'var(--tg-text)'); ?>;">
+                            <?php echo html($settings['title_text']); ?>
                         </h1>
-                    <?php } ?>
+                    <?php endif; ?>
 
-                    <?php if ($showSubtitle && $subtitleText) { ?>
-                        <p class="tg-hero-subtitle text-primary fw-semibold mb-2" style="color: <?php echo $subtitleColor; ?>;">
-                            <?php echo $subtitleText; ?>
+                    <?php if (!empty($settings['show_subtitle']) && !empty($settings['subtitle_text'])): ?>
+                        <p class="tg-hero-subtitle text-primary fw-semibold mb-2" style="color: <?php echo html($settings['subtitle_color'] ?? 'var(--tg-text-secondary)'); ?>;">
+                            <?php echo html($settings['subtitle_text']); ?>
                         </p>
-                    <?php } ?>
+                    <?php endif; ?>
                     
-                    <?php if ($showDescription && $descriptionText) { ?>
+                    <?php if (!empty($settings['show_description']) && !empty($settings['description_text'])): ?>
                         <div class="tg-hero-description lead mb-4">
-                            <?php echo $descriptionText; ?>
+                            <?php echo nl2br(html($settings['description_text'])); ?>
                         </div>
-                    <?php } ?>
+                    <?php endif; ?>
                     
                     <?php echo $buttonsHtml; ?>
                     
                 </div>
             </div>
-            <?php } ?>
             
-            <?php if ($showImage && $imageUrl && $imageColClass) { ?>
+            <?php if (!empty($settings['show_image']) && !empty($settings['image'])): ?>
             <div class="<?php echo $imageColClass; ?> <?php echo $imageOrderClass; ?>">
                 <div class="tg-hero-image-wrapper text-center">
-                    <img src="<?php echo $imageUrl; ?>" 
-                         alt="<?php echo html($titleText); ?>" 
-                         class="tg-hero-image img-fluid <?php echo $imageRounded; ?> <?php echo $imageShadow; ?>"
+                    <img src="<?php echo BlockImageHelper::getImageUrl($settings['image']); ?>" 
+                         alt="<?php echo html($settings['title_text'] ?? ''); ?>" 
+                         class="tg-hero-image img-fluid <?php echo !empty($settings['image_rounded']) ? 'rounded' : ''; ?> <?php echo !empty($settings['image_shadow']) ? 'shadow' : ''; ?>"
                          loading="lazy">
                 </div>
             </div>
-            <?php } ?>
+            <?php endif; ?>
             
         </div>
     </div>
 </section>
 
-<?php if ($bgType === 'image' && $bgOverlay !== 'none') { ?>
+<?php if (($settings['background_type'] ?? '') === 'image' && !empty($settings['background_overlay']) && $settings['background_overlay'] !== 'none'): ?>
 <style>
 .tg-hero {
     position: relative;
@@ -165,4 +144,4 @@ if ($bgType === 'image' && $bgOverlay !== 'none') {
     z-index: 1;
 }
 </style>
-<?php } ?>
+<?php endif; ?>
