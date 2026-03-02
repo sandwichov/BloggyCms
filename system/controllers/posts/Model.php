@@ -227,14 +227,37 @@ class PostModel {
     }
     
     /**
-     * Удаляет пост и связанные с ним теги
+     * Удаляет пост и все связанные с ним данные (теги, блоки)
      * 
      * @param int $id ID поста
      * @return bool Результат выполнения запроса
+     * @throws Exception При ошибке удаления
      */
     public function delete($id) {
-        $this->db->query("DELETE FROM post_tags WHERE post_id = ?", [$id]);
-        return $this->db->query("DELETE FROM posts WHERE id = ?", [$id]);
+        try {
+            $this->db->beginTransaction();
+
+            $this->db->query("DELETE FROM post_blocks WHERE post_id = ?", [$id]);
+
+            $this->db->query("DELETE FROM post_likes WHERE post_id = ?", [$id]);
+
+            $this->db->query("DELETE FROM bookmarks WHERE post_id = ?", [$id]);
+
+            $this->db->query("DELETE FROM comments WHERE post_id = ?", [$id]);
+
+            $this->db->query("DELETE FROM post_tags WHERE post_id = ?", [$id]);
+
+            $this->db->query("DELETE FROM field_values WHERE entity_type = 'post' AND entity_id = ?", [$id]);
+
+            $result = $this->db->query("DELETE FROM posts WHERE id = ?", [$id]);
+
+            $this->db->commit();
+            
+            return $result;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
     
     /**

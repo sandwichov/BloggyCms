@@ -22,25 +22,20 @@ class AdminSaveBlockData extends PostBlockAction {
      * @return void
      */
     public function execute() {
-        // Установка заголовка для JSON-ответа с поддержкой UTF-8
         header('Content-Type: application/json; charset=utf-8');
         
         try {
-            // Проверка прав доступа администратора через сессию
             if (!isset($_SESSION['is_admin'])) {
                 throw new \Exception('Доступ запрещен');
             }
 
-            // Получение данных из POST-запроса
             $blockId = $_POST['block_id'] ?? '';
             $blockType = $_POST['block_type'] ?? '';
             
-            // Проверка наличия обязательных полей
             if (empty($blockId) || empty($blockType)) {
                 throw new \Exception('Не указаны данные блока');
             }
 
-            // Получение экземпляра блока через менеджер
             $postBlock = $this->postBlockManager->getPostBlock($blockType);
             if (!$postBlock || !$postBlock['class']) {
                 throw new \Exception('Блок не найден: ' . $blockType);
@@ -48,23 +43,24 @@ class AdminSaveBlockData extends PostBlockAction {
 
             $blockInstance = $postBlock['class'];
             
-            // Извлечение настроек из POST
             $settings = $this->extractSettingsFromPost();
-            
-            // Извлечение контента из POST
             $content = $this->extractContentFromPost();
+            
+            if (isset($_POST['preset_id'])) {
+                $settings['preset_id'] = $_POST['preset_id'];
+            }
+            if (isset($_POST['preset_name'])) {
+                $settings['preset_name'] = $_POST['preset_name'];
+            }
 
-            // Подготовка настроек через метод блока (если существует)
             if (method_exists($blockInstance, 'prepareSettings')) {
                 $settings = $blockInstance->prepareSettings($settings);
             }
             
-            // Подготовка контента через метод блока (если существует)
             if (method_exists($blockInstance, 'prepareContent')) {
                 $content = $blockInstance->prepareContent($content);
             }
 
-            // Возврат успешного ответа с подготовленными данными
             echo json_encode([
                 'success' => true,
                 'content' => $content,
@@ -73,7 +69,6 @@ class AdminSaveBlockData extends PostBlockAction {
             ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Exception $e) {
-            // Возврат ответа с ошибкой
             echo json_encode([
                 'success' => false,
                 'message' => $e->getMessage(),

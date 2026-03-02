@@ -106,9 +106,25 @@ class PageModel {
      * @return bool Результат выполнения запроса
      */
     public function delete($id) {
-        // Каскадное удаление: сначала блоки страницы, затем саму страницу
-        $this->postBlockModel->deleteByPage($id);
-        return $this->db->query("DELETE FROM pages WHERE id = ?", [$id]);
+        try {
+            $this->db->beginTransaction();
+            
+            $this->postBlockModel->deleteByPage($id);
+            
+            $this->db->query(
+                "DELETE FROM field_values WHERE entity_type = 'page' AND entity_id = ?", 
+                [$id]
+            );
+            
+            $result = $this->db->query("DELETE FROM pages WHERE id = ?", [$id]);
+            
+            $this->db->commit();
+            
+            return $result;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
     
     /**

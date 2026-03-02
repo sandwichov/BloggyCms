@@ -342,7 +342,11 @@
         
         try {
             const presets = await this.getBlockPresets(block.type);
-            const url = `${window.ADMIN_URL}/post-blocks/get-settings-form?system_name=${block.type}&current_settings=${encodeURIComponent(JSON.stringify(block.settings))}&current_content=${encodeURIComponent(JSON.stringify(block.content))}`;
+            
+            const url = `${window.ADMIN_URL}/post-blocks/get-settings-form?` + 
+                `system_name=${block.type}` + 
+                `&current_settings=${encodeURIComponent(JSON.stringify(block.settings || {}))}` + 
+                `&current_content=${encodeURIComponent(JSON.stringify(block.content || {}))}`;
             
             const response = await fetch(url);
             if (!response.ok) {
@@ -357,9 +361,10 @@
             }
             
             content.innerHTML = html;
+
+            this.applySavedBlockData(block);
             
             this.initPresetHandlers(block, presets);
-            
             this.initTabs(content);
             
             setTimeout(() => {
@@ -378,19 +383,82 @@
         }
     }
 
+    applySavedBlockData(block) {
+        if (!block) return;
+        
+        if (block.settings) {
+            Object.keys(block.settings).forEach(key => {
+                const settingInput = document.querySelector(`[name="settings[${key}]"]`);
+                if (settingInput) {
+                    const value = block.settings[key];
+                    
+                    if (settingInput.type === 'checkbox') {
+                        settingInput.checked = Boolean(value);
+                    } else if (settingInput.type === 'radio') {
+                        const radio = document.querySelector(`[name="settings[${key}]"][value="${value}"]`);
+                        if (radio) radio.checked = true;
+                    } else {
+                        settingInput.value = value || '';
+                    }
+                }
+            });
+        }
+        
+        if (block.content) {
+            Object.keys(block.content).forEach(key => {
+                const contentInput = document.querySelector(`[name="content[${key}]"]`);
+                if (contentInput) {
+                    contentInput.value = block.content[key] || '';
+                }
+            });
+        }
+        
+        if (block.settings && block.settings.preset_id) {
+            const presetSelect = document.getElementById('block-preset-select');
+            if (presetSelect) {
+                presetSelect.value = block.settings.preset_id;
+                
+                const selectedOption = presetSelect.options[presetSelect.selectedIndex];
+                if (selectedOption) {
+                    const template = selectedOption.getAttribute('data-template');
+                    if (template) {
+                        this.applyPresetTemplate(template);
+                    }
+                }
+            }
+        }
+    }
+
+    applyPresetTemplate(template) {
+        if (template.includes('text-danger')) {
+            const customClassInput = document.querySelector('[name="settings[custom_class]"]');
+            if (customClassInput && !customClassInput.value) {
+                customClassInput.value = 'text-danger';
+            }
+        } else if (template.includes('text-dark')) {
+            const customClassInput = document.querySelector('[name="settings[custom_class]"]');
+            if (customClassInput && !customClassInput.value) {
+                customClassInput.value = 'text-dark';
+            }
+        }
+    }
+
     createPresetSelector(presets, currentBlock) {
-        const currentPresetId = currentBlock.settings.preset_id || '';
+        const currentPresetId = currentBlock.settings?.preset_id || '';
         
         let options = '<option value="">-- Без пресета (стандартный шаблон) --</option>';
         
         presets.forEach(preset => {
             const selected = currentPresetId == preset.id ? 'selected' : '';
+            const template = this.escapeHtml(preset.preset_template || '');
+            const name = this.escapeHtml(preset.preset_name);
+            
             options += `
                 <option value="${preset.id}" 
                         ${selected}
-                        data-template="${this.escapeHtml(preset.preset_template || '')}"
-                        data-name="${this.escapeHtml(preset.preset_name)}">
-                    ${this.escapeHtml(preset.preset_name)}
+                        data-template="${template}"
+                        data-name="${name}">
+                    ${name}
                 </option>`;
         });
         
@@ -427,33 +495,34 @@
     initPresetHandlers(block, presets) {
         const presetSelect = document.getElementById('block-preset-select');
         const resetPresetBtn = document.getElementById('reset-preset');
-        const closePreviewBtn = document.getElementById('close-preview');
-        const previewContainer = document.querySelector('.preset-preview-container');
-        const previewContent = document.querySelector('.preset-preview-content');
         
         if (presetSelect) {
             presetSelect.addEventListener('change', (e) => {
                 const selectedOption = e.target.options[e.target.selectedIndex];
                 const presetId = e.target.value;
-                const template = selectedOption.getAttribute('data-template') || '';
-                const presetName = selectedOption.getAttribute('data-name') || '';
                 
-                if (block.settings) {
+                if (presetId) {
+
+                    if (!block.settings) block.settings = {};
                     block.settings.preset_id = presetId;
-                    
-                    if (presetId) {
-                        block.settings.preset_name = presetName;
-                    } else {
-                        delete block.settings.preset_name;
+
+                    const template = selectedOption.getAttribute('data-template');
+                    if (template && template.includes('text-danger')) {
+                        const customClassInput = document.querySelector('[name="settings[custom_class]"]');
+                        if (customClassInput) {
+                            customClassInput.value = 'text-danger';
+                        }
+                    } else if (template && template.includes('text-dark')) {
+                        const customClassInput = document.querySelector('[name="settings[custom_class]"]');
+                        if (customClassInput) {
+                            customClassInput.value = 'text-dark';
+                        }
+                    }
+                } else {
+                    if (block.settings) {
+                        delete block.settings.preset_id;
                     }
                 }
-                
-                if (template && presetId) {
-                    this.showPresetPreview(template, previewContainer, previewContent);
-                } else {
-                    this.hidePresetPreview(previewContainer);
-                }
-                
             });
             
             if (presetSelect.value) {
@@ -467,12 +536,6 @@
                     presetSelect.value = '';
                     presetSelect.dispatchEvent(new Event('change'));
                 }
-            });
-        }
-        
-        if (closePreviewBtn) {
-            closePreviewBtn.addEventListener('click', () => {
-                this.hidePresetPreview(previewContainer);
             });
         }
     }
@@ -495,6 +558,7 @@
     }
 
     escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -565,12 +629,12 @@
             block.content = { ...block.content, ...contentData };
             block.settings = { ...block.settings, ...settingsData };
             
-            const uploadFormData = new FormData(form);
+            const uploadFormData = new FormData();
             uploadFormData.append('block_id', blockId);
             uploadFormData.append('block_type', block.type);
             uploadFormData.append('action', 'save_settings');
-            uploadFormData.append('content_json', JSON.stringify(contentData));
-            uploadFormData.append('settings_json', JSON.stringify(settingsData));
+            uploadFormData.append('content_json', JSON.stringify(block.content));
+            uploadFormData.append('settings_json', JSON.stringify(block.settings));
             
             saveButton = modal.querySelector('#save-post-block-settings');
             if (saveButton) {
@@ -588,7 +652,7 @@
             if (!contentType || !contentType.includes('application/json')) {
                 const text = await response.text();
                 console.error('Non-JSON response:', text.substring(0, 200));
-                throw new Error('Сервер вернул не JSON. Возможно, ошибка PHP или редирект');
+                throw new Error('Сервер вернул не JSON');
             }
             
             const data = await response.json();
@@ -597,6 +661,33 @@
                 if (data.block_data) {
                     block.content = data.block_data.content || block.content;
                     block.settings = data.block_data.settings || block.settings;
+                }
+                
+                const blockElement = document.querySelector(`.post-block-item[data-block-id="${blockId}"]`);
+                if (blockElement) {
+                    const hasPreset = block.settings && block.settings.preset_id;
+                    const typeInfo = blockElement.querySelector('.block-type-info');
+                    const existingBadge = typeInfo.querySelector('.badge .bg-success .text-dark');
+                    
+                    if (hasPreset && block.settings.preset_name) {
+                        blockElement.classList.add('has-preset');
+                        
+                        if (!existingBadge) {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-success text-dark';
+                            badge.title = `Используется пресет: ${this.escapeHtml(block.settings.preset_name)}`;
+                            badge.innerHTML = `<i class="bi bi-gear me-1"></i>${this.escapeHtml(block.settings.preset_name)}`;
+                            typeInfo.appendChild(badge);
+                        } else {
+                            existingBadge.title = `Используется пресет: ${this.escapeHtml(block.settings.preset_name)}`;
+                            existingBadge.innerHTML = `<i class="bi bi-gear me-1"></i>${this.escapeHtml(block.settings.preset_name)}`;
+                        }
+                    } else {
+                        blockElement.classList.remove('has-preset');
+                        if (existingBadge) {
+                            existingBadge.remove();
+                        }
+                    }
                 }
                 
                 this.closeCurrentModal();
@@ -690,14 +781,22 @@
     }
 
     async renderBlockWithPreview(block, blockInfo, index) {
+        const hasPreset = block.settings && block.settings.preset_id && block.settings.preset_name;
+        const presetBadge = hasPreset ? 
+            `<span class="badge bg-success text-dark" title="Используется пресет: ${this.escapeHtml(block.settings.preset_name)}">
+                <i class="bi bi-gear me-1"></i>
+                ${this.escapeHtml(block.settings.preset_name)}
+            </span>` : '';
+
         return `
-        <div class="post-block-item" data-block-id="${block.id}" data-block-type="${block.type}">
+        <div class="post-block-item ${hasPreset ? 'has-preset' : ''}" data-block-id="${block.id}" data-block-type="${block.type}">
             <div class="post-block-item-inner">
                 <div class="block-header">
                     <div class="block-order">${index + 1}</div>
                     <div class="block-type-info">
                         <i class="${blockInfo.icon}"></i>
                         <span class="block-type-name">${blockInfo.name}</span>
+                        ${presetBadge}
                     </div>
                     <div class="block-actions">
                         <button type="button" class="btn btn-sm btn-outline-primary edit-post-block" 
@@ -742,6 +841,8 @@
         if (!previewContainer) return;
         
         try {
+            const block = this.blocksData.find(b => b.id === blockId);
+            
             const normalizedContent = this.normalizeContentData(blockType, content);
             const normalizedSettings = Array.isArray(settings) && settings.length === 0 ? {} : settings;
             

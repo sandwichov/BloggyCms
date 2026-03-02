@@ -15,7 +15,6 @@
         initEditors();
         initEventHandlers();
         loadPresets();
-
     }
     
     function initEditors() {
@@ -46,6 +45,7 @@
                 blockTemplateEditor.session.setUseWrapMode(true);
                 blockTemplateEditor.session.setTabSize(4);
                 blockTemplateEditor.session.setUseSoftTabs(true);
+                
                 const form = document.getElementById("blockSettingsForm");
                 const templateField = document.getElementById("template");
                 if (form && templateField) {
@@ -153,11 +153,15 @@
                 if (data.success) {
                     renderPresets(data.presets);
                 } else {
-                    showToast(data.message || 'Ошибка при загрузке пресетов', 'danger');
+                    if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                        window.notificationSystem.showNotification(data.message || 'Ошибка при загрузке пресетов', 'danger');
+                    }
                 }
             })
             .catch(error => {
-                showToast('Ошибка при загрузке пресетов', 'danger');
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification('Ошибка при загрузке пресетов', 'danger');
+                }
             });
     }
     
@@ -186,6 +190,8 @@
                 preset.preset_template.substring(0, 100) + (preset.preset_template.length > 100 ? '...' : '') : '';
             const date = preset.updated_at ? new Date(preset.updated_at).toLocaleDateString() : '';
             
+            const templateForData = encodeURIComponent(preset.preset_template || '');
+            
             html += `
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border">
@@ -213,7 +219,8 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">Обновлен: ${date}</small>
                             <button type="button" class="btn btn-sm btn-outline-primary use-preset" 
-                                    data-id="${preset.id}" data-template="${escapeHtml(preset.preset_template || '')}">
+                                    data-id="${preset.id}" 
+                                    data-template-encoded="${templateForData}">
                                 Использовать
                             </button>
                         </div>
@@ -246,10 +253,14 @@
         container.querySelectorAll('.use-preset').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const template = this.getAttribute('data-template');
-                if (blockTemplateEditor && template) {
+                const encodedTemplate = this.getAttribute('data-template-encoded');
+                if (blockTemplateEditor && encodedTemplate) {
+                    const template = decodeURIComponent(encodedTemplate);
                     blockTemplateEditor.setValue(template, -1);
-                    showToast('Шаблон блока обновлен из пресета', 'success');
+                    
+                    if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                        window.notificationSystem.showNotification('Шаблон блока обновлен из пресета', 'success');
+                    }
                 }
             });
         });
@@ -278,6 +289,15 @@
                             document.getElementById('preset_name').value = preset.preset_name;
                             presetEditorInstance.setValue(preset.preset_template || '', -1);
                         }
+                    } else {
+                        if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                            window.notificationSystem.showNotification(data.message || 'Ошибка при загрузке пресета', 'danger');
+                        }
+                    }
+                })
+                .catch(error => {
+                    if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                        window.notificationSystem.showNotification('Ошибка при загрузке пресета', 'danger');
                     }
                 });
         } else {
@@ -315,7 +335,10 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showToast(data.message, 'success');
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification(data.message, 'success');
+                }
+                
                 loadPresets();
                 const modal = bootstrap.Modal.getInstance(document.getElementById('presetModal'));
                 if (modal) {
@@ -323,11 +346,15 @@
                 }
                 resetPresetForm();
             } else {
-                showToast(data.message, 'danger');
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification(data.message || 'Ошибка при сохранении пресета', 'danger');
+                }
             }
         })
         .catch(error => {
-            showToast('Ошибка при сохранении пресета', 'danger');
+            if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                window.notificationSystem.showNotification('Ошибка при сохранении пресета', 'danger');
+            }
         });
     }
     
@@ -348,18 +375,25 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showToast(data.message, 'success');
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification(data.message || 'Пресет успешно удален', 'success');
+                }
+                
                 loadPresets();
                 const modal = bootstrap.Modal.getInstance(document.getElementById('presetModal'));
                 if (modal) {
                     modal.hide();
                 }
             } else {
-                showToast(data.message, 'danger');
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification(data.message || 'Ошибка при удалении пресета', 'danger');
+                }
             }
         })
         .catch(error => {
-            showToast('Ошибка при удалении пресета', 'danger');
+            if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                window.notificationSystem.showNotification('Ошибка при удалении пресета', 'danger');
+            }
         });
     }
     
@@ -386,14 +420,26 @@
                 if (response.success && response.template) {
                     if (confirm('Загрузить стандартный шаблон? Текущий шаблон будет заменен.')) {
                         blockTemplateEditor.setValue(response.template, -1);
+                        
+                        if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                            window.notificationSystem.showNotification('Стандартный шаблон загружен', 'success');
+                        }
                     }
                 } else {
-                    alert('Не удалось загрузить шаблон: ' + (response.message || 'Неизвестная ошибка'));
+                    if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                        window.notificationSystem.showNotification(response.message || 'Не удалось загрузить шаблон', 'danger');
+                    }
+                }
+            } else {
+                if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                    window.notificationSystem.showNotification('Ошибка при загрузке шаблона', 'danger');
                 }
             }
         };
         xhr.onerror = function() {
-            alert('Ошибка при загрузке шаблона');
+            if (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function') {
+                window.notificationSystem.showNotification('Ошибка при загрузке шаблона', 'danger');
+            }
         };
         xhr.send();
     }
@@ -405,62 +451,11 @@
         return div.innerHTML;
     }
     
-    function showToast(message, type = 'info') {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-            let toastContainer = document.getElementById('toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toast-container';
-                toastContainer.style.position = 'fixed';
-                toastContainer.style.top = '20px';
-                toastContainer.style.right = '20px';
-                toastContainer.style.zIndex = '9999';
-                document.body.appendChild(toastContainer);
-            }
-            
-            const toastId = 'toast-' + Date.now();
-            const toastHtml = `
-                <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                </div>
-            `;
-            
-            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-            const toastElement = document.getElementById(toastId);
-            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
-            toast.show();
-            
-            toastElement.addEventListener('hidden.bs.toast', function () {
-                this.remove();
-            });
-        } else {
-            alert(message);
-        }
-    }
-    
-    function editPreset(presetId) {
-        openPresetModal(presetId);
-    }
-    
-    function resetPresetForm() {
-        const form = document.getElementById('presetForm');
-        if (form) form.reset();
-        const presetIdField = document.getElementById('preset_id');
-        if (presetIdField) presetIdField.value = '';
-        if (presetEditorInstance) presetEditorInstance.setValue('', -1);
-    }
-    
     document.addEventListener('DOMContentLoaded', init);
     
     window.PostBlocksEditor = {
         init: init,
-        loadPresets: loadPresets,
-        showToast: showToast
+        loadPresets: loadPresets
     };
     
 })();

@@ -42,6 +42,14 @@ class AdminUploadBlockFiles extends PostBlockAction {
             $settingsJson = $_POST['settings_json'] ?? '{}';
             $content = json_decode($contentJson, true) ?: [];
             $settings = json_decode($settingsJson, true) ?: [];
+            
+            if (isset($_POST['preset_id']) && !isset($settings['preset_id'])) {
+                $settings['preset_id'] = $_POST['preset_id'];
+            }
+            if (isset($_POST['preset_name']) && !isset($settings['preset_name'])) {
+                $settings['preset_name'] = $_POST['preset_name'];
+            }
+            
             $postBlock = $this->postBlockManager->getPostBlock($blockType);
             
             if (!$postBlock || !$postBlock['class']) {
@@ -94,15 +102,38 @@ class AdminUploadBlockFiles extends PostBlockAction {
      */
     private function processPostFields(&$content, &$settings) {
         foreach ($_POST as $key => $value) {
-
             if (strpos($key, 'content[') === 0) {
                 $this->processContentField($key, $value, $content);
-            } 
-
-            elseif (strpos($key, 'settings[') === 0) {
+            } elseif (strpos($key, 'settings[') === 0) {
                 $this->processSettingsField($key, $value, $settings);
+            } elseif ($key === 'preset_id' || $key === 'preset_name') {
+                $settings[$key] = $value;
             }
         }
+    }
+
+    /**
+     * Объединяет данные пресета с настройками блока
+     * 
+     * @param array $settings Текущие настройки
+     * @param array $content Текущий контент
+     * @return array Обновленные настройки
+     */
+    private function mergePresetData($settings, $content) {
+        if (!empty($settings['preset_id'])) {
+            $presetModel = new \PostBlockModel($this->db);
+            $preset = $presetModel->getPreset($settings['preset_id']);
+            
+            if ($preset && !empty($preset['preset_template'])) {
+                $settings['applied_preset'] = [
+                    'id' => $preset['id'],
+                    'name' => $preset['preset_name'],
+                    'template' => $preset['preset_template']
+                ];
+            }
+        }
+        
+        return $settings;
     }
 
     /**
