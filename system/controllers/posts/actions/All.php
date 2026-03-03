@@ -22,20 +22,16 @@ class All extends PostAction {
      */
     public function execute() {
         try {
-            // Получение и валидация номера страницы
+
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Все записи');
+            $this->setPageTitle('Все записи');
+
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $page = max(1, $page);
-            
-            // Получение групп текущего пользователя для фильтрации видимости
             $userGroups = $this->getUserGroups();
-            
-            // Получение постов с пагинацией и учетом видимости
             $result = $this->postModel->getAllPaginated($page, null, $userGroups);
-            
-            // Получение всех категорий для отображения в сайдбаре или фильтре
             $categories = $this->categoryModel->getAll();
-            
-            // Получение ID всех загруженных постов для подсчета комментариев
             $postIds = array_column($result['posts'], 'id');
             $commentsCount = [];
             
@@ -43,14 +39,10 @@ class All extends PostAction {
                 $commentsCount = $this->postModel->getCommentsCountForPosts($postIds);
             }
             
-            // Обработка каждого поста: добавление дополнительной информации
             foreach ($result['posts'] as &$post) {
                 $postId = $post['id'];
-                
-                // Добавление количества комментариев
                 $post['comments_count'] = $commentsCount[$postId] ?? 0;
                 
-                // Проверка лайка и закладки для авторизованного пользователя
                 if (isset($_SESSION['user_id'])) {
                     $post['userLiked'] = $this->postModel->hasUserLiked($post['id'], $_SESSION['user_id']);
                     $post['userBookmarked'] = $this->postModel->hasBookmark($post['id'], $_SESSION['user_id']);
@@ -59,22 +51,18 @@ class All extends PostAction {
                     $post['userBookmarked'] = false;
                 }
                 
-                // Добавление проверки на защиту паролем
                 $post['password_protected'] = $post['password_protected'] == 1;
                 
-                // Добавление количества лайков (если отсутствует)
                 if (!isset($post['likes_count'])) {
                     $post['likes_count'] = $post['likes_count'] ?? 0;
                 }
             }
             
-            // Формирование данных для шаблона
             $this->render('front/posts/index', [
                 'posts' => $result['posts'],
                 'total_posts' => $result['total'],
                 'total_pages' => $result['pages'],
                 'current_page' => $result['current_page'],
-                'title' => 'Все записи',
                 'categories' => $categories,
                 'pagination' => [
                     'current_page' => $result['current_page'],
@@ -85,7 +73,6 @@ class All extends PostAction {
             ]);
             
         } catch (\Exception $e) {
-            // Обработка ошибок при загрузке постов
             \Notification::error('Ошибка при загрузке постов: ' . $e->getMessage());
             $this->redirect(BASE_URL);
         }
@@ -113,29 +100,21 @@ class All extends PostAction {
      */
     private function getUserGroups() {
         $userGroups = [];
-        
-        // Всегда добавляем 'guest'
         $userGroups[] = 'guest';
         
-        // Если пользователь авторизован, добавляем его группы
         if (isset($_SESSION['user_id'])) {
             try {
                 $userModel = new \UserModel($this->db);
                 $userGroupIds = $userModel->getUserGroupIds($_SESSION['user_id']);
                 
                 if (!empty($userGroupIds)) {
-                    // Преобразуем ID групп в строки и добавляем к основному списку
                     $userGroupIds = array_map('strval', $userGroupIds);
                     $userGroups = array_merge($userGroups, $userGroupIds);
                 }
                 
-            } catch (\Exception $e) {
-                // Подавление исключения - если не удалось получить группы,
-                // используем только 'guest'
-            }
+            } catch (\Exception $e) {}
         }
         
-        // Убираем дубликаты
         $userGroups = array_unique($userGroups);
         
         return $userGroups;

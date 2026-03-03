@@ -27,33 +27,27 @@ class Index extends ArchiveAction {
     */
     public function execute() {
         try {
-            // Получение структуры архива - годов и месяцев с количеством постов
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Архив постов');
+            $this->setPageTitle('Архив постов');
+            
             $archiveData = $this->postModel->getArchive();
 
-            // Инициализация массива для группировки постов по месяцам
             $postsByMonth = [];
             
-            // Обработка каждого элемента архива для получения постов за конкретный месяц
             foreach ($archiveData as $archiveItem) {
                 $year = $archiveItem['year'];
                 $month = $archiveItem['month'];
-                
-                // Получение постов за конкретный год и месяц
                 $posts = $this->postModel->getPostsByArchive($year, $month);
-                
-                // Сохранение постов в структурированном виде
                 $postsByMonth[$year][$month] = $posts;
             }
             
-            // Отображение страницы архива с передачей всех данных
             $this->render('front/archive/archive', [
-                'archiveData' => $archiveData,     // Структура архива (годы/месяцы)
-                'postsByMonth' => $postsByMonth,   // Посты с группировкой по месяцам
-                'title' => 'Архив постов'          // Заголовок страницы
+                'archiveData' => $archiveData,
+                'postsByMonth' => $postsByMonth
             ]);
             
         } catch (\Exception $e) {
-            // В случае ошибки отображаем страницу 500
             $this->render('front/500', [], 500);
         }
     }

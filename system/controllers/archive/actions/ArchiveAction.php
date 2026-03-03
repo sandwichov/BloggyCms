@@ -33,6 +33,16 @@ abstract class ArchiveAction {
     protected $postModel;
     
     /**
+    * @var \BreadcrumbsManager Менеджер для работы с хлебными крошками
+    */
+    protected $breadcrumbs;
+    
+    /**
+    * @var string Заголовок страницы
+    */
+    protected $pageTitle;
+    
+    /**
     * Конструктор действия архива
     * Инициализирует подключение к БД и модель постов
     *
@@ -43,6 +53,8 @@ abstract class ArchiveAction {
         $this->db = $db;
         $this->params = $params;
         $this->postModel = new \PostModel($db);
+        $this->breadcrumbs = new \BreadcrumbsManager($db);
+        $this->pageTitle = '';
     }
     
     /**
@@ -64,6 +76,29 @@ abstract class ArchiveAction {
     abstract public function execute();
     
     /**
+    * Добавляет элемент в хлебные крошки
+    * 
+    * @param string $title Название элемента
+    * @param string|null $url URL элемента (null для текущего элемента)
+    * @return self
+    */
+    protected function addBreadcrumb($title, $url = null) {
+        $this->breadcrumbs->add($title, $url);
+        return $this;
+    }
+    
+    /**
+    * Устанавливает заголовок страницы
+    * 
+    * @param string $title Заголовок
+    * @return self
+    */
+    protected function setPageTitle($title) {
+        $this->pageTitle = $title;
+        return $this;
+    }
+    
+    /**
     * Вспомогательный метод для рендеринга шаблонов
     * Делегирует рендеринг родительскому контроллеру
     *
@@ -72,10 +107,18 @@ abstract class ArchiveAction {
     * @throws \Exception Если контроллер не установлен
     */
     protected function render($template, $data = []) {
-        if ($this->controller) {
-            $this->controller->render($template, $data);
-        } else {
+        if (!$this->controller) {
             throw new \Exception('Controller not set for Action');
         }
+        
+        if (!isset($data['breadcrumbs'])) {
+            $data['breadcrumbs'] = $this->breadcrumbs;
+        }
+        
+        if (!isset($data['title']) && $this->pageTitle) {
+            $data['title'] = $this->pageTitle;
+        }
+        
+        $this->controller->render($template, $data);
     }
 }
