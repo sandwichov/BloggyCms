@@ -6,27 +6,6 @@
 
 <div class="tg-password-page">
     <div class="tg-container tg-container-sm">
-        <div class="tg-breadcrumbs tg-mb-4">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <a href="<?php echo BASE_URL; ?>/posts" class="tg-breadcrumb-item">Блог</a>
-                
-                <?php if (!empty($post['category_name'])) { ?>
-                <span class="tg-breadcrumb-sep">/</span>
-                <a href="<?php echo BASE_URL; ?>/category/<?php echo html($post['category_slug']); ?>" 
-                   class="tg-breadcrumb-item">
-                    <?php echo html($post['category_name']); ?>
-                </a>
-                <?php } ?>
-                
-                <span class="tg-breadcrumb-sep">/</span>
-                <span class="tg-breadcrumb-item"><?php echo html($post['title']); ?></span>
-            </nav>
-        </div>
         
         <div class="tg-card">
             <div class="tg-card-body">

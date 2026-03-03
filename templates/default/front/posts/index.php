@@ -6,35 +6,6 @@
 
 <div class="tg-posts-page">
     <div class="tg-container">
-
-        <div class="tg-breadcrumbs tg-mb-3">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                
-                <?php 
-                if (!empty($_GET['category'])) {
-                    $currentCategory = null;
-                    foreach ($categories as $cat) {
-                        if ($cat['slug'] === $_GET['category']) {
-                            $currentCategory = $cat;
-                            break;
-                        }
-                    }
-                ?>
-                    <a href="<?php echo BASE_URL; ?>/posts" class="tg-breadcrumb-item">Блог</a>
-                    <span class="tg-breadcrumb-sep">/</span>
-                    <span class="tg-breadcrumb-item tg-active">
-                        <?php echo html($currentCategory['name'] ?? $_GET['category']); ?>
-                    </span>
-                <?php } else { ?>
-                    <span class="tg-breadcrumb-item tg-active">Блог</span>
-                <?php } ?>
-            </nav>
-        </div>
         
         <div class="tg-page-header tg-mb-4">
             <h1 class="tg-page-title">Блог</h1>

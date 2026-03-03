@@ -22,8 +22,12 @@ class Index extends SearchAction {
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             
             if ($page < 1) $page = 1;
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Поиск', BASE_URL . '/search');
             
             if (empty($query)) {
+                $this->setPageTitle('Поиск по сайту');
+                
                 $popularQueries = $this->searchModel->getPopularSearchQueries(10);
                 $suggestedSearches = $this->searchModel->getSuggestedSearches(6);
                 
@@ -39,6 +43,12 @@ class Index extends SearchAction {
                 ]);
                 return;
             }
+            
+            $this->clearBreadcrumbs();
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Поиск', BASE_URL . '/search');
+            $this->addBreadcrumb('Результаты поиска: "' . htmlspecialchars($query) . '"');
+            $this->setPageTitle('Поиск: ' . htmlspecialchars($query));
             
             $this->searchModel->saveSearchQuery($query);
             $results = $this->searchModel->searchAll($query, $type, $page);
@@ -57,7 +67,10 @@ class Index extends SearchAction {
             ]);
             
         } catch (\Exception $e) {
-            error_log('Search error: ' . $e->getMessage());
+            $this->clearBreadcrumbs();
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Поиск', BASE_URL . '/search');
+            $this->setPageTitle('Ошибка поиска');
             
             $this->render('front/search/index', [
                 'error' => 'Произошла ошибка при выполнении поиска. Пожалуйста, попробуйте позже.',

@@ -66,9 +66,7 @@ abstract class PostAction {
         $this->postBlockManager = new \PostBlockManager($db);
         $this->breadcrumbs = new \BreadcrumbsManager($db);
         $this->pageTitle = '';
-        if (class_exists('\BreadcrumbsHelper')) {
-            \BreadcrumbsHelper::setManager($this->breadcrumbs);
-        }
+        \BreadcrumbsHelper::setManager($this->breadcrumbs);
     }
     
     /**

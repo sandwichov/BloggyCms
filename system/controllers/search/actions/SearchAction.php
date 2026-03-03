@@ -23,6 +23,12 @@ abstract class SearchAction {
     /** @var \SearchModel Модель для работы с поиском и историей запросов */
     protected $searchModel;
     
+    /** @var \BreadcrumbsManager Менеджер для работы с хлебными крошками */
+    protected $breadcrumbs;
+    
+    /** @var string Заголовок страницы */
+    protected $pageTitle;
+    
     /**
      * Конструктор класса действия
      * Инициализирует подключение к БД, параметры и модель поиска
@@ -33,9 +39,9 @@ abstract class SearchAction {
     public function __construct($db, $params = []) {
         $this->db = $db;
         $this->params = $params;
-        
-        // Инициализация модели для работы с поиском
         $this->searchModel = new \SearchModel($db);
+        $this->breadcrumbs = new \BreadcrumbsManager($db);
+        $this->pageTitle = '';
     }
     
     /**
@@ -59,6 +65,51 @@ abstract class SearchAction {
     abstract public function execute();
     
     /**
+     * Добавляет элемент в хлебные крошки
+     * 
+     * @param string $title Название элемента
+     * @param string|null $url URL элемента (null для текущего элемента)
+     * @return self
+     */
+    protected function addBreadcrumb($title, $url = null) {
+        $this->breadcrumbs->add($title, $url);
+        return $this;
+    }
+    
+    /**
+     * Добавляет элемент в начало хлебных крошек
+     * 
+     * @param string $title Название элемента
+     * @param string|null $url URL элемента
+     * @return self
+     */
+    protected function prependBreadcrumb($title, $url = null) {
+        $this->breadcrumbs->prepend($title, $url);
+        return $this;
+    }
+    
+    /**
+     * Очищает все хлебные крошки
+     * 
+     * @return self
+     */
+    protected function clearBreadcrumbs() {
+        $this->breadcrumbs->clear();
+        return $this;
+    }
+    
+    /**
+     * Устанавливает заголовок страницы
+     * 
+     * @param string $title Заголовок
+     * @return self
+     */
+    protected function setPageTitle($title) {
+        $this->pageTitle = $title;
+        return $this;
+    }
+    
+    /**
      * Рендерит шаблон с переданными данными
      * Использует контроллер для рендеринга, если он установлен
      * 
@@ -68,11 +119,19 @@ abstract class SearchAction {
      * @return void
      */
     protected function render($template, $data = []) {
-        if ($this->controller) {
-            $this->controller->render($template, $data);
-        } else {
+        if (!$this->controller) {
             throw new \Exception('Controller not set for Action');
         }
+        
+        if (!isset($data['breadcrumbs'])) {
+            $data['breadcrumbs'] = $this->breadcrumbs;
+        }
+        
+        if (!isset($data['title']) && $this->pageTitle) {
+            $data['title'] = $this->pageTitle;
+        }
+        
+        $this->controller->render($template, $data);
     }
     
     /**
@@ -100,5 +159,14 @@ abstract class SearchAction {
      */
     protected function checkAuth() {
         return isset($_SESSION['user_id']);
+    }
+    
+    /**
+     * Возвращает менеджер хлебных крошек
+     * 
+     * @return \BreadcrumbsManager
+     */
+    protected function getBreadcrumbs() {
+        return $this->breadcrumbs;
     }
 }

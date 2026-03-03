@@ -12,21 +12,6 @@ $tagPrefix = SettingsHelper::get('controller_tags', 'tag_prefix', '#');
 
 <div class="tg-tag-page">
     <div class="tg-container">
-        <div class="tg-breadcrumbs tg-mb-4">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <a href="<?php echo BASE_URL; ?>/tags" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'tags', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Теги
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <span class="tg-breadcrumb-item tg-active"><?php echo html($tag['name']); ?></span>
-            </nav>
-        </div>
         
         <div class="tg-tag-header tg-mb-4">
             <div class="tg-tag-header-left">

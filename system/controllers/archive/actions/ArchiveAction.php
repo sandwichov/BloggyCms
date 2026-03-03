@@ -55,6 +55,7 @@ abstract class ArchiveAction {
         $this->postModel = new \PostModel($db);
         $this->breadcrumbs = new \BreadcrumbsManager($db);
         $this->pageTitle = '';
+        \BreadcrumbsHelper::setManager($this->breadcrumbs);
     }
     
     /**

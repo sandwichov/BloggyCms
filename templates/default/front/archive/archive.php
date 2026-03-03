@@ -13,17 +13,6 @@ $monthNames = [
 <div class="tg-archive-page">
     <div class="tg-container">
         
-        <div class="tg-breadcrumbs tg-mb-4">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <span class="tg-breadcrumb-item tg-active">Архив</span>
-            </nav>
-        </div>
-        
         <div class="tg-archive-header tg-mb-4">
             <div class="tg-archive-header-left">
                 <div class="tg-archive-icon">

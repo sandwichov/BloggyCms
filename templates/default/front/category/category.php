@@ -10,22 +10,6 @@ $customFields = $fieldModel->getActiveByEntityType('post');
 <div class="tg-category-page">
     <div class="tg-container">
         
-        <div class="tg-breadcrumbs tg-mb-4">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <a href="<?php echo BASE_URL; ?>/categories" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'folders', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Категории
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <span class="tg-breadcrumb-item tg-active"><?php echo html($category['name']); ?></span>
-            </nav>
-        </div>
-        
         <div class="tg-category-header tg-mb-4">
             <div class="tg-category-header-left">
                 <div class="tg-category-icon-large">

@@ -55,6 +55,7 @@ abstract class CategoryAction {
         $this->categoryModel = new \CategoryModel($db);
         $this->breadcrumbs = new \BreadcrumbsManager($db);
         $this->pageTitle = '';
+        \BreadcrumbsHelper::setManager($this->breadcrumbs);
     }
     
     /**
