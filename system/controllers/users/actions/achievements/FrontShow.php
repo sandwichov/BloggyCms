@@ -21,40 +21,35 @@ class FrontShow extends AdminAchievementAction {
      */
     public function execute() {
         try {
-            // Получение ID ачивки из параметров
             $id = $this->params['id'] ?? null;
             
-            // Если ID не указан - редирект на список ачивок
             if (!$id) {
                 $this->redirect(BASE_URL . '/achievements');
                 return;
             }
             
-            // Получение информации об ачивке
             $achievement = $this->userModel->getAchievementById($id);
             
-            // Если ачивка не найдена или не активна - 404
             if (!$achievement || !$achievement['is_active']) {
                 $this->render('front/404', [], 404);
                 return;
             }
             
-            // Обогащение данных ачивки
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Участники', BASE_URL . '/users');
+            $this->addBreadcrumb('Ачивки', BASE_URL . '/users/achievements');
+            $this->addBreadcrumb($achievement['name']);
+            $this->setPageTitle($achievement['name'] . ' — Ачивка');
+            
             $this->enrichAchievementData($achievement, $id);
             
-            // Получение пользователей с этой ачивкой (с пагинацией)
             $usersData = $this->getAchievementUsers($id);
-            
-            // Проверка, имеет ли текущий пользователь эту ачивку
             $userHasAchievement = $this->checkUserHasAchievement($id);
             
-            // Отображение страницы с деталями ачивки
             $this->renderAchievementPage($achievement, $usersData, $userHasAchievement);
             
         } catch (\Exception $e) {
-            // Логирование и обработка ошибок
-            error_log("Ошибка при загрузке ачивки: " . $e->getMessage());
-            \Notification::error('Ошибка при загрузке информации о достижении');
+            \Notification::error('Ошибка при загрузке информации об ачивке');
             $this->redirect(BASE_URL . '/achievements');
         }
     }
@@ -67,16 +62,11 @@ class FrontShow extends AdminAchievementAction {
      * @return void
      */
     private function enrichAchievementData(&$achievement, $id) {
-        // Получение условий ачивки
+
         $achievement['conditions'] = $this->userModel->getAchievementConditions($id);
-        
-        // Форматирование условий для отображения
         $achievement['formatted_conditions'] = $this->userModel->formatConditions($achievement['conditions']);
-        
-        // Получение количества пользователей с ачивкой
         $achievement['unlocked_count'] = $this->userModel->getAchievementUnlockedCount($id);
         
-        // Расчет процента пользователей с ачивкой
         $totalUsers = $this->userModel->getTotalUsersCount();
         if ($totalUsers > 0) {
             $achievement['percent'] = round(($achievement['unlocked_count'] / $totalUsers) * 100, 1);
@@ -132,14 +122,7 @@ class FrontShow extends AdminAchievementAction {
                 'total_pages' => $usersData['total_pages']
             ],
             'userHasAchievement' => $userHasAchievement,
-            'pageTitle' => $achievement['name'] . ' - Достижения',
-            'title' => $achievement['name'],
-            'breadcrumbs' => [
-                ['url' => BASE_URL . '/', 'title' => 'Главная'],
-                ['url' => BASE_URL . '/users', 'title' => 'Участники'],
-                ['url' => BASE_URL . '/achievements', 'title' => 'Достижения'],
-                ['title' => $achievement['name']]
-            ]
+            'pageTitle' => $achievement['name'] . ' - Ачивки'
         ]);
     }
 }

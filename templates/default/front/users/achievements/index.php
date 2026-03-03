@@ -8,24 +8,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 
 <div class="tg-page">
     <div class="tg-container">
-        <div class="tg-breadcrumbs tg-mb-4">
-            <nav class="tg-breadcrumbs-nav">
-                <a href="<?php echo BASE_URL; ?>/" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'house', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Главная
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <a href="<?php echo BASE_URL; ?>/users" class="tg-breadcrumb-item">
-                    <?php echo bloggy_icon('bs', 'people', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Участники
-                </a>
-                <span class="tg-breadcrumb-sep">/</span>
-                <span class="tg-breadcrumb-item tg-active">
-                    <?php echo bloggy_icon('bs', 'trophy', '14', 'currentColor', 'tg-mr-1'); ?>
-                    Достижения
-                </span>
-            </nav>
-        </div>
 
         <div class="tg-card tg-mb-4">
             <div class="tg-card-body">

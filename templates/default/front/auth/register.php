@@ -17,19 +17,19 @@ $errorMessage = $error ?? '';
                     <?php echo bloggy_icon('bs', 'person-x', '48', 'currentColor'); ?>
                 </div>
                 
-                <h2 class="tg-title tg-mb-2">Registration is closed</h2>
+                <h2 class="tg-title tg-mb-2">Регистрация закрыта</h2>
                 
                 <?php if ($errorMessage) { ?>
                 <p class="tg-text-muted tg-mb-4"><?php echo htmlspecialchars($errorMessage); ?></p>
                 <?php } else { ?>
-                <p class="tg-text-muted tg-mb-4">New user registration is temporarily unavailable</p>
+                <p class="tg-text-muted tg-mb-4">Регистрация новых пользователей временно недоступна</p>
                 <?php } ?>
                 
                 <div class="tg-divider tg-mb-4"></div>
                 
                 <a href="<?php echo BASE_URL; ?>/login" class="tg-btn tg-btn-primary">
                     <?php echo bloggy_icon('bs', 'box-arrow-in-right', '16', 'currentColor', 'tg-mr-1'); ?>
-                    Sign in
+                    Войти
                 </a>
             </div>
         </div>
@@ -42,26 +42,26 @@ $errorMessage = $error ?? '';
         <div class="tg-container tg-container-sm">
             
             <div class="tg-page-header">
-                <h1 class="tg-page-title">Create account</h1>
-                <p class="tg-page-subtitle">Join our community</p>
+                <h1 class="tg-page-title">Создать аккаунт</h1>
+                <p class="tg-page-subtitle">Присоединяйтесь к нашему сообществу</p>
             </div>
             
             <div class="tg-benefits tg-mb-4">
                 <div class="tg-benefit-item">
                     <?php echo bloggy_icon('bs', 'chat-dots', '16', 'var(--tg-primary)'); ?>
-                    <span>Comment</span>
+                    <span>Комментировать</span>
                 </div>
                 <div class="tg-benefit-item">
                     <?php echo bloggy_icon('bs', 'person-badge', '16', 'var(--tg-primary)'); ?>
-                    <span>Profile</span>
+                    <span>Профиль</span>
                 </div>
                 <div class="tg-benefit-item">
                     <?php echo bloggy_icon('bs', 'download', '16', 'var(--tg-primary)'); ?>
-                    <span>Downloads</span>
+                    <span>Загрузки</span>
                 </div>
                 <div class="tg-benefit-item">
                     <?php echo bloggy_icon('bs', 'trophy', '16', 'var(--tg-primary)'); ?>
-                    <span>Achievements</span>
+                    <span>Достижения</span>
                 </div>
             </div>
             
@@ -74,7 +74,7 @@ $errorMessage = $error ?? '';
                             <?php echo bloggy_icon('bs', 'exclamation-triangle', '18', 'currentColor'); ?>
                         </div>
                         <div class="tg-alert-content">
-                            <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
+                            <strong>Ошибка:</strong> <?php echo htmlspecialchars($error); ?>
                         </div>
                     </div>
                     <?php } ?>
@@ -84,7 +84,7 @@ $errorMessage = $error ?? '';
                         
                         <div class="tg-field">
                             <label for="username" class="tg-label">
-                                Username <span class="tg-text-muted">*</span>
+                                Имя пользователя <span class="tg-text-muted">*</span>
                                 <span class="tg-field-status" id="username-status"></span>
                             </label>
                             <div class="tg-input-wrapper">
@@ -95,34 +95,34 @@ $errorMessage = $error ?? '';
                                     id="username"
                                     name="username" 
                                     class="tg-input" 
-                                    placeholder="johndoe" 
+                                    placeholder="ivanov" 
                                     required 
                                     value="<?php echo htmlspecialchars($username ?? ''); ?>" 
                                     minlength="3"
                                     maxlength="30"
                                     pattern="[a-zA-Z0-9_]+"
-                                    title="Only letters, numbers and underscore">
+                                    title="Только буквы, цифры и знак подчеркивания">
                             </div>
                             <div class="tg-field-hint">
-                                3-30 characters, letters, numbers and _
+                                3-30 символов, буквы, цифры и _
                             </div>
                         </div>
                         
                         <div class="tg-field">
-                            <label for="display_name" class="tg-label">Display name</label>
+                            <label for="display_name" class="tg-label">Отображаемое имя</label>
                             <div class="tg-input-wrapper">
                                 <span class="tg-input-icon">
-                                    <?php echo bloggy_icon('bs', 'badge', '16', 'currentColor'); ?>
+                                    <?php echo bloggy_icon('bs', 'person-badge', '16', 'currentColor'); ?>
                                 </span>
                                 <input type="text" 
                                     id="display_name"
                                     name="display_name" 
                                     class="tg-input" 
-                                    placeholder="John Doe"
+                                    placeholder="Иван Иванов"
                                     value="<?php echo htmlspecialchars($display_name ?? ''); ?>">
                             </div>
                             <div class="tg-field-hint">
-                                If empty, username will be used
+                                Если не указано, будет использовано имя пользователя
                             </div>
                         </div>
                         
@@ -139,7 +139,7 @@ $errorMessage = $error ?? '';
                                     id="email"
                                     name="email" 
                                     class="tg-input" 
-                                    placeholder="your@email.com" 
+                                    placeholder="ваш@email.ru" 
                                     required 
                                     value="<?php echo htmlspecialchars($email ?? ''); ?>">
                             </div>
@@ -147,7 +147,7 @@ $errorMessage = $error ?? '';
                         
                         <div class="tg-field">
                             <label for="password" class="tg-label">
-                                Password <span class="tg-text-muted">*</span>
+                                Пароль <span class="tg-text-muted">*</span>
                                 <span class="tg-field-status" id="password-strength"></span>
                             </label>
                             <div class="tg-input-wrapper">
@@ -168,14 +168,14 @@ $errorMessage = $error ?? '';
                             <div class="tg-field-requirements tg-mt-2">
                                 <div class="tg-requirement" id="req-length">
                                     <?php echo bloggy_icon('bs', 'dash-circle', '12', 'var(--tg-text-secondary)', 'tg-mr-1'); ?>
-                                    At least 6 characters
+                                    Минимум 6 символов
                                 </div>
                             </div>
                         </div>
                         
                         <div class="tg-field">
                             <label for="password_confirm" class="tg-label">
-                                Confirm password <span class="tg-text-muted">*</span>
+                                Подтверждение пароля <span class="tg-text-muted">*</span>
                                 <span class="tg-field-status" id="password-match"></span>
                             </label>
                             <div class="tg-input-wrapper">
@@ -199,17 +199,17 @@ $errorMessage = $error ?? '';
                                 <input type="checkbox" name="terms" id="terms" required>
                                 <span class="tg-checkbox-mark"></span>
                                 <span class="tg-checkbox-label">
-                                    I agree to the 
-                                    <a href="<?php echo BASE_URL; ?>/terms" target="_blank" class="tg-link">Terms of Service</a>
-                                    and 
-                                    <a href="<?php echo BASE_URL; ?>/privacy" target="_blank" class="tg-link">Privacy Policy</a>
+                                    Я принимаю 
+                                    <a href="<?php echo BASE_URL; ?>/terms" target="_blank" class="tg-link">Условия использования</a>
+                                    и 
+                                    <a href="<?php echo BASE_URL; ?>/privacy" target="_blank" class="tg-link">Политику конфиденциальности</a>
                                 </span>
                             </label>
                         </div>
                         
                         <button type="submit" class="tg-btn tg-btn-primary tg-btn-block" id="submit-btn">
                             <?php echo bloggy_icon('bs', 'person-plus', '16', 'currentColor', 'tg-mr-1'); ?>
-                            Create account
+                            Создать аккаунт
                         </button>
                     </form>
                     
@@ -217,21 +217,21 @@ $errorMessage = $error ?? '';
                         <div class="tg-login-links">
                             <a href="<?php echo BASE_URL; ?>/login" class="tg-link">
                                 <?php echo bloggy_icon('bs', 'box-arrow-in-right', '14', 'currentColor', 'tg-mr-1'); ?>
-                                Already have an account?
+                                Уже есть аккаунт?
                             </a>
                             
                             <span class="tg-link-sep">•</span>
                             
                             <a href="<?php echo BASE_URL; ?>/forgot-password" class="tg-link">
                                 <?php echo bloggy_icon('bs', 'key', '14', 'currentColor', 'tg-mr-1'); ?>
-                                Forgot password?
+                                Забыли пароль?
                             </a>
                         </div>
                         
                         <div class="tg-login-security">
                             <small class="tg-text-muted">
                                 <?php echo bloggy_icon('bs', 'shield-check', '12', 'currentColor', 'tg-mr-1'); ?>
-                                Your data is secure
+                                Ваши данные в безопасности
                             </small>
                         </div>
                     </div>

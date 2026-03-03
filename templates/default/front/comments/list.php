@@ -225,7 +225,7 @@ $canComment = AuthHelper::canAddComment();
             
             <?php if (!$canComment && !Auth::isLoggedIn()) { ?>
                 <div class="tg-empty-action">
-                    <a href="<?php echo BASE_URL; ?>/auth/login" class="tg-btn tg-btn-primary">
+                    <a href="<?php echo BASE_URL; ?>/login" class="tg-btn tg-btn-primary">
                         <?php echo bloggy_icon('bs', 'box-arrow-in-right', '16', 'currentColor', 'tg-mr-1'); ?>
                         Войдите, чтобы комментировать
                     </a>

@@ -21,30 +21,27 @@ class FrontIndex extends UserAction {
      */
     public function execute() {
         try {
-            // Получение активных пользователей через модель
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Все участники');
+            $this->setPageTitle('Все участники');
+            
             $users = $this->userModel->getActiveUsers();
             
-            // Получение менеджера активности пользователей
             $activityManager = \UserActivityManager::getInstance($this->db);
             
-            // Обогащение пользователей дополнительной информацией
             foreach ($users as &$user) {
                 $this->enrichUserData($user, $activityManager);
             }
             
-            // Получение активных пользовательских полей
             $customFields = $this->fieldModel->getActiveByEntityType('user');
             
-            // Отображение страницы со списком участников
             $this->render('front/users/users', [
                 'users' => $users,
                 'customFields' => $customFields,
-                'title' => 'Все участники',
                 'total_users' => count($users)
             ]);
             
         } catch (\Exception $e) {
-            // Обработка ошибок
             \Notification::error('Ошибка при загрузке списка пользователей: ' . $e->getMessage());
             $this->redirect(BASE_URL);
         }
@@ -58,18 +55,11 @@ class FrontIndex extends UserAction {
      * @return void
      */
     private function enrichUserData(&$user, $activityManager) {
-        // Получение статистики пользователя
         $user['posts_count'] = $this->userModel->getUserStatValue($user['id'], 'posts_count');
         $user['comments_count'] = $this->userModel->getUserStatValue($user['id'], 'comments_count');
         $user['registration_days'] = $this->userModel->getUserStatValue($user['id'], 'registration_days');
-        
-        // Получение онлайн-статуса и информации о последней активности
         $this->enrichUserActivity($user, $activityManager);
-        
-        // Получение групп пользователя
         $user['groups'] = $this->userModel->getUserGroupsWithDetails($user['id']);
-        
-        // Получение достижений пользователя
         $user['achievements'] = $this->userModel->getUserAchievements($user['id']);
         $user['unlocked_achievements_count'] = $this->countUnlockedAchievements($user['achievements']);
     }

@@ -8,8 +8,8 @@
     <div class="tg-container tg-container-sm">
         
         <div class="tg-login-header">
-            <h1 class="tg-login-title">Sign in</h1>
-            <p class="tg-login-subtitle">Welcome back! Please enter your details</p>
+            <h1 class="tg-login-title">Вход в систему</h1>
+            <p class="tg-login-subtitle">С возвращением! Пожалуйста, введите свои данные</p>
         </div>
         
         <div class="tg-login-form">
@@ -20,9 +20,9 @@
                     <?php echo bloggy_icon('bs', 'exclamation-triangle', '18', 'currentColor'); ?>
                 </div>
                 <div class="tg-alert-content">
-                    <strong>Login attempt:</strong> <?php echo $currentAttempts; ?> of <?php echo $maxAttempts; ?>
+                    <strong>Попытка входа:</strong> <?php echo $currentAttempts; ?> из <?php echo $maxAttempts; ?>
                     <?php if ($currentAttempts >= $maxAttempts - 1) { ?>
-                    <div class="tg-alert-small">Next failed attempt will temporarily lock your account</div>
+                    <div class="tg-alert-small">Следующая неудачная попытка временно заблокирует ваш аккаунт</div>
                     <?php } ?>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                                id="email"
                                name="email" 
                                class="tg-input" 
-                               placeholder="your@email.com" 
+                               placeholder="ваш@email.ru" 
                                required 
                                value="<?php echo htmlspecialchars($email ?? ''); ?>" 
                                autofocus>
@@ -49,7 +49,7 @@
                 </div>
                 
                 <div class="tg-field">
-                    <label for="password" class="tg-label">Password</label>
+                    <label for="password" class="tg-label">Пароль</label>
                     <div class="tg-input-wrapper">
                         <span class="tg-input-icon">
                             <?php echo bloggy_icon('bs', 'lock', '16', 'currentColor'); ?>
@@ -67,13 +67,13 @@
                     <label class="tg-checkbox">
                         <input type="checkbox" name="remember_me" id="remember_me">
                         <span class="tg-checkbox-mark"></span>
-                        <span class="tg-checkbox-label">Remember me</span>
+                        <span class="tg-checkbox-label">Запомнить меня</span>
                     </label>
                 </div>
                 
                 <button type="submit" class="tg-btn tg-btn-primary tg-btn-block">
                     <?php echo bloggy_icon('bs', 'box-arrow-in-right', '16', 'currentColor', 'tg-mr-1'); ?>
-                    Sign in
+                    Войти
                 </button>
             </form>
             
@@ -81,14 +81,14 @@
                 <div class="tg-login-links">
                     <a href="<?php echo BASE_URL; ?>/register" class="tg-link">
                         <?php echo bloggy_icon('bs', 'person-plus', '14', 'currentColor', 'tg-mr-1'); ?>
-                        Create account
+                        Создать аккаунт
                     </a>
                     
                     <?php if (!$disable_restore) { ?>
                     <span class="tg-link-sep">•</span>
                     <a href="<?php echo BASE_URL; ?>/forgot-password" class="tg-link">
                         <?php echo bloggy_icon('bs', 'key', '14', 'currentColor', 'tg-mr-1'); ?>
-                        Forgot password?
+                        Забыли пароль?
                     </a>
                     <?php } ?>
                 </div>
@@ -96,7 +96,7 @@
                 <div class="tg-login-security">
                     <small class="tg-text-muted">
                         <?php echo bloggy_icon('bs', 'shield-check', '12', 'currentColor', 'tg-mr-1'); ?>
-                        Secure login
+                        Безопасный вход
                     </small>
                 </div>
             </div>

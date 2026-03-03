@@ -1,59 +1,72 @@
 <?php
 
+namespace pages\actions;
+
 /**
- * Контроллер для отображения страниц на фронтенде
+ * Действие отображения страницы на фронтенде
+ * Загружает страницу, её блоки и пользовательские поля, подготавливает контент для отображения
  * 
- * @package Controllers
- * @extends Controller
+ * @package pages\actions
+ * @extends PageAction
  */
-class PageController extends Controller {
-    
-    /** @var PageModel Модель для работы со страницами */
-    private $pageModel;
-    
-    /** @var PostBlockModel Модель для работы с блоками контента */
-    private $postBlockModel;
-    
-    /** @var PostBlockManager Менеджер для обработки блоков и управления ассетами */
-    private $postBlockManager;
+class Show extends PageAction {
     
     /**
-     * Конструктор контроллера
-     * Инициализирует модели и менеджер для работы со страницами и блоками
+     * Метод выполнения отображения страницы
      * 
-     * @param object $db Подключение к базе данных
-     */
-    public function __construct($db) {
-        parent::__construct($db);
-        $this->pageModel = new PageModel($db);
-        $this->postBlockModel = new PostBlockModel($db);
-        $this->postBlockManager = new PostBlockManager($db);
-    }
-    
-    /**
-     * Отображает страницу по её URL-адресу (slug)
-     * Загружает страницу, её блоки и пользовательские поля, подготавливает контент для отображения
-     * 
-     * @param string|null $slug URL-адрес страницы
      * @return void
      */
-    public function showAction($slug = null) {
-        $action = new \pages\actions\Show($this->db, ['slug' => $slug]);
-        $action->setController($this);
-        return $action->execute();
+    public function execute() {
+        $slug = $this->params['slug'] ?? null;
+
+        if (!$slug) {
+            \Notification::error('Slug страницы не указан');
+            $this->redirect(BASE_URL);
+            return;
+        }
+        
+        try {
+            $page = $this->pageModel->getBySlug($slug);
+            
+            if (!$page) {
+                \Notification::error('Страница не найдена');
+                $this->redirect(BASE_URL);
+                return;
+            }
+            
+            $this->addBreadcrumb('Главная', BASE_URL);
+            
+            if (!empty($page['parent_id'])) {
+                $this->addParentPageBreadcrumbs($page['parent_id']);
+            }
+            
+            $this->addBreadcrumb($page['title']);
+            $this->setPageTitle($page['title']);
+            
+            $processedBlocks = $this->preparePageBlocks($page['id']);
+            
+            $customFields = $this->prepareCustomFields('page', $page['id']);
+            
+            $this->render('front/pages/page', [
+                'page' => $page,
+                'fieldValues' => $customFields,
+                'blocks' => $processedBlocks
+            ]);
+            
+        } catch (\Exception $e) {
+            \Notification::error('Ошибка при загрузке страницы');
+            $this->redirect(BASE_URL);
+        }
     }
     
     /**
      * Подготавливает блоки страницы для отображения
-     * Загружает ассеты, обрабатывает контент и объединяет настройки
      * 
      * @param int $pageId ID страницы
      * @return array Массив обработанных блоков
      */
     private function preparePageBlocks($pageId) {
-
         $blocks = $this->postBlockModel->getByPage($pageId);
-        
         $this->loadBlockAssets($blocks);
         
         $processedBlocks = [];
@@ -83,17 +96,16 @@ class PageController extends Controller {
     
     /**
      * Обрабатывает отдельный блок страницы
-     * Декодирует JSON-данные, объединяет настройки и обрабатывает контент
      * 
      * @param array $block Данные блока из базы данных
      * @return array Обработанный блок готовый к отображению
      */
     private function processSingleBlock($block) {
+
         $content = $this->decodeJsonIfNeeded($block['content']);
         $settings = $this->decodeJsonIfNeeded($block['settings'], true);
         $dbSettings = $this->postBlockModel->getBlockSettings($block['type']);
         $mergedSettings = array_merge($dbSettings, $settings);
-        
         $processedContent = $this->postBlockManager->processPostBlockContent(
             $content, 
             $block['type'], 
@@ -147,14 +159,23 @@ class PageController extends Controller {
     }
     
     /**
-     * Обрабатывает ошибки при загрузке страницы
+     * Рекурсивно добавляет хлебные крошки для родительских страниц
      * 
-     * @param string $message Сообщение об ошибке
-     * @param string $redirectUrl URL для перенаправления
+     * @param int $parentId ID родительской страницы
      * @return void
      */
-    private function handleError($message, $redirectUrl) {
-        \Notification::error($message);
-        $this->redirect($redirectUrl);
+    private function addParentPageBreadcrumbs($parentId) {
+        $parentPage = $this->pageModel->getById($parentId);
+        
+        if ($parentPage) {
+            if (!empty($parentPage['parent_id'])) {
+                $this->addParentPageBreadcrumbs($parentPage['parent_id']);
+            }
+            
+            $this->addBreadcrumb(
+                $parentPage['title'],
+                BASE_URL . '/page/' . $parentPage['slug']
+            );
+        }
     }
 }

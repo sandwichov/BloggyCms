@@ -30,6 +30,12 @@ abstract class UserAction {
     /** @var \PostModel Модель для работы с постами */
     protected $postModel;
     
+    /** @var \BreadcrumbsManager Менеджер для работы с хлебными крошками */
+    protected $breadcrumbs;
+    
+    /** @var string Заголовок страницы */
+    protected $pageTitle;
+    
     /**
      * Конструктор класса действия
      * Инициализирует подключение к БД, параметры и все необходимые модели
@@ -40,11 +46,13 @@ abstract class UserAction {
     public function __construct($db, $params = []) {
         $this->db = $db;
         $this->params = $params;
-        
-        // Инициализация моделей для работы с данными
         $this->userModel = new \UserModel($db);
         $this->fieldModel = new \FieldModel($db);
         $this->postModel = new \PostModel($db);
+        $this->breadcrumbs = new \BreadcrumbsManager($db);
+        $this->pageTitle = '';
+        
+        \BreadcrumbsHelper::setManager($this->breadcrumbs);
     }
     
     /**
@@ -68,6 +76,51 @@ abstract class UserAction {
     abstract public function execute();
     
     /**
+     * Добавляет элемент в хлебные крошки
+     * 
+     * @param string $title Название элемента
+     * @param string|null $url URL элемента (null для текущего элемента)
+     * @return self
+     */
+    protected function addBreadcrumb($title, $url = null) {
+        $this->breadcrumbs->add($title, $url);
+        return $this;
+    }
+    
+    /**
+     * Добавляет элемент в начало хлебных крошек
+     * 
+     * @param string $title Название элемента
+     * @param string|null $url URL элемента
+     * @return self
+     */
+    protected function prependBreadcrumb($title, $url = null) {
+        $this->breadcrumbs->prepend($title, $url);
+        return $this;
+    }
+    
+    /**
+     * Очищает все хлебные крошки
+     * 
+     * @return self
+     */
+    protected function clearBreadcrumbs() {
+        $this->breadcrumbs->clear();
+        return $this;
+    }
+    
+    /**
+     * Устанавливает заголовок страницы
+     * 
+     * @param string $title Заголовок
+     * @return self
+     */
+    protected function setPageTitle($title) {
+        $this->pageTitle = $title;
+        return $this;
+    }
+    
+    /**
      * Рендерит шаблон с переданными данными
      * Использует контроллер для рендеринга, если он установлен
      * 
@@ -77,11 +130,19 @@ abstract class UserAction {
      * @return void
      */
     protected function render($template, $data = []) {
-        if ($this->controller) {
-            $this->controller->render($template, $data);
-        } else {
+        if (!$this->controller) {
             throw new \Exception('Controller not set for Action');
         }
+        
+        if (!isset($data['breadcrumbs'])) {
+            $data['breadcrumbs'] = $this->breadcrumbs;
+        }
+        
+        if (!isset($data['title']) && $this->pageTitle) {
+            $data['title'] = $this->pageTitle;
+        }
+        
+        $this->controller->render($template, $data);
     }
     
     /**
@@ -118,5 +179,14 @@ abstract class UserAction {
      */
     protected function getCurrentUserId() {
         return $_SESSION['user_id'] ?? null;
+    }
+    
+    /**
+     * Возвращает менеджер хлебных крошек
+     * 
+     * @return \BreadcrumbsManager
+     */
+    protected function getBreadcrumbs() {
+        return $this->breadcrumbs;
     }
 }

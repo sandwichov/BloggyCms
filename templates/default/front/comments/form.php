@@ -29,11 +29,11 @@ if (!$canComment && !$isLoggedIn): ?>
             <div>
                 <strong>Комментарии доступны только авторизованным пользователям</strong>
                 <p class="mb-0 mt-2">
-                    <a href="<?= BASE_URL ?>/auth/login" class="btn btn-primary btn-sm me-2">
-                        <i class="bi bi-box-arrow-in-right me-1"></i>Войти
+                    <a href="<?= BASE_URL ?>/login" class="btn btn-primary btn-sm me-2">
+                        <?php echo bloggy_icon('bs', 'box-arrow-in-right', '16', 'currentColor', 'tg-mr-1'); ?> Войти
                     </a>
-                    <a href="<?= BASE_URL ?>/auth/register" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-person-plus me-1"></i>Зарегистрироваться
+                    <a href="<?= BASE_URL ?>/register" class="btn btn-outline-primary btn-sm">
+                        <?php echo bloggy_icon('bs', 'person-plus', '14', 'currentColor', 'tg-mr-1'); ?> Зарегистрироваться
                     </a>
                 </p>
             </div>

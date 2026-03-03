@@ -21,41 +21,33 @@ class FrontIndex extends AdminAchievementAction {
      */
     public function execute() {
         try {
-            // Получение всех активных ачивок системы
+            $this->addBreadcrumb('Главная', BASE_URL);
+            $this->addBreadcrumb('Участники', BASE_URL . '/users');
+            $this->addBreadcrumb('Ачивки');
+            $this->setPageTitle('Все ачивки блога');
+            
             $achievements = $this->userModel->getAllAchievements(['active' => true]);
             
-            // Обогащение каждой ачивки дополнительной информацией
             foreach ($achievements as &$achievement) {
                 $this->enrichAchievementData($achievement);
             }
             
-            // Сортировка ачивок: сначала самые редкие (малый процент)
             usort($achievements, function($a, $b) {
                 return $a['percent'] <=> $b['percent'];
             });
             
-            // Получение общей статистики
             $totalAchievements = count($achievements);
             $totalUsers = $this->userModel->getTotalUsersCount();
             $totalUnlockedAchievements = $this->userModel->getTotalUnlockedAchievements();
-            
-            // Получение ачивок текущего пользователя (если авторизован)
             $userAchievements = $this->getUserAchievements();
             
-            // Отображение страницы со списком достижений
             $this->render('front/users/achievements/index', [
                 'achievements' => $achievements,
                 'userAchievements' => $userAchievements,
                 'totalAchievements' => $totalAchievements,
                 'totalUsers' => $totalUsers,
                 'totalUnlockedAchievements' => $totalUnlockedAchievements,
-                'pageTitle' => 'Все достижения системы',
-                'title' => 'Достижения',
-                'breadcrumbs' => [
-                    ['url' => BASE_URL . '/', 'title' => 'Главная'],
-                    ['url' => BASE_URL . '/users', 'title' => 'Участники'],
-                    ['title' => 'Достижения']
-                ]
+                'pageTitle' => 'Все достижения системы'
             ]);
             
         } catch (\Exception $e) {
@@ -71,19 +63,11 @@ class FrontIndex extends AdminAchievementAction {
      * @return void
      */
     private function enrichAchievementData(&$achievement) {
-        // Получение условий ачивки
         $achievement['conditions'] = $this->userModel->getAchievementConditions($achievement['id']);
-        
-        // Получение количества пользователей, получивших ачивку
         $achievement['unlocked_count'] = $this->userModel->getAchievementUnlockedCount($achievement['id']);
-        
-        // Получение первых 5 пользователей для предпросмотра
         $achievement['preview_users'] = $this->userModel->getAchievementUsersPreview($achievement['id'], 5);
-        
-        // Форматирование условий для отображения
         $achievement['formatted_conditions'] = $this->userModel->formatConditions($achievement['conditions']);
         
-        // Расчет процента пользователей с ачивкой
         $totalUsers = $this->userModel->getTotalUsersCount();
         if ($totalUsers > 0) {
             $achievement['percent'] = round(($achievement['unlocked_count'] / $totalUsers) * 100, 1);
