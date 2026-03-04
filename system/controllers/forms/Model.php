@@ -7,7 +7,20 @@
  * 
  * @package models
  */
-class FormModel {
+class FormModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        // Публичные методы (для фронтенда)
+        'getBySlug',
+        'getById',
+        'saveSubmission',
+        'getAvailableTemplates',
+        'getCurrentTheme',
+        'getAllActive',
+        'validateFormStructure'
+    ];
     
     /**
      * @var Database Объект подключения к базе данных

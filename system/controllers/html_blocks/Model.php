@@ -7,7 +7,15 @@
  * 
  * @package models
  */
-class HtmlBlockModel {
+class HtmlBlockModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getBySlug',
+        'getById',
+        'getAll'
+    ];
     
     /**
      * @var Database Объект подключения к базе данных
@@ -96,27 +104,34 @@ class HtmlBlockModel {
         if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
             throw new Exception('Имя может содержать только латинские буквы, цифры и дефисы.');
         }
-    
+
         // Проверка уникальности slug
         if ($this->isSlugExists($data['slug'])) {
             throw new Exception('Имя уже существует.');
         }
-    
+
+        $settingsJson = null;
+        if (isset($data['settings'])) {
+            $settingsJson = json_encode($data['settings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($settingsJson === false) {
+                throw new Exception('Ошибка кодирования настроек: ' . json_last_error_msg());
+            }
+        }
+
         $sql = "INSERT INTO html_blocks (name, slug, content, type_id, settings, css_files, js_files, inline_css, inline_js, template) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $this->db->query($sql, [
+        
+        return $this->db->query($sql, [
             $data['name'],
             $data['slug'],
-            '', // Контент всегда пустой (генерируется динамически)
+            '',
             $data['type_id'] ?? null,
-            isset($data['settings']) ? json_encode($data['settings']) : null,
-            isset($data['css_files']) ? json_encode($data['css_files']) : null,
-            isset($data['js_files']) ? json_encode($data['js_files']) : null,
+            $settingsJson,
+            isset($data['css_files']) ? json_encode($data['css_files'], JSON_UNESCAPED_UNICODE) : null,
+            isset($data['js_files']) ? json_encode($data['js_files'], JSON_UNESCAPED_UNICODE) : null,
             $data['inline_css'] ?? '',
             $data['inline_js'] ?? '',
             $data['template'] ?? 'default'
         ]);
-    
-        return $this->db->lastInsertId();
     }
     
     /**
@@ -135,15 +150,24 @@ class HtmlBlockModel {
             // Использование переданного slug с проверкой уникальности
             $slug = $this->createUniqueSlug($data['slug'], $id);
         }
-    
+
+        $settingsJson = null;
+        if (isset($data['settings'])) {
+            $settingsJson = json_encode($data['settings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($settingsJson === false) {
+                throw new Exception('Ошибка кодирования настроек: ' . json_last_error_msg());
+            }
+        }
+
         $sql = "UPDATE html_blocks SET name = ?, slug = ?, content = '', type_id = ?, settings = ?, css_files = ?, js_files = ?, inline_css = ?, inline_js = ?, template = ? WHERE id = ?";
+        
         return $this->db->query($sql, [
             $data['name'],
             $slug,
             $data['type_id'] ?? null,
-            isset($data['settings']) ? json_encode($data['settings']) : null,
-            isset($data['css_files']) ? json_encode($data['css_files']) : null,
-            isset($data['js_files']) ? json_encode($data['js_files']) : null,
+            $settingsJson,
+            isset($data['css_files']) ? json_encode($data['css_files'], JSON_UNESCAPED_UNICODE) : null,
+            isset($data['js_files']) ? json_encode($data['js_files'], JSON_UNESCAPED_UNICODE) : null,
             $data['inline_css'] ?? '',
             $data['inline_js'] ?? '',
             $data['template'] ?? 'default',

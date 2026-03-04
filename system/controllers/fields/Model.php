@@ -7,7 +7,19 @@
  * 
  * @package models
  */
-class FieldModel {
+class FieldModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getByEntityType',
+        'getActiveByEntityType',
+        'getFieldBySystemName',
+        'getFieldValue',
+        'getFieldTypes',
+        'renderFieldDisplay',
+        'renderFieldList'
+    ];
     
     /**
      * @var Database Объект подключения к базе данных

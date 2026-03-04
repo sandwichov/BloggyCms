@@ -7,7 +7,20 @@
  * 
  * @package Models
  */
-class SearchModel {
+class SearchModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'searchAll',
+        'searchPosts',
+        'searchPages',
+        'searchCategories',
+        'searchTags',
+        'searchUsers',
+        'getSuggestedSearches',
+        'saveSearchQuery'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

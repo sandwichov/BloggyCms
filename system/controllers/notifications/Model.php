@@ -6,7 +6,20 @@
  * 
  * @package Models
  */
-class NotificationModel {
+class NotificationModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getUserNotifications',
+        'getUserNotificationsWithDetails',
+        'getUnreadCount',
+        'getStats',
+        'markAsRead',
+        'markAllAsRead',
+        'delete',
+        'clearRead'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

@@ -1,5 +1,18 @@
 <?php
-class User {
+class User implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getById',
+        'getByUsername',
+        'authenticate',
+        'authenticateByEmail',
+        'getTotalCount',
+        'getActiveUsers',
+        'updatePassword'
+    ];
+
     private $db;
 
     /**

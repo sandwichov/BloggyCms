@@ -7,7 +7,19 @@
  * 
  * @package Models
  */
-class PageModel {
+class PageModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getBySlug',
+        'getById',
+        'getAll',
+        'getBlocks',
+        'getRecent',
+        'search',
+        'getStats'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

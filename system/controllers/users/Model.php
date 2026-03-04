@@ -7,7 +7,31 @@
  * 
  * @package Models
  */
-class UserModel {
+class UserModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'authenticate',
+        'authenticateByEmail',
+        'getById',
+        'getByUsername',
+        'updatePassword',
+        'getActiveUsers',
+        'getTotalCount',
+        'getAdmins',
+        'getUserAchievements',
+        'getUserUnlockedAchievements',
+        'getAchievementById',
+        'getAllAchievements',
+        'getAchievementUsersPreview',
+        'getAchievementUsers',
+        'formatConditions',
+        'getAllGroups',
+        'getGroupById',
+        'getUserGroups',
+        'getUserGroupsWithDetails'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

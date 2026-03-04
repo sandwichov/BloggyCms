@@ -7,7 +7,19 @@
  * 
  * @package models
  */
-class CommentModel {
+class CommentModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getCommentsByPost',
+        'getReplies',
+        'getTotalCommentsByPost',
+        'getCommentWithUserData',
+        'addComment',
+        'updateComment',
+        'deleteComment'
+    ];
     
     /**
      * @var Database Объект подключения к базе данных

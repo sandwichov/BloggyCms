@@ -7,7 +7,20 @@
  * 
  * @package Models
  */
-class TagModel {
+class TagModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getAllPaginated',
+        'getAll',
+        'getFilteredTags',
+        'getById',
+        'getBySlug',
+        'getForPost',
+        'getPostsByTag',
+        'searchByName'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

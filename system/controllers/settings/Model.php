@@ -7,7 +7,13 @@
  * 
  * @package Models
  */
-class SettingsModel {
+class SettingsModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'get'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;

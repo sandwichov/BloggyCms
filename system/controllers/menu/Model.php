@@ -7,7 +7,21 @@
  * 
  * @package models
  */
-class MenuModel {
+class MenuModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getByTemplate', 
+        'getAllByTemplate',
+        'getAllActive',
+        'getActiveById',
+        'getActiveByName',
+        'getAvailableTemplates',
+        'getAllUserGroups',
+        'filterMenuByUserGroups',
+        'shouldShowMenuItem'
+    ];
     
     /**
      * @var Database Объект подключения к базе данных
