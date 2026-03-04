@@ -27,14 +27,27 @@ class Bookmarks extends PostAction {
         }
         
         try {
+            $userId = $_SESSION['user_id'];
+            $username = $_SESSION['username'] ?? '';
+            
+            if (empty($username)) {
+                $user = $this->userModel->getById($userId);
+                $username = $user['username'] ?? '';
+            }
+            
             $this->addBreadcrumb('Главная', BASE_URL);
-            $this->addBreadcrumb('Профиль', BASE_URL . '/profile');
+            
+            if (!empty($username)) {
+                $this->addBreadcrumb('Мой профиль', BASE_URL . '/profile/' . $username);
+            }
+            
             $this->addBreadcrumb('Мои закладки');
             $this->setPageTitle('Мои закладки');
+            
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $page = max(1, $page);
             $perPage = 10;
-            $userId = $_SESSION['user_id'];
+            
             $result = $this->postModel->getUserBookmarks($userId, $page, $perPage);
             
             $this->render('front/posts/bookmarks', [

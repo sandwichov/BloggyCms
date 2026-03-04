@@ -1,147 +1,96 @@
 <?php
 /**
- * Hero Block Template
- */
+* Hero Template
+*/
 
-$imageColSize = $settings['image_column_size'] ?? '6';
-$contentColSize = 12 - (int)$imageColSize;
-$imageColClass = $settings['show_image'] && !empty($settings['image']) ? 'col-md-' . $imageColSize : '';
-$contentColClass = $settings['show_image'] && !empty($settings['image']) ? 'col-md-' . $contentColSize : 'col-12';
-$imagePosition = $settings['image_position'] ?? 'right';
-if ($imagePosition === 'left') {
-    $imageOrderClass = 'order-md-1';
-    $contentOrderClass = 'order-md-2';
-} else {
-    $imageOrderClass = 'order-md-2';
-    $contentOrderClass = 'order-md-1';
+$theme = $settings['theme'] ?? 'light';
+$align = $settings['align'] ?? 'left';
+$hasImage = !empty($settings['image']);
+$customStyles = [];
+if($theme === 'custom') {
+    if(!empty($settings['background_color'])) {
+        $customStyles[] = '--bg-color: ' . html($settings['background_color']);
+    }
+    if(!empty($settings['text_color'])) {
+        $customStyles[] = '--text-color: ' . html($settings['text_color']);
+    }
+}
+if(!empty($settings['accent_color'])) {
+    $customStyles[] = '--accent-color: ' . html($settings['accent_color']);
+    $hex = ltrim($settings['accent_color'], '#');
+    if(strlen($hex) === 6) {
+        $rgb = hexdec(substr($hex, 0, 2)) . ', ' . 
+               hexdec(substr($hex, 2, 2)) . ', ' . 
+               hexdec(substr($hex, 4, 2));
+        $customStyles[] = '--accent-rgb: ' . $rgb;
+    }
 }
 
-$alignSelfClass = ($settings['image_alignment'] ?? 'center') === 'top' ? 'align-items-start' : 'align-items-center';
+$paddingTop = (int)($settings['padding_top'] ?? 80);
+$paddingBottom = (int)($settings['padding_bottom'] ?? 80);
+$customStyles[] = '--padding-top: ' . $paddingTop . 'px';
+$customStyles[] = '--padding-bottom: ' . $paddingBottom . 'px';
+$sectionClass = 'hero-character';
+$sectionClass .= ' theme-' . $theme;
+$sectionClass .= ' align-' . $align;
+if(!empty($settings['custom_css_class'])) {
+    $sectionClass .= ' ' . html($settings['custom_css_class']);
+}
+
+$imageHtml = '';
+if($hasImage) {
+    $imageUrl = BlockImageHelper::getImageUrl($settings['image']);
+    $imageStyle = $settings['image_style'] ?? 'circle';
+    $imageHtml = '<img src="' . $imageUrl . '" class="hero-image ' . $imageStyle . '" alt="">';
+}
+
+$imagePosition = $settings['image_position'] ?? 'right';
+$contentOrder = $imagePosition === 'left' ? 'order-lg-2' : '';
+$imageOrder = $imagePosition === 'left' ? 'order-lg-1' : '';
+$contentColClass = $hasImage ? 'col-lg-6' : 'col-lg-8 mx-auto';
+$imageColClass = $hasImage ? 'col-lg-6' : '';
 
 $buttonsHtml = '';
-if (!empty($settings['buttons'])) {
-    $buttonsHtml .= '<div class="tg-hero-buttons d-flex gap-2 flex-wrap">';
-    foreach ($settings['buttons'] as $btn) {
-        $btnClass = 'btn btn-' . html($btn['type']);
-        if (!empty($btn['size']) && $btn['size'] !== 'md') {
-            $btnClass .= ' btn-' . html($btn['size']);
-        }
-        
-        $iconHtml = '';
-        if (!empty($btn['icon'])) {
-            $iconParts = explode(':', $btn['icon']);
-            $iconSet = $iconParts[0] ?? 'bs';
-            $iconName = $iconParts[1] ?? $btn['icon'];
-            $iconHtml = bloggy_icon($iconSet, $iconName, '20 20', 'currentColor', 'me-1');
-        }
-        
-        $buttonsHtml .= sprintf(
-            '<a href="%s" class="%s">%s%s</a>',
-            html($btn['url']),
-            $btnClass,
-            $iconHtml,
-            html($btn['text'])
-        );
+if(!empty($settings['buttons'])) {
+    $buttonsHtml .= '<div class="buttons">';
+    
+    foreach($settings['buttons'] as $index => $btn) {
+        $btnClass = $index === 0 ? 'primary' : 'secondary';
+        $buttonsHtml .= '<a href="' . html($btn['url']) . '" class="btn ' . $btnClass . '">' . html($btn['text']) . '</a>';
     }
+    
     $buttonsHtml .= '</div>';
-}
-
-$bgStyle = '';
-switch ($settings['background_type'] ?? 'color') {
-    case 'color':
-        $bgStyle = "background-color: " . ($settings['background_color'] ?? 'var(--tg-surface)') . ";";
-        break;
-    case 'gradient':
-        $bgStyle = "background: linear-gradient(" . 
-                   ($settings['gradient_direction'] ?? 'to bottom') . ", " . 
-                   ($settings['gradient_start'] ?? 'var(--tg-surface)') . ", " . 
-                   ($settings['gradient_end'] ?? 'var(--tg-bg)') . ");";
-        break;
-    case 'image':
-        $bgImageUrl = !empty($settings['background_image']) ? BlockImageHelper::getImageUrl($settings['background_image']) : '';
-        if ($bgImageUrl) {
-            $bgStyle = "background-image: url('$bgImageUrl'); background-size: cover; background-position: center;";
-        }
-        break;
-}
-
-$overlayClass = '';
-if (($settings['background_type'] ?? '') === 'image' && !empty($settings['background_overlay']) && $settings['background_overlay'] !== 'none') {
-    $overlayClass = 'tg-hero-overlay tg-overlay-' . html($settings['background_overlay']);
 }
 ?>
 
-<section class="tg-hero pt-<?php echo html($settings['padding_top'] ?? 5); ?> pb-<?php echo html($settings['padding_bottom'] ?? 5); ?> <?php echo html($settings['custom_css_class'] ?? ''); ?>" style="<?php echo $bgStyle; ?>">
-    
-    <?php if ($overlayClass): ?>
-    <div class="<?php echo $overlayClass; ?>"></div>
-    <?php endif; ?>
-    
+<section class="<?php echo $sectionClass; ?>" style="<?php echo implode('; ', $customStyles); ?>">
     <div class="container">
-        <div class="row <?php echo $alignSelfClass; ?>">
+        <div class="row">
             
-            <div class="<?php echo $contentColClass; ?> <?php echo $contentOrderClass; ?>">
-                <div class="tg-hero-content text-<?php echo html($settings['content_alignment'] ?? 'left'); ?>">
-
-                    <?php if (!empty($settings['show_title']) && !empty($settings['title_text'])): ?>
-                        <h1 class="tg-hero-title display-4 fw-bold mb-3" style="color: <?php echo html($settings['title_color'] ?? 'var(--tg-text)'); ?>;">
-                            <?php echo html($settings['title_text']); ?>
-                        </h1>
-                    <?php endif; ?>
-
-                    <?php if (!empty($settings['show_subtitle']) && !empty($settings['subtitle_text'])): ?>
-                        <p class="tg-hero-subtitle text-primary fw-semibold mb-2" style="color: <?php echo html($settings['subtitle_color'] ?? 'var(--tg-text-secondary)'); ?>;">
-                            <?php echo html($settings['subtitle_text']); ?>
-                        </p>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($settings['show_description']) && !empty($settings['description_text'])): ?>
-                        <div class="tg-hero-description lead mb-4">
-                            <?php echo nl2br(html($settings['description_text'])); ?>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php echo $buttonsHtml; ?>
-                    
-                </div>
+            <div class="content-col <?php echo $contentColClass; ?> <?php echo $contentOrder; ?>">
+                
+                <?php if(!empty($settings['badge'])) { ?>
+                <div class="badge"><?php echo html($settings['badge']); ?></div>
+                <?php } ?>
+                
+                <?php if(!empty($settings['title'])) { ?>
+                <h1><?php echo $settings['title']; ?></h1>
+                <?php } ?>
+                
+                <?php if(!empty($settings['description'])) { ?>
+                <div class="description"><?php echo nl2br(html($settings['description'])); ?></div>
+                <?php } ?>
+                
+                <?php echo $buttonsHtml; ?>
+                
             </div>
             
-            <?php if (!empty($settings['show_image']) && !empty($settings['image'])): ?>
-            <div class="<?php echo $imageColClass; ?> <?php echo $imageOrderClass; ?>">
-                <div class="tg-hero-image-wrapper text-center">
-                    <img src="<?php echo BlockImageHelper::getImageUrl($settings['image']); ?>" 
-                         alt="<?php echo html($settings['title_text'] ?? ''); ?>" 
-                         class="tg-hero-image img-fluid <?php echo !empty($settings['image_rounded']) ? 'rounded' : ''; ?> <?php echo !empty($settings['image_shadow']) ? 'shadow' : ''; ?>"
-                         loading="lazy">
-                </div>
+            <?php if($hasImage) { ?>
+            <div class="image-col <?php echo $imageColClass; ?> <?php echo $imageOrder; ?>">
+                <?php echo $imageHtml; ?>
             </div>
-            <?php endif; ?>
+            <?php } ?>
             
         </div>
     </div>
 </section>
-
-<?php if (($settings['background_type'] ?? '') === 'image' && !empty($settings['background_overlay']) && $settings['background_overlay'] !== 'none'): ?>
-<style>
-.tg-hero {
-    position: relative;
-    isolation: isolate;
-}
-.tg-hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-}
-.tg-overlay-dark { background-color: rgba(0, 0, 0, 0.5); }
-.tg-overlay-light { background-color: rgba(255, 255, 255, 0.7); }
-.tg-overlay-primary { background-color: rgba(43, 82, 120, 0.8); }
-.tg-hero .container {
-    position: relative;
-    z-index: 1;
-}
-</style>
-<?php endif; ?>

@@ -19,15 +19,17 @@ abstract class Field {
      * 
      * @param string $name Имя поля
      * @param array $options Опции поля:
-     *                       - title: заголовок поля
-     *                       - hint: подсказка под полем
-     *                       - default: значение по умолчанию
-     *                       - required: обязательность
-     *                       - placeholder: placeholder
-     *                       - class: дополнительные CSS классы
-     *                       - attributes: дополнительные HTML атрибуты
-     *                       - show: условие показа
-     *                       - show_class: класс для условного отображения
+     * - title: заголовок поля
+     * - hint: подсказка под полем
+     * - default: значение по умолчанию
+     * - required: обязательность
+     * - placeholder: placeholder
+     * - class: дополнительные CSS классы
+     * - attributes: дополнительные HTML атрибуты
+     * - show: условие показа
+     * - show_class: класс для условного отображения
+     * - column: ширина колонки (для кастомной сетки)
+     * - full_width: признак поля на всю ширину
      */
     public function __construct($name, $options = []) {
         $this->name = $name;
@@ -40,7 +42,9 @@ abstract class Field {
             'class' => '',
             'attributes' => [],
             'show' => null,
-            'show_class' => 'field-conditional'
+            'show_class' => 'field-conditional',
+            'column' => null,
+            'full_width' => false
         ], $options);
     }
     
@@ -51,6 +55,49 @@ abstract class Field {
      */
     public function getName() {
         return $this->name;
+    }
+    
+    /**
+     * Получает все опции поля
+     * 
+     * @return array Массив опций
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+    
+    /**
+     * Получает ширину колонки для поля
+     * Используется в кастомном режиме Fieldset
+     * 
+     * @return int|null Ширина колонки (от 1 до 12) или null если не задана
+     */
+    public function getColumnWidth() {
+        return $this->options['column'] ?? null;
+    }
+    
+    /**
+     * Проверяет, должно ли поле занимать всю ширину
+     * 
+     * @return bool
+     */
+    public function isFullWidth() {
+        // Проверка через full_width
+        if (isset($this->options['full_width']) && $this->options['full_width'] === true) {
+            return true;
+        }
+        
+        // Поле-уведомление всегда на всю ширину
+        if ($this instanceof FieldAlert) {
+            return true;
+        }
+        
+        // Проверка column = 12
+        if (isset($this->options['column']) && $this->options['column'] == 12) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
@@ -126,11 +173,11 @@ abstract class Field {
             $dependencyIndicator = $this->renderDependencyIndicator($formData);
         }
         
-        // Дополнительный CSS класс для условных полей
         $conditionalClass = $this->isConditional() ? 'field-dependent' : '';
+        $columnDataAttr = $this->getColumnWidth() ? ' data-column="' . $this->getColumnWidth() . '"' : '';
         
         return "
-        <div class=\"mb-3 {$conditionalClass}\" data-field-name=\"{$this->name}\" {$conditionalAttrs}>
+        <div class=\"mb-3 {$conditionalClass}\" data-field-name=\"{$this->name}\"{$columnDataAttr} {$conditionalAttrs}>
             {$dependencyIndicator}
             <label class=\"form-label\">{$this->options['title']}{$requiredBadge}</label>
             {$fieldHtml}
@@ -183,8 +230,6 @@ abstract class Field {
      * @return string Заголовок поля
      */
     protected function getParentFieldTitle($parentFieldName) {
-        // В реальной реализации нужно получить заголовок поля из контекста
-        // Пока возвращаем просто имя поля
         return $parentFieldName;
     }
 
@@ -238,7 +283,7 @@ abstract class Field {
      * 
      * @return array
      */
-    public function getOptions() {
+    public function getSelectOptions() {
         return $this->options['options'] ?? [];
     }
 

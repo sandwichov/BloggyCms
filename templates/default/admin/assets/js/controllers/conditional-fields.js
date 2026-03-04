@@ -2,14 +2,17 @@ class ConditionalFields {
     constructor(formSelector = 'form') {
         this.form = document.querySelector(formSelector);
         this.conditionalFields = [];
+        this.dependentGroups = new Map();
         this.init();
     }
     
     init() {
         if (!this.form) return;
         this.findConditionalFields();
+        this.findDependentGroups();
         this.bindEvents();
         this.evaluateAllConditions();
+        this.addStyles();
     }
     
     findConditionalFields() {
@@ -18,8 +21,18 @@ class ConditionalFields {
         );
     }
     
+    findDependentGroups() {
+        const groups = document.querySelectorAll('.dependent-group-container');
+        groups.forEach(group => {
+            const fields = group.querySelectorAll('[data-conditional="true"]');
+            if (fields.length > 0) {
+                this.dependentGroups.set(group, fields);
+            }
+        });
+    }
+    
     bindEvents() {
-        this.form.addEventListener('change', (e) => {
+        this.form.addEventListener('change', () => {
             this.evaluateAllConditions();
         });
         
@@ -27,10 +40,6 @@ class ConditionalFields {
             if (e.target.type === 'text' || e.target.type === 'textarea' || e.target.type === 'number') {
                 this.evaluateAllConditions();
             }
-        });
-        
-        this.form.addEventListener('submit', (e) => {
-            this.handleFormSubmit();
         });
     }
     
@@ -40,8 +49,29 @@ class ConditionalFields {
         this.conditionalFields.forEach(field => {
             const condition = field.dataset.condition;
             const isVisible = this.evaluateCondition(condition, formData);
-            
             this.toggleField(field, isVisible);
+        });
+        
+        this.checkGroupsVisibility();
+    }
+    
+    checkGroupsVisibility() {
+        this.dependentGroups.forEach((fields, group) => {
+            let hasVisibleFields = false;
+            
+            fields.forEach(field => {
+                if (!field.classList.contains('d-none') && !field.classList.contains('field-hidden')) {
+                    hasVisibleFields = true;
+                }
+            });
+            
+            if (hasVisibleFields) {
+                group.classList.remove('d-none');
+                group.classList.remove('group-hidden');
+            } else {
+                group.classList.add('d-none');
+                group.classList.add('group-hidden');
+            }
         });
     }
     
@@ -68,47 +98,7 @@ class ConditionalFields {
             }
         });
         
-        const fileInputs = this.form.querySelectorAll('input[type="file"]');
-        fileInputs.forEach(input => {
-            const name = this.getFieldName(input);
-            if (name.endsWith('_file')) {
-                const baseName = name.replace('_file', '');
-                if (input.files && input.files.length > 0) {
-                    data[baseName] = true;
-                }
-                else {
-                    const hiddenField = this.findHiddenFieldForFile(input, baseName);
-                    if (hiddenField && hiddenField.value) {
-                        data[baseName] = true;
-                    } else {
-                        data[baseName] = false;
-                    }
-                }
-            }
-        });
-
-        const removeCheckboxes = this.form.querySelectorAll('input[type="checkbox"][name^="remove_"]');
-        removeCheckboxes.forEach(checkbox => {
-            const name = this.getFieldName(checkbox);
-            if (name.startsWith('remove_')) {
-                const baseName = name.replace('remove_', '');
-                if (checkbox.checked) {
-                    data[baseName] = false;
-                }
-            }
-        });
-        
         return data;
-    }
-
-    findHiddenFieldForFile(fileInput, baseName) {
-        const container = fileInput.closest('.image-field') || fileInput.parentElement;
-        if (container) {
-            const hiddenField = container.querySelector(`input[type="hidden"][name="settings[${baseName}]"], 
-                                                       input[type="hidden"][name="${baseName}"]`);
-            return hiddenField;
-        }
-        return null;
     }
     
     getFieldName(input) {
@@ -180,31 +170,64 @@ class ConditionalFields {
     toggleField(field, isVisible) {
         if (isVisible) {
             field.classList.remove('d-none');
+            field.classList.remove('field-hidden');
+            field.classList.add('field-conditional-visible');
+            
             const inputs = field.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
                 input.disabled = false;
+                input.removeAttribute('tabindex', '-1');
             });
         } else {
             field.classList.add('d-none');
+            field.classList.add('field-hidden');
+            field.classList.remove('field-conditional-visible');
+            
+            const inputs = field.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.setAttribute('tabindex', '-1');
+            });
         }
     }
     
-    handleFormSubmit() {
-        const formData = this.getFormData();
+    addStyles() {
+        if (document.getElementById('conditional-fields-styles')) return;
         
-        this.conditionalFields.forEach(field => {
-            const condition = field.dataset.condition;
-            const isVisible = this.evaluateCondition(condition, formData);
-            
-            if (!isVisible) {
-                const inputs = field.querySelectorAll('input, select, textarea');
-                inputs.forEach(input => {
-                    input.disabled = true;
-                });
+        const style = document.createElement('style');
+        style.id = 'conditional-fields-styles';
+        style.textContent = `
+            .field-conditional-visible {
+                position: relative;
             }
-        });
+            
+            .dependent-group-container {
+                position: relative;
+                transition: opacity 0.2s ease;
+            }
+            
+            .dependent-group-container.group-hidden,
+            .dependent-group-container.d-none {
+                display: none !important;
+            }
+            
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .field-conditional-visible {
+                animation: fadeIn 0.2s ease-out;
+            }
+        `;
         
-        setTimeout(() => {}, 100);
+        document.head.appendChild(style);
     }
 }
 

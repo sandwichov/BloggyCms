@@ -11,11 +11,7 @@ class DefaultHeroBlock extends BaseHtmlBlock {
     }
 
     public function getDescription(): string {
-        return "Привлекающий внимание блок с заголовком, текстом, кнопками и изображением.";
-    }
-
-    public function getAuthor(): string {
-        return 'BloggyCMS Team';
+        return "Харизматичный hero-блок с акцентом на личность и типографику";
     }
 
     public function getVersion(): string {
@@ -30,53 +26,27 @@ class DefaultHeroBlock extends BaseHtmlBlock {
         
         $settings = array_merge([], $currentSettings);
         
-        $fieldsets[] = new \Fieldset('Основной контент', [
-            'icon' => 'bi bi-pencil-square',
-            'columns' => '12',
+        $fieldsets[] = new \Fieldset('Контент', [
+            'icon' => 'bi bi-pencil',
+            'columns' => 'custom',
             'fields' => [
-                \FieldFactory::checkbox('show_title', [
-                    'title' => 'Показывать заголовок',
-                    'default' => $settings['show_title'] ?? 1,
-                    'switch' => true,
+                \FieldFactory::string('badge', [
+                    'title' => 'Бейдж (маленький текст сверху)',
+                    'default' => $settings['badge'] ?? 'Senior PHP-разработчик',
+                    'column' => '6',
+                    'placeholder' => 'Например: Senior Developer'
                 ]),
-                \FieldFactory::string('title_text', [
-                    'title' => 'Текст заголовка',
-                    'default' => $settings['title_text'] ?? 'Заголовок, который привлекает внимание',
-                    'placeholder' => 'Например: Создайте свой идеальный сайт',
-                    'show' => 'field:show_title',
+                \FieldFactory::string('title', [
+                    'title' => 'Заголовок',
+                    'default' => $settings['title'] ?? 'Пишу чистый PHP-код и <span class="highlight">учу этому</span> других',
+                    'column' => '6',
+                    'placeholder' => 'Используйте <span class="highlight"> для выделения'
                 ]),
-                $color = FieldFactory::color('title_color', [
-                    'title' => 'Цвет заголовка',
-                    'preset' => 'basic',
-                    'show' => 'field:show_title',
-                ]),
-                \FieldFactory::checkbox('show_subtitle', [
-                    'title' => 'Показывать подзаголовок',
-                    'default' => $settings['show_subtitle'] ?? 1,
-                    'switch' => true,
-                ]),
-                \FieldFactory::string('subtitle_text', [
-                    'title' => 'Текст подзаголовка',
-                    'default' => $settings['subtitle_text'] ?? 'Краткое описание преимуществ',
-                    'placeholder' => 'Например: Просто, быстро и эффективно',
-                    'show' => 'field:show_subtitle',
-                ]),
-                \FieldFactory::color('subtitle_color', [
-                    'title' => 'Цвет подзаголовка',
-                    'preset' => 'basic',
-                    'show' => 'field:show_subtitle',
-                ]),
-                \FieldFactory::checkbox('show_description', [
-                    'title' => 'Показывать описание',
-                    'default' => $settings['show_description'] ?? 1,
-                    'switch' => true,
-                ]),
-                \FieldFactory::textarea('description_text', [
-                    'title' => 'Текст описания',
-                    'default' => $settings['description_text'] ?? 'Более подробный текст, который раскрывает суть предложения и побуждает пользователя к действию. Расскажите о ключевых выгодах.',
-                    'placeholder' => 'Введите описание...',
+                \FieldFactory::textarea('description', [
+                    'title' => 'Описание',
+                    'default' => $settings['description'] ?? 'Пишу о рефакторинге, архитектуре, PSR-стандартах и о том, как не скатиться в поддержку 10-летнего проекта на CodeIgniter 2. Подписывайся, будет больно, но полезно.',
                     'rows' => 4,
-                    'show' => 'field:show_description',
+                    'column' => '12'
                 ]),
             ]
         ]);
@@ -86,48 +56,26 @@ class DefaultHeroBlock extends BaseHtmlBlock {
             'columns' => '12',
             'fields' => [
                 \FieldFactory::repeater('buttons', [
-                    'title' => 'Кнопки действий',
-                    'hint' => 'Добавьте кнопки для призыва к действию.',
+                    'title' => 'Кнопки',
+                    'column' => '12',
+                    'repeater_columns' => 2,
+                    'hint' => 'Первая кнопка будет основной (с фоном), остальные - второстепенные',
+                    'min_items' => 0,
+                    'max_items' => 3,
                     'fields' => [
                         [
                             'name' => 'text',
                             'title' => 'Текст кнопки',
                             'type' => 'string',
-                            'placeholder' => 'Например: Начать',
-                            'default' => 'Кнопка',
+                            'placeholder' => 'Читать блог',
+                            'default' => 'Кнопка'
                         ],
                         [
                             'name' => 'url',
                             'title' => 'Ссылка',
                             'type' => 'string',
-                            'placeholder' => '/contact или https://...',
-                            'default' => '#',
-                        ],
-                        [
-                            'name' => 'type',
-                            'title' => 'Тип кнопки',
-                            'type' => 'select',
-                            'options' => [
-                                'primary' => 'Основная (Primary)',
-                                'outline' => 'Контурная (Outline)',
-                            ],
-                            'default' => 'primary',
-                        ],
-                        [
-                            'name' => 'size',
-                            'title' => 'Размер',
-                            'type' => 'select',
-                            'options' => [
-                                'md' => 'Средний',
-                                'lg' => 'Большой',
-                            ],
-                            'default' => 'lg',
-                        ],
-                        [
-                            'name' => 'icon',
-                            'title' => 'Иконка (опционально)',
-                            'type' => 'icon',
-                            'hint' => 'Например: bs:arrow-right',
+                            'placeholder' => '/posts',
+                            'default' => '#'
                         ],
                     ]
                 ]),
@@ -136,195 +84,113 @@ class DefaultHeroBlock extends BaseHtmlBlock {
 
         $fieldsets[] = new \Fieldset('Изображение', [
             'icon' => 'bi bi-image',
-            'columns' => '12',
+            'columns' => 'custom',
             'fields' => [
-                \FieldFactory::checkbox('show_image', [
-                    'title' => 'Показывать изображение',
-                    'default' => $settings['show_image'] ?? 1,
-                    'switch' => true,
-                ]),
                 \FieldFactory::blockImage('image', [
                     'title' => 'Изображение',
-                    'hint' => 'Рекомендуемый размер: 600x400px. Форматы: JPG, PNG, WebP.',
-                    'upload_path' => 'uploads/images/html_blocks/' . $this->getSystemName() . '/',
-                    'preview_size' => '120px',
-                    'show' => 'field:show_image',
+                    'hint' => 'Рекомендуемый размер: 600x600px. Квадратное или портрет',
+                    'upload_path' => 'uploads/images/html_blocks/hero/',
+                    'preview_size' => '100px',
+                ]),
+                \FieldFactory::select('image_style', [
+                    'title' => 'Стиль изображения',
+                    'options' => [
+                        'circle' => 'Круг',
+                        'square' => 'Квадрат',
+                        'rounded' => 'Скругленные углы',
+                    ],
+                    'column' => '6',
+                    'default' => 'circle',
                 ]),
                 \FieldFactory::select('image_position', [
                     'title' => 'Позиция изображения',
                     'options' => [
-                        'right' => 'Справа от текста',
-                        'left' => 'Слева от текста',
+                        'right' => 'Справа',
+                        'left' => 'Слева',
                     ],
-                    'default' => 'right',
-                    'show' => 'field:show_image',
-                ]),
-                \FieldFactory::select('image_alignment', [
-                    'title' => 'Вертикальное выравнивание',
-                    'options' => [
-                        'center' => 'По центру',
-                        'top' => 'По верхнему краю',
-                    ],
-                    'default' => 'center',
-                    'show' => 'field:show_image',
-                ]),
-                \FieldFactory::number('image_width', [
-                    'title' => 'Ширина колонки с изображением (%)',
-                    'default' => 50,
-                    'min' => 30,
-                    'max' => 70,
-                    'step' => 5,
-                    'hint' => 'Процент ширины для колонки с изображением. Контент займет оставшуюся часть.',
-                    'show' => 'field:show_image',
-                ]),
-                \FieldFactory::checkbox('image_rounded', [
-                    'title' => 'Скругленные углы',
-                    'default' => 1,
-                    'switch' => true,
-                    'show' => 'field:show_image',
-                ]),
-                \FieldFactory::checkbox('image_shadow', [
-                    'title' => 'Тень',
-                    'default' => 1,
-                    'switch' => true,
-                    'show' => 'field:show_image',
+                    'column' => '6',
+                    'default' => 'right'
                 ]),
             ]
         ]);
 
-        $fieldsets[] = new \Fieldset('Фон', [
-            'icon' => 'bi bi-brush',
-            'columns' => '12',
+        $fieldsets[] = new \Fieldset('Цвета и фон', [
+            'icon' => 'bi bi-palette',
+            'columns' => 'custom',
             'fields' => [
-                \FieldFactory::select('background_type', [
-                    'title' => 'Тип фона',
+                \FieldFactory::select('theme', [
+                    'title' => 'Тема',
                     'options' => [
-                        'color' => 'Цвет',
-                        'gradient' => 'Градиент',
-                        'image' => 'Изображение',
+                        'light' => 'Светлая',
+                        'dark' => 'Темная',
+                        'custom' => 'Своя',
                     ],
-                    'default' => 'color',
+                    'column' => '12',
+                    'default' => 'light'
                 ]),
                 \FieldFactory::color('background_color', [
                     'title' => 'Цвет фона',
                     'preset' => 'basic',
-                    'show' => 'field:background_type = color',
+                    'column' => '6',
+                    'show' => 'field:theme = custom'
                 ]),
-                \FieldFactory::color('gradient_start', [
-                    'title' => 'Начальный цвет градиента',
+                \FieldFactory::color('text_color', [
+                    'title' => 'Цвет текста',
                     'preset' => 'basic',
-                    'show' => 'field:background_type = gradient',
+                    'column' => '6',
+                    'show' => 'field:theme = custom'
                 ]),
-                \FieldFactory::color('gradient_end', [
-                    'title' => 'Конечный цвет градиента',
-                    'preset' => 'basic',
-                    'show' => 'field:background_type = gradient',
-                ]),
-                \FieldFactory::select('gradient_direction', [
-                    'title' => 'Направление градиента',
-                    'options' => [
-                        'to bottom' => 'Сверху вниз',
-                        'to right' => 'Слева направо',
-                        'to bottom right' => 'По диагонали',
-                    ],
-                    'default' => 'to bottom',
-                    'show' => 'field:background_type = gradient',
-                ]),
-                \FieldFactory::blockImage('background_image', [
-                    'title' => 'Фоновое изображение',
-                    'hint' => 'Рекомендуемый размер: 1920x1080px.',
-                    'upload_path' => 'uploads/images/html_blocks/' . $this->getSystemName() . '/backgrounds/',
-                    'preview_size' => '80px',
-                    'show' => 'field:background_type = image',
-                ]),
-                \FieldFactory::select('background_overlay', [
-                    'title' => 'Затемнение/оверлей',
-                    'options' => [
-                        'none' => 'Нет',
-                        'dark' => 'Темный',
-                        'light' => 'Светлый',
-                        'primary' => 'Цвет темы',
-                    ],
-                    'default' => 'none',
-                    'show' => 'field:background_type = image',
+                \FieldFactory::color('accent_color', [
+                    'title' => 'Акцентный цвет',
+                    'preset' => 'website',
+                    'column' => '12',
+                    'default' => '#2563eb'
                 ]),
             ]
         ]);
-        $fieldsets[] = new \Fieldset('Отступы и выравнивание', [
+
+        $fieldsets[] = new \Fieldset('Отступы', [
             'icon' => 'bi bi-arrows-expand',
-            'columns' => '12',
+            'columns' => 'custom',
             'fields' => [
-                \FieldFactory::select('content_alignment', [
+                \FieldFactory::select('align', [
                     'title' => 'Выравнивание текста',
                     'options' => [
                         'left' => 'Слева',
                         'center' => 'По центру',
                         'right' => 'Справа',
                     ],
-                    'default' => 'left',
+                    'column' => '6',
+                    'default' => 'left'
                 ]),
                 \FieldFactory::number('padding_top', [
-                    'title' => 'Отступ сверху (pt-*)',
-                    'hint' => 'Значение от 0 до 5 для Bootstrap pt-* классов. 0 = pt-0, 5 = pt-5.',
-                    'default' => 5,
+                    'title' => 'Отступ сверху (px)',
+                    'default' => 80,
                     'min' => 0,
-                    'max' => 5,
-                    'step' => 1,
+                    'max' => 200,
+                    'step' => 10,
+                    'column' => '6'
                 ]),
                 \FieldFactory::number('padding_bottom', [
-                    'title' => 'Отступ снизу (pb-*)',
-                    'hint' => 'Значение от 0 до 5 для Bootstrap pb-* классов.',
-                    'default' => 5,
+                    'title' => 'Отступ снизу (px)',
+                    'default' => 80,
                     'min' => 0,
-                    'max' => 5,
-                    'step' => 1,
-                ]),
-                \FieldFactory::checkbox('full_width', [
-                    'title' => 'На всю ширину',
-                    'default' => 0,
-                    'switch' => true,
-                    'hint' => 'Контент будет внутри контейнера, но фон блока будет на всю ширину экрана.',
+                    'max' => 200,
+                    'step' => 10,
+                    'column' => '6'
                 ]),
             ]
         ]);
-        $fieldsets[] = new \Fieldset('Дополнительно', [
-            'icon' => 'bi bi-gear',
-            'columns' => '12',
-            'fields' => [
-                \FieldFactory::string('custom_css_class', [
-                    'title' => 'Дополнительный CSS класс',
-                    'default' => $settings['custom_css_class'] ?? '',
-                    'placeholder' => 'my-custom-hero',
-                ]),
-            ]
-        ]);
-        
+
         ob_start();
         ?>
-        <div class="row">
-            <?php foreach ($fieldsets as $fieldset) { ?>
-            <div class="col-md-12"><?= $fieldset->render($settings) ?></div>
-            <?php } ?>
+        <div class="row g-4">
+            <?php foreach ($fieldsets as $fieldset): ?>
+            <div class="col-12"><?= $fieldset->render($settings) ?></div>
+            <?php endforeach; ?>
         </div>
         <?php
         return ob_get_clean();
-    }
-
-    public function validateSettings($settings): array {
-        if (!is_array($settings)) {
-            return [false, ['Настройки должны быть массивом']];
-        }
-        
-        $errors = [];
-        
-        if (!empty($settings['show_title']) && empty(trim($settings['title_text'] ?? ''))) {
-            $errors[] = 'Текст заголовка не может быть пустым, если заголовок включен.';
-        }
-        if (!empty($settings['show_subtitle']) && empty(trim($settings['subtitle_text'] ?? ''))) {
-            $errors[] = 'Текст подзаголовка не может быть пустым, если подзаголовок включен.';
-        }
-        
-        return [empty($errors), $errors];
     }
 
     public function prepareSettings($settings): array {
@@ -332,67 +198,29 @@ class DefaultHeroBlock extends BaseHtmlBlock {
             return [];
         }
 
-        $uploadResult = BlockImageHelper::handleUpload('image', $this->getSystemName(), $settings['image'] ?? '');
-        if ($uploadResult['success']) {
-            $settings['image'] = $uploadResult['value'];
+        if (isset($settings['remove_image']) && $settings['remove_image'] == 1) {
+            $settings['image'] = '';
+        } else {
+            $uploadResult = BlockImageHelper::handleUpload('image', 'hero', $settings['image'] ?? '');
+            if ($uploadResult['success']) {
+                $settings['image'] = $uploadResult['value'];
+            }
         }
-        $settings['image'] = BlockImageHelper::handleDelete('image', $settings['image'] ?? '');
         unset($settings['image_file'], $settings['remove_image']);
-        $uploadResultBg = BlockImageHelper::handleUpload('background_image', $this->getSystemName() . '/backgrounds', $settings['background_image'] ?? '');
-        if ($uploadResultBg['success']) {
-            $settings['background_image'] = $uploadResultBg['value'];
-        }
-        $settings['background_image'] = BlockImageHelper::handleDelete('background_image', $settings['background_image'] ?? '');
-        unset($settings['background_image_file'], $settings['remove_background_image']);
+
         if (isset($settings['buttons']) && is_array($settings['buttons'])) {
             $filteredButtons = [];
             foreach ($settings['buttons'] as $button) {
-                if (!empty(trim($button['text'] ?? '')) && !empty(trim($button['url'] ?? ''))) {
+                if (!empty(trim($button['text'] ?? ''))) {
                     $filteredButtons[] = [
                         'text' => trim($button['text']),
-                        'url' => trim($button['url']),
-                        'type' => $button['type'] ?? 'primary',
-                        'size' => $button['size'] ?? 'md',
-                        'icon' => trim($button['icon'] ?? ''),
+                        'url' => trim($button['url'] ?? '#'),
                     ];
                 }
             }
             $settings['buttons'] = $filteredButtons;
-        } else {
-            $settings['buttons'] = [];
         }
 
-        $settings['show_title'] = isset($settings['show_title']) ? (int)$settings['show_title'] : 1;
-        $settings['title_text'] = trim($settings['title_text'] ?? 'Заголовок');
-        $settings['title_color'] = trim($settings['title_color'] ?? 'var(--tg-text)');
-        $settings['show_subtitle'] = isset($settings['show_subtitle']) ? (int)$settings['show_subtitle'] : 1;
-        $settings['subtitle_text'] = trim($settings['subtitle_text'] ?? '');
-        $settings['subtitle_color'] = trim($settings['subtitle_color'] ?? 'var(--tg-text-secondary)');
-        $settings['show_description'] = isset($settings['show_description']) ? (int)$settings['show_description'] : 1;
-        $settings['description_text'] = trim($settings['description_text'] ?? '');
-        $settings['show_image'] = isset($settings['show_image']) ? (int)$settings['show_image'] : 1;
-        $settings['image_position'] = $settings['image_position'] ?? 'right';
-        $settings['image_alignment'] = $settings['image_alignment'] ?? 'center';
-        $settings['image_width'] = min(70, max(30, (int)($settings['image_width'] ?? 50)));
-        $settings['image_rounded'] = isset($settings['image_rounded']) ? (int)$settings['image_rounded'] : 1;
-        $settings['image_shadow'] = isset($settings['image_shadow']) ? (int)$settings['image_shadow'] : 1;
-        $settings['background_type'] = $settings['background_type'] ?? 'color';
-        $settings['background_color'] = trim($settings['background_color'] ?? 'var(--tg-surface)');
-        $settings['gradient_start'] = trim($settings['gradient_start'] ?? 'var(--tg-surface)');
-        $settings['gradient_end'] = trim($settings['gradient_end'] ?? 'var(--tg-bg)');
-        $settings['gradient_direction'] = $settings['gradient_direction'] ?? 'to bottom';
-        $settings['background_overlay'] = $settings['background_overlay'] ?? 'none';
-        $settings['content_alignment'] = $settings['content_alignment'] ?? 'left';
-        $settings['padding_top'] = min(5, max(0, (int)($settings['padding_top'] ?? 5)));
-        $settings['padding_bottom'] = min(5, max(0, (int)($settings['padding_bottom'] ?? 5)));
-        $settings['full_width'] = isset($settings['full_width']) ? (int)$settings['full_width'] : 0;
-        $settings['custom_css_class'] = trim($settings['custom_css_class'] ?? '');
-
         return $settings;
-    }
-
-    public function processFrontend($settings = [], $templateName = null): string {
-        $content = parent::processFrontend($settings, $templateName);
-        return $content;
     }
 }

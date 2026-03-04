@@ -55,7 +55,7 @@ class DefaultBreadcrumbsBlock extends BaseHtmlBlock {
 
         $fieldsets[] = new \Fieldset('Внешний вид', [
             'icon' => 'bi bi-palette',
-            'columns' => '12',
+            'columns' => 'custom',
             'fields' => [
                 \FieldFactory::select('separator', [
                     'title' => 'Разделитель',
@@ -65,12 +65,8 @@ class DefaultBreadcrumbsBlock extends BaseHtmlBlock {
                         'arrow' => '→',
                         'dot' => '•',
                     ],
+                    'column' => '6',
                     'default' => 'chevron'
-                ]),
-                \FieldFactory::icon('home_icon', [
-                    'title' => 'Иконка главной',
-                    'hint' => 'Оставьте пустым чтобы не показывать иконку',
-                    'default' => '',
                 ]),
                 \FieldFactory::select('alignment', [
                     'title' => 'Выравнивание',
@@ -79,8 +75,15 @@ class DefaultBreadcrumbsBlock extends BaseHtmlBlock {
                         'center' => 'По центру',
                         'right' => 'Справа',
                     ],
+                    'column' => '6',
                     'default' => 'left'
                 ]),
+                \FieldFactory::icon('home_icon', [
+                    'title' => 'Иконка главной',
+                    'hint' => 'Оставьте пустым чтобы не показывать иконку',
+                    'default' => '',
+                    'column' => '12'
+                ])
             ]
         ]);
 

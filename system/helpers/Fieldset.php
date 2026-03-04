@@ -14,7 +14,7 @@ class Fieldset {
     /** @var string Иконка для заголовка (класс Bootstrap Icons) */
     private $icon;
     
-    /** @var string Количество колонок для полей (по умолчанию '6' - половина ширины) */
+    /** @var string|array Режим колонок ('custom' для индивидуальной настройки или число для всех полей) */
     private $columns;
     
     /** @var array Массив полей в группе */
@@ -25,9 +25,9 @@ class Fieldset {
      * 
      * @param string $title Заголовок группы
      * @param array $options Опции группы:
-     *                       - icon: класс иконки (например 'bi bi-gear')
-     *                       - columns: количество колонок ('6', '4', '3' и т.д.)
-     *                       - fields: массив начальных полей
+     * - icon: класс иконки (например 'bi bi-gear')
+     * - columns: режим колонок ('custom' или число, например '6', '4', '3')
+     * - fields: массив начальных полей
      */
     public function __construct($title, $options = []) {
         $this->title = $title;
@@ -164,22 +164,24 @@ class Fieldset {
         ?>
         <div class="col-12 dependent-group-container mb-3">
             <div class="dependent-group">
-                <?php foreach ($dependentFields as $field): ?>
-                    <?php 
-                    $conditionalAttrs = '';
-                    if (method_exists($field, 'isConditional') && $field->isConditional()) {
-                        $shouldShow = $field->shouldShow($formData);
-                        $hiddenClass = $shouldShow ? '' : 'd-none';
-                        $conditionalAttrs = " data-conditional=\"true\" data-condition=\"" . htmlspecialchars($field->getShowCondition()) . "\" class=\"field-conditional {$hiddenClass}\"";
-                    }
-                    
-                    $colClass = $this->shouldFieldTakeFullWidth($field) ? 'col-12' : "col-md-{$this->columns}";
-                    ?>
-                    
-                    <div class="<?= $colClass ?> mt-2"<?= $conditionalAttrs ?>>
-                        <?= $field->render($formData['settings'][$field->getName()] ?? null) ?>
-                    </div>
-                <?php endforeach; ?>
+                <div class="row">
+                    <?php foreach ($dependentFields as $field): ?>
+                        <?php 
+                        $conditionalAttrs = '';
+                        if (method_exists($field, 'isConditional') && $field->isConditional()) {
+                            $shouldShow = $field->shouldShow($formData);
+                            $hiddenClass = $shouldShow ? '' : 'd-none';
+                            $conditionalAttrs = " data-conditional=\"true\" data-condition=\"" . htmlspecialchars($field->getShowCondition()) . "\" class=\"field-conditional {$hiddenClass}\"";
+                        }
+                        
+                        $colClass = $this->getFieldColumnClass($field);
+                        ?>
+                        
+                        <div class="<?= $colClass ?>"<?= $conditionalAttrs ?>>
+                            <?= $field->render($formData['settings'][$field->getName()] ?? null) ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
         <?php
@@ -201,7 +203,7 @@ class Fieldset {
             $conditionalAttrs = " data-conditional=\"true\" data-condition=\"" . htmlspecialchars($field->getShowCondition()) . "\" class=\"field-conditional {$hiddenClass}\"";
         }
         
-        $colClass = $this->shouldFieldTakeFullWidth($field) ? 'col-12' : "col-md-{$this->columns}";
+        $colClass = $this->getFieldColumnClass($field);
         
         ob_start();
         ?>
@@ -210,6 +212,34 @@ class Fieldset {
         </div>
         <?php
         return ob_get_clean();
+    }
+    
+    /**
+     * Получает CSS класс для колонки поля
+     * 
+     * @param Field $field Объект поля
+     * @return string CSS класс для Bootstrap колонки
+     */
+    private function getFieldColumnClass($field) {
+        // Если включен кастомный режим, проверяем наличие параметра column у поля
+        if ($this->columns === 'custom') {
+            $options = method_exists($field, 'getOptions') ? $field->getOptions() : [];
+            
+            // Проверяем, задана ли ширина для поля
+            if (isset($options['column'])) {
+                return "col-md-{$options['column']}";
+            }
+            
+            // Если ширина не задана, используем значение по умолчанию
+            return "col-md-12"; // По умолчанию на всю ширину
+        }
+        
+        // Стандартный режим - все поля одинаковой ширины
+        if ($this->shouldFieldTakeFullWidth($field)) {
+            return 'col-12';
+        }
+        
+        return "col-md-{$this->columns}";
     }
     
     /**

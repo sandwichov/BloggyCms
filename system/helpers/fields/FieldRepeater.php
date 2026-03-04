@@ -21,185 +21,186 @@ class FieldRepeater extends Field {
     public function render($currentValue = null) {
         $values = $currentValue !== null ? $currentValue : [];
         $subFieldsConfig = $this->options['fields'] ?? [];
+        $columns = $this->options['repeater_columns'] ?? 1;
+        $cardColumnClass = $this->getCardColumnClass($columns);
         
         ob_start();
         ?>
         <div class="repeater-field" data-field-name="<?= $this->name ?>">
-            <!-- Контейнер для существующих элементов -->
-            <div class="repeater-items">
+            <div class="repeater-items row g-3">
                 <?php foreach ($values as $index => $item): ?>
-                <div class="repeater-item card mb-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <?php foreach ($subFieldsConfig as $fieldConfig): ?>
-                            <div class="<?= $this->getColumnClass($fieldConfig) ?>">
-                                <div class="mb-3">
+                <div class="<?= $cardColumnClass ?>">
+                    <div class="repeater-item card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2">
+                            <span class="text-muted small">Элемент #<?= $index + 1 ?></span>
+                            <button type="button" class="btn btn-sm btn-outline-danger repeater-remove-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="repeater-fields-container">
+                                <?php foreach ($subFieldsConfig as $fieldConfig): ?>
                                     <?php
                                     $fieldName = $fieldConfig['name'] ?? '';
                                     $fieldTitle = $fieldConfig['title'] ?? '';
                                     $fieldType = $fieldConfig['type'] ?? 'string';
                                     $fieldValue = $item[$fieldName] ?? '';
-                                    
-                                    // ВАЖНО: Для полей в repeater используем другую структуру имен
-                                    $hiddenFieldName = "settings[{$this->name}][{$index}][{$fieldName}]";
-                                    $fileFieldName = "{$this->name}[{$index}][{$fieldName}_file]"; // Без settings[]!
-                                    $removeFieldName = "{$this->name}[{$index}][remove_{$fieldName}]"; // Без settings[]!
-                                    
-                                    echo '<label class="form-label">' . $fieldTitle . '</label>';
-                                    
-                                    // Рендеринг поля в зависимости от типа
-                                    $this->renderFieldByType($fieldConfig, $fieldValue, $hiddenFieldName, $fileFieldName, $removeFieldName, $index, $fieldType);
-                                    
-                                    if (!empty($fieldConfig['hint'])) {
-                                        echo '<div class="form-text">' . $fieldConfig['hint'] . '</div>';
-                                    }
                                     ?>
-                                </div>
+                                    <div class="repeater-field-item mb-3">
+                                        <label class="form-label small fw-bold mb-1"><?= $fieldTitle ?></label>
+                                        <?php
+                                        $hiddenFieldName = "settings[{$this->name}][{$index}][{$fieldName}]";
+                                        $fileFieldName = "{$this->name}[{$index}][{$fieldName}_file]";
+                                        $removeFieldName = "{$this->name}[{$index}][remove_{$fieldName}]";
+                                        
+                                        $this->renderFieldByType($fieldConfig, $fieldValue, $hiddenFieldName, $fileFieldName, $removeFieldName, $index, $fieldType);
+                                        
+                                        if (!empty($fieldConfig['hint'])) {
+                                            echo '<div class="form-text small text-muted mt-1">' . $fieldConfig['hint'] . '</div>';
+                                        }
+                                        ?>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endforeach; ?>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger repeater-remove-btn mt-2">
-                            <i class="bi bi-trash"></i> Удалить
-                        </button>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
             
-            <!-- Кнопка добавления нового элемента -->
-            <button type="button" class="btn btn-outline-primary repeater-add-btn">
+            <button type="button" class="btn btn-outline-primary btn-sm repeater-add-btn mt-3">
                 <i class="bi bi-plus"></i> Добавить элемент
             </button>
             
-            <!-- Шаблон для нового элемента (скрыт) -->
             <template class="repeater-template">
-                <div class="repeater-item card mb-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <?php foreach ($subFieldsConfig as $fieldConfig): ?>
-                            <div class="<?= $this->getColumnClass($fieldConfig) ?>">
-                                <div class="mb-3">
+                <div class="<?= $cardColumnClass ?>">
+                    <div class="repeater-item card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2">
+                            <span class="text-muted small">Новый элемент</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger repeater-remove-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="repeater-fields-container">
+                                <?php foreach ($subFieldsConfig as $fieldConfig): ?>
                                     <?php
                                     $fieldName = $fieldConfig['name'] ?? '';
                                     $fieldTitle = $fieldConfig['title'] ?? '';
                                     $fieldType = $fieldConfig['type'] ?? 'string';
-                                    
-                                    $hiddenFieldName = "settings[{$this->name}][__INDEX__][{$fieldName}]";
-                                    $fileFieldName = "{$this->name}[__INDEX__][{$fieldName}_file]"; // Без settings[]!
-                                    $removeFieldName = "{$this->name}[__INDEX__][remove_{$fieldName}]"; // Без settings[]!
-                                    
-                                    echo '<label class="form-label">' . $fieldTitle . '</label>';
-                                    
-                                    $this->renderFieldByType($fieldConfig, '', $hiddenFieldName, $fileFieldName, $removeFieldName, '__INDEX__', $fieldType, true);
-                                    
-                                    if (!empty($fieldConfig['hint'])) {
-                                        echo '<div class="form-text">' . $fieldConfig['hint'] . '</div>';
-                                    }
                                     ?>
-                                </div>
+                                    <div class="repeater-field-item mb-3">
+                                        <label class="form-label small fw-bold mb-1"><?= $fieldTitle ?></label>
+                                        <?php
+                                        $hiddenFieldName = "settings[{$this->name}][__INDEX__][{$fieldName}]";
+                                        $fileFieldName = "{$this->name}[__INDEX__][{$fieldName}_file]";
+                                        $removeFieldName = "{$this->name}[__INDEX__][remove_{$fieldName}]";
+                                        
+                                        $this->renderFieldByType($fieldConfig, '', $hiddenFieldName, $fileFieldName, $removeFieldName, '__INDEX__', $fieldType, true);
+                                        
+                                        if (!empty($fieldConfig['hint'])) {
+                                            echo '<div class="form-text small text-muted mt-1">' . $fieldConfig['hint'] . '</div>';
+                                        }
+                                        ?>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                            <?php endforeach; ?>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-danger repeater-remove-btn mt-2">
-                            <i class="bi bi-trash"></i> Удалить
-                        </button>
                     </div>
                 </div>
             </template>
         </div>
         
-        <!-- JavaScript для управления повторителем -->
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const repeater = document.querySelector('.repeater-field[data-field-name="<?= $this->name ?>"]');
-            const addBtn = repeater.querySelector('.repeater-add-btn');
-            const template = repeater.querySelector('.repeater-template');
-            const itemsContainer = repeater.querySelector('.repeater-items');
-            
-            let itemIndex = <?= count($values) ?>;
-            
-            addBtn.addEventListener('click', function() {
-                const newItem = template.content.cloneNode(true);
-                const itemElement = newItem.querySelector('.repeater-item');
-                
-                // Замена плейсхолдера __INDEX__ на текущий индекс
-                const htmlContent = itemElement.outerHTML.replace(/__INDEX__/g, itemIndex);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
-                
-                itemsContainer.appendChild(tempDiv.firstElementChild);
-                itemIndex++;
-            });
-            
-            // Обработка удаления элементов
-            repeater.addEventListener('click', function(e) {
-                if (e.target.classList.contains('repeater-remove-btn')) {
-                    e.target.closest('.repeater-item').remove();
-                }
-            });
-            
-            // Обработка предпросмотра изображений
-            repeater.addEventListener('change', function(e) {
-                if (e.target.type === 'file' && e.target.accept === 'image/*') {
-                    this.handleImagePreview(e);
-                }
-            }.bind(this));
-        });
-        
-        // Функция для предпросмотра изображений
-        function handleImagePreview(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                const parentDiv = e.target.closest('.mb-3');
-                const hiddenInput = parentDiv.querySelector('input[type="hidden"]');
-                
-                reader.onload = function(e) {
-                    let previewContainer = parentDiv.querySelector('.image-preview');
-                    if (!previewContainer) {
-                        previewContainer = document.createElement('div');
-                        previewContainer.className = 'image-preview mb-2';
-                        parentDiv.insertBefore(previewContainer, e.target.parentNode);
-                    }
+            (function() {
+                function initRepeater(repeater) {
+                    if (!repeater) return;
                     
-                    previewContainer.innerHTML = `
-                        <div class="border rounded p-2 text-center">
-                            <img src="${e.target.result}" 
-                                 alt="Preview" 
-                                 class="img-fluid rounded" 
-                                 style="max-width: 48px; max-height: 48px;">
-                            <div class="mt-1">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                           name="${e.target.name.replace('_file', 'remove')}" 
-                                           value="1">
-                                    <label class="form-check-label text-danger small">
-                                        Удалить
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+                    const addBtn = repeater.querySelector('.repeater-add-btn');
+                    const template = repeater.querySelector('.repeater-template');
+                    const itemsContainer = repeater.querySelector('.repeater-items');
+                    
+                    let itemIndex = itemsContainer.children.length;
+                    
+                    addBtn.addEventListener('click', function() {
+                        const newItem = template.content.cloneNode(true);
+                        const tempDiv = document.createElement('div');
+                        tempDiv.appendChild(newItem);
+                        
+                        let htmlContent = tempDiv.innerHTML;
+                        htmlContent = htmlContent.replace(/__INDEX__/g, itemIndex);
+                        
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = htmlContent;
+                        const newItemElement = wrapper.firstElementChild;
+                        
+                        itemsContainer.appendChild(newItemElement);
+                        itemIndex++;
+                    });
+                    
+                    itemsContainer.addEventListener('click', function(e) {
+                        if (e.target.closest('.repeater-remove-btn')) {
+                            const item = e.target.closest('[class*="col-"]');
+                            if (item && itemsContainer.children.length > 1) {
+                                item.remove();
+                            }
+                        }
+                    });
+                }
+                
+                const repeater = document.querySelector('.repeater-field[data-field-name="<?= $this->name ?>"]');
+                initRepeater(repeater);
+            })();
         </script>
         <?php
-        return $this->renderFieldGroup(ob_get_clean());
+        
+        $fieldHtml = ob_get_clean();
+        return $this->renderFieldGroup($fieldHtml);
+    }
+
+    /**
+     * Определяет класс колонки для карточки репитера
+     */
+    private function getCardColumnClass($columns) {
+        switch ($columns) {
+            case 2:
+                return 'col-md-6'; // 2 колонки
+            case 3:
+                return 'col-md-4'; // 3 колонки
+            case 4:
+                return 'col-md-3'; // 4 колонки
+            case 6:
+                return 'col-md-2'; // 6 колонок
+            default:
+                return 'col-12'; // 1 колонка
+        }
+    }
+
+    /**
+     * Определяет класс колонки для поля внутри карточки
+     */
+    private function getFieldColumnClass($fieldConfig) {
+        if (isset($fieldConfig['field_column'])) {
+            return "col-{$fieldConfig['field_column']}";
+        }
+        return 'col-12';
     }
     
     /**
      * Определяет класс колонки для поля (сетка Bootstrap)
-     * Изображения и текстовые области занимают всю ширину, остальные - половину
+     * Учитывает параметр column из конфигурации поля
      * 
      * @param array $fieldConfig Конфигурация поля
      * @return string CSS класс для колонки
      */
     private function getColumnClass($fieldConfig) {
+        if (isset($fieldConfig['column'])) {
+            return "col-md-{$fieldConfig['column']}";
+        }
+        
         $fieldType = $fieldConfig['type'] ?? 'string';
         if ($fieldType === 'image' || $fieldType === 'blockimage' || $fieldType === 'textarea') {
-            return 'col-md-12';
+            return 'col-12';
         }
         return 'col-md-6';
     }
@@ -219,22 +220,26 @@ class FieldRepeater extends Field {
     private function renderFieldByType($config, $value, $hiddenFieldName, $fileFieldName, $removeFieldName, $index, $fieldType, $isTemplate = false) {
         switch ($fieldType) {
             case 'string':
-                echo '<input type="text" name="' . $hiddenFieldName . '" class="form-control" value="' . htmlspecialchars($value) . '" placeholder="' . ($config['placeholder'] ?? '') . '">';
+                echo '<input type="text" name="' . $hiddenFieldName . '" class="form-control form-control-sm w-100" value="' . htmlspecialchars($value) . '" placeholder="' . ($config['placeholder'] ?? '') . '">';
                 break;
+                
             case 'select':
-                echo '<select name="' . $hiddenFieldName . '" class="form-control">';
+                echo '<select name="' . $hiddenFieldName . '" class="form-select form-select-sm w-100">';
                 foreach ($config['options'] as $optValue => $optLabel) {
                     $selected = $value == $optValue ? ' selected' : '';
                     echo '<option value="' . $optValue . '"' . $selected . '>' . $optLabel . '</option>';
                 }
                 echo '</select>';
                 break;
+                
             case 'textarea':
-                echo '<textarea name="' . $hiddenFieldName . '" class="form-control" rows="3">' . htmlspecialchars($value) . '</textarea>';
+                echo '<textarea name="' . $hiddenFieldName . '" class="form-control form-control-sm w-100" rows="2">' . htmlspecialchars($value) . '</textarea>';
                 break;
+                
             case 'number':
-                echo '<input type="number" name="' . $hiddenFieldName . '" class="form-control" value="' . htmlspecialchars($value) . '" min="' . ($config['min'] ?? '') . '" max="' . ($config['max'] ?? '') . '">';
+                echo '<input type="number" name="' . $hiddenFieldName . '" class="form-control form-control-sm w-100" value="' . htmlspecialchars($value) . '" min="' . ($config['min'] ?? '') . '" max="' . ($config['max'] ?? '') . '" step="' . ($config['step'] ?? '1') . '">';
                 break;
+                
             case 'image':
             case 'blockimage':
                 $this->renderBlockImageField($config, $value, $hiddenFieldName, $fileFieldName, $removeFieldName, $index, $isTemplate);
@@ -258,22 +263,22 @@ class FieldRepeater extends Field {
         $uploadPath = $config['upload_path'] ?? 'uploads/';
         $previewUrl = '';
         
-        // Формирование URL для превью (только не в шаблоне)
         if (!empty($value) && !$isTemplate) {
-            $cleanValue = str_replace(BASE_URL . '/', '', $value);
-            $cleanValue = ltrim($cleanValue, '/');
-            
-            if (strpos($cleanValue, 'uploads/') === 0 || strpos($cleanValue, '/') === 0) {
-                $previewUrl = BASE_URL . '/' . ltrim($cleanValue, '/');
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                $previewUrl = $value;
             } else {
-                $previewUrl = BASE_URL . '/' . ltrim($uploadPath, '/') . ltrim($value, '/');
+                $cleanValue = ltrim($value, '/');
+                if (defined('BASE_URL')) {
+                    $previewUrl = BASE_URL . '/' . $cleanValue;
+                } else {
+                    $previewUrl = '/' . $cleanValue;
+                }
             }
         }
         
         $previewSize = $config['preview_size'] ?? '48px';
         $previewClass = $config['preview_class'] ?? 'img-fluid rounded';
         
-        // Превью текущего изображения
         if ($previewUrl && !$isTemplate) {
             ?>
             <div class="image-preview mb-2">
@@ -300,18 +305,13 @@ class FieldRepeater extends Field {
         }
         ?>
         <div>
-            <!-- Скрытое поле для хранения значения -->
             <input type="hidden" 
                    name="<?= $hiddenFieldName ?>" 
                    value="<?= $isTemplate ? '' : html($value) ?>">
-            <!-- Поле для загрузки файла -->
             <input type="file" 
                    class="form-control form-control-sm" 
                    name="<?= $fileFieldName ?>" 
                    accept="image/*">
-            <div class="form-text text-muted small">
-                <?= $config['hint'] ?? 'Разрешенные форматы: JPG, PNG, GIF, WebP' ?>
-            </div>
         </div>
         <?php
     }
