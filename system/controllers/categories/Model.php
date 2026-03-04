@@ -5,7 +5,20 @@
 * Обеспечивает взаимодействие с таблицей категорий в базе данных
 * Включает CRUD-операции, управление slug-ами, пагинацию и проверку структуры таблицы
 */
-class CategoryModel {
+class CategoryModel implements ModelAPI {
+
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getAll',
+        'getById',
+        'getBySlug',
+        'getAllOrdered',
+        'getPostsCount',
+        'getPostsPaginated',
+        'checkPassword'
+    ];
+
     /**
     * @var Database Объект подключения к базе данных
     */

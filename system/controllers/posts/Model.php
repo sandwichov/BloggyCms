@@ -7,7 +7,25 @@
  * 
  * @package Models
  */
-class PostModel {
+class PostModel implements ModelAPI {
+    use APIAware;
+
+    protected $allowedAPIMethods = [
+        'getAll',
+        'getById',
+        'getBySlug',
+        'getLatest',
+        'getPostTags',
+        'hasUserLiked',
+        'getLikesCount',
+        'hasBookmark',
+        'getBookmarksCount',
+        'checkPostVisibility',
+        'getPostsByCategory',
+        'search',
+        'getRelatedPosts',
+        'getArchive'
+    ];
     
     /** @var object Подключение к базе данных */
     private $db;
