@@ -629,7 +629,7 @@
             block.content = { ...block.content, ...contentData };
             block.settings = { ...block.settings, ...settingsData };
             
-            const uploadFormData = new FormData();
+            const uploadFormData = new FormData(form);
             uploadFormData.append('block_id', blockId);
             uploadFormData.append('block_type', block.type);
             uploadFormData.append('action', 'save_settings');
